@@ -1,0 +1,15 @@
+# OS
+.DS_Store
+
+# local preview
+.netlify/
+node_modules/
+
+# working files that are not part of the deployed site
+scratch/
+output_texts.txt
+parse_react.py
+_v.html
+_vu.html
+_sheet*.html
+_navtest.html
