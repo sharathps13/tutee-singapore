@@ -152,7 +152,8 @@ export function parsePayload(raw) {
   const extras = [];
   for (const key of Object.keys(data).sort()) {
     if (KNOWN_FIELDS.has(key)) continue;
-    const value = clean(data[key], 300);
+    // The university shortlist can name up to 12 institutions, so it gets more room.
+    const value = clean(data[key], key === 'shortlist' ? 1200 : 300);
     if (value && extras.length < MAX_EXTRA_FIELDS) extras.push([clean(key, 60), value]);
   }
 

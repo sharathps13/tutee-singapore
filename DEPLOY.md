@@ -9,7 +9,7 @@
 | `assets/css/sg-*.css`, `assets/js/sg-*.js` | The page styles and scripts. There are no inline scripts, so the strict security policy in `netlify.toml` works unchanged |
 | `assets/fonts/*.woff2` | Self-hosted fonts: Fraunces, Quicksand and JetBrains Mono. No Google Fonts calls are made |
 | `_redirects` | Sends the old `/universities.html` and `/tutee-singapore-landing.html` to the new pages |
-| `netlify/functions/enquiry.mjs` | Unchanged. It receives the form, saves the lead in Supabase, then emails it |
+| `netlify/functions/enquiry.mjs` | Receives the form, saves the lead in Supabase, then emails it. Updated in this version so the university shortlist (up to 12 names) is not cut short |
 | `supabase/leads.sql` | One-time SQL that creates the `leads` table the function writes to |
 
 `netlify.toml` is unchanged. There is no build step: Netlify publishes the folder as it is.
@@ -34,10 +34,11 @@
 
 1. Go to **Supabase, then SQL Editor, then New query**, paste the contents of `supabase/leads.sql`, and click **Run**.
    - It is safe to run again. It only creates what is missing.
-2. This creates:
+2. If you ran it before, run it again once: it adds a `shortlist` column to the `leads_singapore` view.
+3. This creates:
    - **`public.leads`**: every form submission, from every country page.
    - **`public.leads_singapore`**: a view of the Singapore leads, with the form's extra answers as their own columns (study level, call slot, country, note).
-3. Row Level Security is on with no public policies. The public anon key used by the website cannot read leads. Only the Netlify function, which uses the service role key, can write them, and you see them in the Supabase dashboard.
+4. Row Level Security is on with no public policies. The public anon key used by the website cannot read leads. Only the Netlify function, which uses the service role key, can write them, and you see them in the Supabase dashboard.
 
 ## 3. Check it works
 
@@ -57,7 +58,8 @@ destination  Singapore
 source       Tutee Connect Singapore
 page         <your-domain>/
 extras       {"study_level":"Bachelor's degree","call_slot":"Evening, 4–8pm",
-              "origin_city":"India","description":"Interested in NUS computing"}
+              "origin_city":"India","description":"Interested in NUS computing",
+              "shortlist":"1. NUS (National University of Singapore); 2. SMU (Singapore Management University)"}
 status       new
 ```
 
@@ -66,4 +68,5 @@ status       new
 - If Supabase saves the lead but the email fails, the student still sees "reserved". The lead is safe, and the failure shows in the Netlify function log.
 - If both fail, the student sees an error asking them to try again or WhatsApp +91 73583 64959.
 - A hidden honeypot field drops bot submissions.
+- Visitors can heart institutions on either page. The list (in their order of preference) travels with the form as `shortlist` and shows in the email and in Supabase.
 - The server re-checks every field, whatever the browser sent.

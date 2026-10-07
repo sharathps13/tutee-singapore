@@ -1,2 +1,2 @@
 /* Runs in <head> before first paint: the page theme is set only by the toggle (saved in localStorage), never by the OS. */
-(function(){var m="light";try{var s=localStorage.getItem("tc-mode");if(s==="dark"||s==="light")m=s;}catch(e){}document.documentElement.setAttribute("data-mode",m);})();
+(function(){var m="light";try{var s=localStorage.getItem("tc-mode");if(s==="dark"||s==="light")m=s;}catch(e){}document.documentElement.setAttribute("data-mode",m);try{if(!location.hash&&!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches))document.documentElement.classList.add("hw-intro-on");}catch(e){}})();

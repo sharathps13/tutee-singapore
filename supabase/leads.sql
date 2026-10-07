@@ -61,7 +61,8 @@ select
   extras ->> 'origin_city'  as from_country,
   extras ->> 'description'  as note,
   status,
-  page
+  page,
+  extras ->> 'shortlist'    as shortlist   -- universities the student picked, in their order (added last so the view can be replaced in place)
 from public.leads
 where country = 'Singapore'
 order by created_at desc;
