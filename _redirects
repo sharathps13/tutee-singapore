@@ -1,0 +1,5 @@
+# Old URLs from the previous build point at the new pages.
+/universities.html        /institutions.html   301!
+/universities             /institutions.html   301!
+/tutee-singapore-landing.html  /                301!
+/institutions             /institutions.html   200

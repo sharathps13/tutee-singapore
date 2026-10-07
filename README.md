@@ -1,5 +1,17 @@
 # Tutee Connect — Study in Singapore
 
+> **Current site (October 2026):** `index.html` and `institutions.html` are the
+> redesigned Singapore pages. Their styles and scripts are in `assets/css/sg-*.css`
+> and `assets/js/sg-*.js`, and their fonts in `assets/fonts/`. `_redirects` sends the
+> old `universities.html` and `tutee-singapore-landing.html` URLs to the new pages.
+> **To deploy on Netlify and connect the form to Supabase, see [DEPLOY.md](DEPLOY.md).**
+>
+> These two pages are no longer produced by `_tooling/`. Running the old
+> `assemble.py singapore` / `build_unipage.py singapore` would overwrite them,
+> so don't run those for Singapore. The notes below describe the previous build
+> and the institution dataset, which is still the source of the 126 institutions.
+
+
 The Singapore destination page. Country #8, built 2026-09-02 from the UK
 fragments by the shared toolchain in `../_tooling/`.
 
