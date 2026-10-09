@@ -13,3 +13,11 @@ _v.html
 _vu.html
 _sheet*.html
 _navtest.html
+
+# Blender's automatic backup of the hero scene
+*.blend1
+
+# raw 4K source footage for the hero videos (hundreds of MB; over GitHub's 100 MB limit). The site uses the
+# encoded copies in assets/img/hero/. Keep these masters on disk or in cloud storage, not in Git.
+_source/hero/src/*.mov
+_source/hero/src/*.mp4

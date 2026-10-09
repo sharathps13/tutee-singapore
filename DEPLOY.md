@@ -7,6 +7,7 @@
 | `index.html` | The Study in Singapore landing page (served at `/`) |
 | `institutions.html` | The universities and institutions page |
 | `assets/css/sg-*.css`, `assets/js/sg-*.js` | The page styles and scripts. There are no inline scripts, so the strict security policy in `netlify.toml` works unchanged |
+| `assets/img/hero/hero-<day|night>-*.mp4`, `.webp` | The hero's looped videos, Jewel's Rain Vortex (light mode) and the Supertree Grove at night (dark mode), at 1920 and 1280 px, with their first-frame stills; made by `_source/hero/make_hero_video.py` (credited in the footer) |
 | `assets/fonts/*.woff2` | Self-hosted fonts: Fraunces, Quicksand and JetBrains Mono. No Google Fonts calls are made |
 | `_redirects` | Sends the old `/universities.html` and `/tutee-singapore-landing.html` to the new pages |
 | `netlify/functions/enquiry.mjs` | Receives the form, saves the lead in Supabase, then emails it. Updated in this version so the university shortlist (up to 12 names) is not cut short |

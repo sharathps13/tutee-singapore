@@ -1,0 +1,99 @@
+/* Quiet background motion for the sections that otherwise sit on a plain colour, each a hint of what the section
+   is about (assets/js/sg-bgfx.js adds the markup when a section first comes near, and loads this file then).
+   Transform and opacity only, very low contrast, running only while the section is on screen. */
+.fx-host{position:relative;isolation:isolate}
+.bgfx{--fx:15,62,72;position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none;contain:strict}
+html[data-mode="dark"] .bgfx{--fx:190,226,226}
+.bgfx *,.bgfx *::before,.bgfx *::after{animation-play-state:paused!important}
+.fx-run .bgfx *,.fx-run .bgfx *::before,.fx-run .bgfx *::after{animation-play-state:running!important}
+.lite .bgfx{display:none}
+.bgfx{opacity:0;transition:opacity 1.2s ease-out}
+.fx-in .bgfx{opacity:1}
+
+/* Services: a soft light sits behind the stage you're looking at (before you apply, getting in, after you land) and
+   takes its colour (teal, gold, red), moving down the list as you go; a fine dot grid and a warm glow behind the panel */
+#services .bgfx{background:linear-gradient(180deg,var(--bg) 0%,#EEF4F5 45%,#F4EFEA 100%)}
+html[data-mode="dark"] #services .bgfx{background:none}
+.fx-sv-grid{position:absolute;inset:0;background:radial-gradient(rgba(var(--fx),.16) 1.1px,transparent 1.6px) 0 0/26px 26px;
+  -webkit-mask:radial-gradient(90% 75% at 30% 55%,#000 10%,transparent 75%);mask:radial-gradient(90% 75% at 30% 55%,#000 10%,transparent 75%)}
+.fx-sv-glow{position:absolute;left:-12%;top:12%;width:70%;height:62%;transition:transform 1.4s cubic-bezier(.16,1,.3,1)}
+[data-phase="1"] .fx-sv-glow{transform:translateY(18%)}
+[data-phase="2"] .fx-sv-glow{transform:translateY(36%)}
+.fx-sv-glow i{position:absolute;left:0;top:0;width:100%;height:100%;opacity:0;transition:opacity 1.2s ease;animation:fxBreathe 11s ease-in-out infinite alternate}
+.fx-sv-glow .g1{background:radial-gradient(closest-side,rgba(23,96,107,.22),rgba(23,96,107,.08) 55%,transparent)}
+.fx-sv-glow .g2{background:radial-gradient(closest-side,rgba(242,181,68,.30),rgba(242,181,68,.10) 55%,transparent)}
+.fx-sv-glow .g3{background:radial-gradient(closest-side,rgba(217,43,58,.18),rgba(217,43,58,.06) 55%,transparent)}
+.bgfx:not([data-phase]) .g1,[data-phase="0"] .g1,[data-phase="1"] .g2,[data-phase="2"] .g3{opacity:1}
+.fx-sv-warm{position:absolute;right:-10%;top:20%;width:65%;height:80%;background:radial-gradient(closest-side,rgba(217,43,58,.10),rgba(242,181,68,.06) 50%,transparent);animation:fxDrift 18s ease-in-out infinite alternate}
+html[data-mode="dark"] .fx-sv-glow .g1{background:radial-gradient(closest-side,rgba(60,170,185,.20),transparent)}
+html[data-mode="dark"] .fx-sv-glow .g2{background:radial-gradient(closest-side,rgba(242,181,68,.16),transparent)}
+html[data-mode="dark"] .fx-sv-glow .g3{background:radial-gradient(closest-side,rgba(217,43,58,.18),transparent)}
+@keyframes fxBreathe{from{transform:scale(.92)}to{transform:scale(1.08) translateX(3%)}}
+@keyframes fxDrift{from{transform:translate(0,0)}to{transform:translate(-6%,-8%)}}
+
+/* Universities: a campus map with places pinging, one after another */
+.fx-map{position:absolute;inset:0;background:
+  linear-gradient(90deg,rgba(var(--fx),.05) 1px,transparent 1px) 0 0/72px 72px,
+  linear-gradient(0deg,rgba(var(--fx),.05) 1px,transparent 1px) 0 0/72px 72px;
+  -webkit-mask:radial-gradient(70% 70% at 50% 50%,#000 30%,transparent 80%);mask:radial-gradient(70% 70% at 50% 50%,#000 30%,transparent 80%)}
+.fx-ping{position:absolute;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:rgba(200,64,43,.35)}
+.fx-ping::after{content:"";position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(200,64,43,.45);animation:fxPing 6s ease-out infinite;animation-delay:inherit}
+.fx-ping{animation-delay:calc(var(--i) * -1.2s)}
+@keyframes fxPing{0%{transform:scale(1);opacity:.9}55%,100%{transform:scale(7);opacity:0}}
+
+/* Funding: a budget building up, bar by bar */
+.fx-bars{position:absolute;right:4%;bottom:0;display:flex;align-items:flex-end;gap:14px;height:46%;opacity:.9}
+.fx-bars i{display:block;width:18px;height:var(--h);border-radius:5px 5px 0 0;background:linear-gradient(rgba(var(--fx),.09),rgba(var(--fx),.02));
+  transform-origin:bottom;animation:fxBar 9s ease-in-out infinite alternate;animation-delay:calc(var(--i) * -.8s)}
+@keyframes fxBar{0%{transform:scaleY(.55)}100%{transform:scaleY(1)}}
+.fx-coin{position:absolute;width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(var(--fx),.14);animation:fxCoin 12s ease-in infinite;animation-delay:calc(var(--i) * -4s)}
+.fx-coin::after{content:"$";position:absolute;inset:0;display:grid;place-items:center;font:700 13px/1 var(--body,sans-serif);color:rgba(var(--fx),.2)}
+@keyframes fxCoin{0%{transform:translateY(-40px);opacity:0}15%{opacity:1}80%{opacity:1}100%{transform:translateY(240px);opacity:0}}
+
+/* Student stories: words of thanks rising */
+.fx-quote{position:absolute;font:400 200px/1 var(--display,Georgia),Georgia,serif;color:rgba(var(--fx),.06);animation:fxQuote 16s ease-in-out infinite;animation-delay:calc(var(--i) * -3.2s)}
+@keyframes fxQuote{0%{transform:translateY(50px);opacity:0}25%,70%{opacity:1}100%{transform:translateY(-60px);opacity:0}}
+
+/* FAQ: questions turning into answers */
+.fx-qa{position:absolute;width:60px;height:60px;animation:fxFloat 10s ease-in-out infinite alternate;animation-delay:calc(var(--i) * -2.1s)}
+.fx-qa b,.fx-qa s{position:absolute;inset:0;display:grid;place-items:center;font:700 54px/1 var(--display,Georgia),Georgia,serif;text-decoration:none;color:rgba(var(--fx),.08)}
+.fx-qa b{animation:fxAsk 12s ease-in-out infinite;animation-delay:calc(var(--i) * -2.4s)}
+.fx-qa s{color:rgba(31,140,90,.16);animation:fxAnswer 12s ease-in-out infinite;animation-delay:calc(var(--i) * -2.4s)}
+@keyframes fxFloat{from{transform:translateY(-10px)}to{transform:translateY(10px)}}
+@keyframes fxAsk{0%,40%{opacity:1;transform:scale(1)}50%,90%{opacity:0;transform:scale(.7)}100%{opacity:1;transform:scale(1)}}
+@keyframes fxAnswer{0%,40%{opacity:0;transform:scale(.7)}50%,90%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.7)}}
+
+/* Institutions list: a search, a lens drifting slowly over the list */
+.fx-lens{position:absolute;left:0;top:0;width:90px;height:90px;border-radius:50%;border:2px solid rgba(var(--fx),.09);
+  animation:fxLens 34s ease-in-out infinite;animation-delay:calc(var(--i) * -11s)}
+.fx-lens::after{content:"";position:absolute;right:-26px;bottom:-14px;width:34px;height:3px;border-radius:2px;background:rgba(var(--fx),.09);transform:rotate(40deg)}
+@keyframes fxLens{0%{transform:translate(4vw,30%)}25%{transform:translate(60vw,10%)}50%{transform:translate(78vw,60%)}75%{transform:translate(28vw,80%)}100%{transform:translate(4vw,30%)}}
+
+/* Family, the consultation and the footer: soft lights drifting (a large blurred-looking radial, moved only) */
+.fx-glow{position:absolute;width:60%;height:75%;border-radius:50%;--g:23,96,107;
+  background:radial-gradient(closest-side,rgba(var(--g),.13),rgba(var(--g),.05) 55%,transparent);animation:fxGlow 24s ease-in-out infinite alternate}
+.fx-glow.a{left:-14%;top:-6%}
+.fx-glow.b{right:-16%;bottom:-14%;--g:217,43,58;animation-duration:29s;animation-direction:alternate-reverse}
+html[data-mode="dark"] .fx-glow{--g:60,170,185}
+html[data-mode="dark"] .fx-glow.b{--g:217,43,58}
+@keyframes fxGlow{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(9%,7%,0) scale(1.14)}}
+
+/* the consultation: a dashed route across the section and a paper plane gliding along its line now and then */
+.fx-route{position:absolute;inset:6% 0 10%;width:100%;height:84%;stroke:rgba(var(--fx),.16);stroke-width:2.2;vector-effect:non-scaling-stroke}
+.fx-route path{vector-effect:non-scaling-stroke}
+.fx-jet{position:absolute;left:0;top:0;color:rgba(200,64,43,.32);animation:fxJet 19s cubic-bezier(.45,.05,.55,.95) infinite;will-change:transform,opacity}
+.fx-jet svg{display:block;transform:rotate(-28deg)}
+@keyframes fxJet{0%{transform:translate3d(-4vw,78vh,0);opacity:0}8%{opacity:1}60%{opacity:1}72%{transform:translate3d(96vw,6vh,0);opacity:0}100%{transform:translate3d(96vw,6vh,0);opacity:0}}
+
+/* the footer: a faint dot map */
+.fx-dots{position:absolute;inset:0;background:radial-gradient(rgba(var(--fx),.14) 1px,transparent 1.5px) 0 0/22px 22px;
+  -webkit-mask:radial-gradient(80% 90% at 70% 40%,#000 10%,transparent 75%);mask:radial-gradient(80% 90% at 70% 40%,#000 10%,transparent 75%)}
+
+/* phones: fewer, smaller pieces, kept to the edges */
+@media (max-width:760px){
+  .fx-bars{gap:9px;height:30%}.fx-bars i{width:11px}.fx-bars i:nth-child(n+6){display:none}
+  .fx-quote{font-size:130px}.fx-quote:nth-child(n+4){display:none}
+  .fx-qa:nth-child(n+4){display:none}
+  .fx-ping:nth-child(n+5){display:none}
+}
+@media (prefers-reduced-motion:reduce){.bgfx{display:none}}

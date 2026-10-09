@@ -1,0 +1,320 @@
+/* Phones and small tablets: no sideways swiping. Every row of cards that scrolled sideways on a phone is laid out
+   to read top to bottom instead (or as a small grid), and the enquiry pass is made compact enough to sit on one
+   screen. Loaded after the other stylesheets; desktop layouts are untouched (everything here is inside a media
+   query). sg-mobile.js adds the "More stories" button and hides the bottom bar while the pass is on screen. */
+
+/* ---- How it works: the seven stops wrap onto rows instead of scrolling ---- */
+@media (max-width:900px){
+  .jr-stops{display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr));overflow:visible!important;scroll-snap-type:none!important;gap:6px 4px!important;padding:6px var(--gutter) 4px!important}
+  .jr-stops li{width:auto!important;min-width:0}
+}
+@media (max-width:640px){
+  .jr-stops{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .jr-stop{gap:6px!important;padding:0 0 4px!important}
+  .jr-dot{transform:scale(.82);transform-origin:50% 50%;margin:-4px 0}
+  .jr-lbl{font-size:12.5px!important;line-height:1.2;text-align:center}
+}
+
+@media (max-width:640px){
+  /* ---- every card rail becomes a column (or a 2 x 2 grid) ---- */
+  .rail-m.rail-m{display:grid!important;grid-auto-flow:row!important;grid-auto-columns:auto!important;grid-template-columns:minmax(0,1fr)!important;
+    overflow:visible!important;scroll-snap-type:none!important;margin-inline:0!important;padding:0!important;gap:12px!important}
+  .rail-m > *{scroll-snap-align:none}
+
+  /* Why Singapore: compact rows, the icon beside the words */
+  .why-grid.rail-m{gap:10px!important}
+  .why-card{display:grid!important;grid-template-columns:44px minmax(0,1fr);column-gap:14px;align-items:start;padding:16px!important}
+  .why-card .ic{grid-row:1/3;width:44px!important;height:44px!important;margin:0!important;border-radius:12px!important}
+  .why-card h3{font-size:18px!important;margin:2px 0 4px!important}
+  .why-card p{font-size:14.5px!important;line-height:1.5!important;margin:0!important}
+
+  /* Universities: the four cards stack, a little tighter; the four kinds of institution sit in a 2 x 2 grid */
+  .top4.rail-m{gap:12px!important}
+  .uni-card{padding:16px 18px!important;gap:10px!important}
+  .uni-card .head{align-items:center!important}
+  .uni-card .crest{width:46px!important;height:46px!important;font-size:15px!important;border-radius:13px!important}
+  .uni-card .qsrank{display:flex!important;align-items:baseline;gap:8px;text-align:left!important;margin-right:auto;margin-left:12px}
+  .uni-card .qsrank b{font-size:28px!important;line-height:1!important}
+  .uni-card h3{font-size:19px!important;margin:0!important}
+  .uni-card dl{margin:0!important}
+  .uni-card dl > div{padding:7px 0!important;min-height:0!important}
+  .types.rail-m{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+  .types .type{padding:16px!important;min-width:0}
+  .types .type p{font-size:13.5px!important;line-height:1.45!important}
+  .types .type .count b{font-size:30px!important}
+  .types .type .link-cta{font-size:14px}
+
+  /* Funding: the four ways to pay stack */
+  .fund-grid.rail-m{gap:12px!important}
+  .fund{padding:20px!important}
+
+  /* What we do: the nine services as a 3 x 3 grid of tiles, not a sideways strip */
+  .svc-list{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;flex-direction:initial!important;flex-wrap:initial!important;
+    overflow:visible!important;gap:8px!important;margin-inline:0!important;padding:0!important}
+  .svc-tab{flex:initial!important;width:auto!important;min-width:0;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;
+    text-align:center;gap:6px!important;padding:10px 6px!important;border-radius:16px!important;min-height:92px}
+  .svc-tab .n{width:34px!important;height:34px!important;flex:none}
+  .svc-tab b{display:block;font-size:12.5px!important;line-height:1.25!important;white-space:normal!important;overflow-wrap:anywhere}
+  .svc-tab small,.svc-tab .chev{display:none!important}
+
+  /* Student stories: read down the page; three first, the rest behind a button (sg-mobile.js) */
+  #vRail{display:grid!important;grid-auto-flow:row!important;grid-auto-columns:auto!important;grid-template-columns:minmax(0,1fr)!important;
+    overflow:visible!important;scroll-snap-type:none!important;gap:12px!important;padding:0!important}
+  #vRail > *{scroll-snap-align:none}
+  #vRail:not(.all) > :nth-child(n+3){display:none}
+  #stories .rail-ctrl,#vDots{display:none!important}
+  .v-card{padding:20px!important}
+  .v-more{display:flex;justify-content:center;margin-top:16px}
+  .v-more button{min-height:48px;padding:0 22px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:700 15px/1 var(--body);cursor:pointer}
+
+  /* ---- the enquiry pass: compact enough to see whole on one screen ---- */
+  .pass-head{padding:12px 16px!important;gap:10px!important}
+  .ph-brand{gap:10px!important}
+  .ph-brand img{width:34px!important;height:34px!important;padding:3px!important}
+  .ph-brand b{font-size:17px!important}
+  .ph-brand small{font-size:12px!important}
+  .pass-code{font-size:13px!important}
+  .pass-code small{font-size:10.5px!important}
+  .pass-route{padding:12px 16px 10px!important;gap:6px!important}
+  .pr-end small{font-size:11.5px!important}
+  .pr-end b,.pass-route b{font-size:32px!important;margin:0 0 2px!important}
+  .pr-end > span,.city-pick{font-size:14px!important}
+  .pr-arc{height:40px!important}
+  .pass-meta{margin:0 16px!important;grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .pass-meta div{padding:7px 10px!important;grid-column:auto!important;border-top:0!important}
+  .pass-meta div + div{border-left:1px solid #DCE6E9!important}
+  .pass-meta dt{font-size:10.5px!important}
+  .pass-meta dd{font-size:13px!important}
+  .pass-tear{margin:12px 16px 0!important}
+  .pass-body{padding:12px 16px 14px!important}
+  .pass-body form{gap:9px 10px!important}
+  .pf{gap:4px!important}
+  .pf label,.note summary{font-size:12.5px!important}
+  .pf input,.pf select{padding:10px 12px!important;border-radius:11px!important;font-size:16px!important}
+  .pf select{padding-right:32px!important}
+  .pass-btn{padding:13px 18px!important;font-size:16.5px!important;margin-top:2px!important}
+  .pr-arc{height:32px!important}
+  .pf input,.pf select{padding:9px 12px!important}
+  .pass-tear.small{margin-top:0!important}
+  .pass-foot{padding:8px 16px 10px!important;gap:12px!important}
+  .pass-foot canvas{width:110px!important;height:28px!important}
+  .pass-foot p{font-size:12px!important;line-height:1.35!important}
+  /* while the pass is on screen the bottom bar (WhatsApp / Free consultation) steps aside: the pass is the call to action */
+  html.pass-in .m-bar{transform:translateY(110%)!important}
+}
+/* shorter phones: the barcode stub, then the summary row (which repeats what the form shows) step aside, so the
+   form itself always fits on one screen */
+@media (max-width:640px) and (max-height:800px){
+  .pass-foot,.pass-tear.small{display:none!important}
+  .pr-end b,.pass-route b{font-size:28px!important}
+  .pass-route{padding-top:8px!important;padding-bottom:6px!important}
+}
+@media (max-width:640px) and (max-height:740px){
+  .pass-meta{display:none!important}
+  .pass-head{padding:9px 14px!important}
+  .ph-brand small,.pass-code small{display:none!important}
+  .pr-end small{display:none!important}
+  .pr-end b,.pass-route b{font-size:24px!important}
+  .pr-arc{height:24px!important}
+  .pass-tear{margin-top:8px!important}
+  .pass-body{padding-top:10px!important}
+  .pass-body form{gap:7px 10px!important}
+  .pf label,.note summary{font-size:12px!important}
+}
+@media (max-width:640px) and (max-height:660px){
+  .pf input,.pf select{padding:7px 12px!important}
+  .pass-btn{padding:11px 18px!important}
+  .pass-body{padding-bottom:10px!important}
+}
+
+/* ---- compact sections on phones: the same content in about half the height ---- */
+@media (max-width:640px){
+  /* Why Singapore: a 2 x 2 grid of small tiles */
+  .why-grid.rail-m{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+  .why-card{display:flex!important;flex-direction:column;gap:6px;padding:14px!important;border-radius:18px!important}
+  .why-card .ic{width:36px!important;height:36px!important;border-radius:10px!important;margin:0 0 4px!important}
+  .why-card .ic svg{width:18px;height:18px}
+  .why-card h3{font-size:15.5px!important;line-height:1.25!important;margin:0!important}
+  .why-card p{font-size:13px!important;line-height:1.45!important;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+
+  /* Universities: the top four as a 2 x 2 grid of compact cards; the kinds of institution without their chips */
+  .top4.rail-m{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+  .uni-card{padding:12px!important;gap:8px!important;border-radius:18px!important}
+  .uni-card .head{position:relative}
+  .uni-card .crest{width:38px!important;height:38px!important;font-size:12px!important;border-radius:11px!important}
+  .uni-card .qsrank{margin-left:8px!important;gap:0!important;flex-direction:column;align-items:flex-start!important}
+  .uni-card .qsrank small{display:none!important}
+  .uni-card .qsrank b{font-size:20px!important}
+  .uni-card .uc-heart{width:32px!important;height:32px!important}
+  .uni-card h3{font-size:14.5px!important;line-height:1.25!important}
+  .uni-card .loc{font-size:12px!important}
+  .uni-card .glob{font-size:11px!important;padding:5px 8px!important;gap:5px!important;align-self:flex-start;max-width:100%;white-space:normal!important;line-height:1.3}
+  .uni-card .glob svg{width:12px;height:12px}
+  .uni-card dl > div:nth-child(2){display:none!important}
+  .uni-card dl > div{display:block!important;padding:6px 0 0!important}
+  .uni-card dl dt{font-size:11px!important}
+  .uni-card dl dd{font-size:12.5px!important;text-align:left!important;margin:0!important}
+  .types .type .chips{display:none!important}
+  .types .type p{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .types .type .count b{font-size:26px!important}
+
+  /* Making it affordable: each way to pay is a row that opens (sg-mobile.js); the grant is open first */
+  .fund-grid.rail-m{gap:8px!important}
+  .fund{padding:12px 14px!important;border-radius:16px!important;cursor:pointer;display:grid!important;grid-template-columns:38px minmax(0,1fr) 20px;align-items:center;column-gap:12px;row-gap:8px}
+  .fund .fund-ic{width:38px!important;height:38px!important;margin:0!important;border-radius:11px!important}
+  .fund .fund-ic svg{width:18px;height:18px}
+  .fund h3{font-size:16px!important;margin:0!important;line-height:1.25}
+  .fund::after,.fund::before{display:none!important}
+  .fund-chev{display:block;width:9px;height:9px;justify-self:center;border:solid currentColor;border-width:0 2px 2px 0;transform:translateY(-2px) rotate(45deg);opacity:.6;transition:transform .25s}
+  .fund.open .fund-chev{transform:translateY(2px) rotate(-135deg)}
+  .fund > p,.fund > ul,.fund > .pills{grid-column:1/-1;display:none!important;margin:0!important}
+  .fund.open > p,.fund.open > ul{display:block!important}
+  .fund.open > .pills{display:flex!important}
+  .fund > p{font-size:14px!important;line-height:1.5!important}
+  .fund li{font-size:13.5px!important}
+  .fee-cta{padding:18px!important;border-radius:20px!important;gap:12px!important}
+  .fee-cta h3{font-size:19px!important}
+  .fee-cta p,.fee-cta li{font-size:14px!important}
+
+  /* What we do: smaller tiles, a shorter photo */
+  .svc-list{gap:6px!important}
+  .svc-tab{min-height:64px!important;padding:8px 4px!important;gap:4px!important;border-radius:14px!important}
+  .svc-tab .n{width:28px!important;height:28px!important}
+  .svc-tab .n svg{width:16px;height:16px}
+  .svc-tab b{font-size:11.5px!important}
+  .svc-panel{min-height:0!important;padding:14px!important;gap:12px!important;border-radius:22px!important}
+  .sp-bg{height:150px!important}
+  .svc-panel .sp-top{margin-bottom:70px!important}
+  .svc-panel::before{background:linear-gradient(180deg,rgba(8,28,36,.3) 0,rgba(8,28,36,0) 50px,rgba(8,28,36,0) 80px,#0A2730 150px,#0A2730 100%)!important}
+  .svc-panel .phase-tag{font-size:12px!important;padding:4px 10px 4px 4px!important}
+  .sp-content{gap:12px!important}
+  .sp-main{gap:8px!important;margin-top:0!important}
+  .svc-panel .sp-content{flex:0 0 auto!important}
+  .svc-panel .big-ic{width:42px!important;height:42px!important;border-radius:13px!important}
+  .svc-panel .big-ic svg{width:20px!important;height:20px!important}
+  .svc-panel h3{font-size:22px!important}
+  .sp-main p{font-size:14.5px!important;line-height:1.5!important}
+  .sp-card{padding:12px 14px!important;border-radius:16px!important}
+  .sp-card ul{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px 10px!important}
+  .sp-card li{font-size:13px!important;gap:7px!important}
+  .sp-card .ck{width:20px!important;height:20px!important}
+  .sp-foot .btn{padding:12px 18px!important;font-size:15px!important}
+
+  /* Relocating with family: a shorter photo, compact rows */
+  .fam-photo{aspect-ratio:16/11;height:auto!important;min-height:0!important;max-height:260px}
+  .fam-photo .float{padding:8px 12px!important;font-size:13px!important;gap:8px!important;top:12px!important;left:12px!important;right:auto!important;max-width:75%}
+  .fam-photo .float i{width:28px!important;height:28px!important}
+  .fam-photo .cap{padding:14px 16px!important}
+  .fam-photo .cap b,.fam-photo .cap h3{font-size:20px!important}
+  .fam-photo .cap span{font-size:13px!important;line-height:1.4!important}
+  .fam-cards{gap:8px!important}
+  .fam-card{display:grid!important;grid-template-columns:36px minmax(0,1fr);column-gap:12px;row-gap:6px;padding:12px 14px!important;border-radius:16px!important;align-items:start}
+  .fam-card .n{width:36px!important;height:36px!important;border-radius:10px!important;grid-row:1/3}
+  .fam-card b{font-size:15px!important}
+  .fam-card div > span{font-size:13px!important;line-height:1.45!important}
+  .fam-card .amt{grid-column:2;justify-self:start;margin:0!important}
+  .fam-card .amt strong{font-size:12px!important;padding:4px 10px!important}
+
+  /* Student stories: two first, tighter cards */
+  .v-card{padding:16px!important;gap:12px!important}
+  .v-card .stars{font-size:14px!important}
+  .v-card blockquote{font-size:15px!important;line-height:1.55!important}
+  .v-card .av{width:38px!important;height:38px!important;font-size:15px!important}
+  .v-card .who b{font-size:14.5px!important}
+}
+.fund-chev{display:none}
+@media (max-width:640px){.fund-chev{display:block}}
+
+/* ================= phone redesign, round 2 (desktop untouched: everything is inside these media queries) ================= */
+.uni-seg{display:none}
+@media (max-width:640px){
+  .vh-m{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important}
+
+  /* ---- How it works: the seven stops as one row of numbered dots; a compact card for the stop in hand (swipe it) ---- */
+  .jr-head{position:relative}
+  .jr-stamp{position:absolute!important;right:0!important;top:-6px!important;width:70px!important;height:70px!important}
+  .jr-stamp-in{width:44px!important;height:44px!important}
+  .jr-stamp-tip{right:0!important;left:auto!important;width:min(230px,80vw)!important}
+  .jr-stamp-in b{font-size:20px!important}.jr-stamp-in small{font-size:8px!important}
+  .jr-head h2{padding-right:76px!important}
+  .jr-map{margin-top:16px!important}
+  .jr-stops{grid-template-columns:repeat(7,minmax(0,1fr))!important;gap:0!important;padding:0 var(--gutter)!important;position:relative}
+  .jr-stops::before{content:"";position:absolute;left:calc(var(--gutter) + 7%);right:calc(var(--gutter) + 7%);top:21px;height:2px;background:repeating-linear-gradient(90deg,#D5E1E5 0 6px,transparent 6px 11px)}
+  .jr-stop{gap:0!important;padding:0 0 4px!important;position:relative}
+  .jr-dot{transform:scale(.62)!important;margin:-8px 0!important}
+  .jr-lbl{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip-path:inset(50%)!important}
+  .jr-bar{display:none!important}
+  .jr-stage{margin-top:12px!important}
+  .jr-panel{padding:16px!important;gap:12px!important;border-radius:20px!important;touch-action:pan-y}
+  .jr-main{gap:6px!important}
+  .jr-num{font-size:13px!important}.jr-num b{font-size:28px!important}
+  .jr-kick{font-size:11.5px!important;margin:0!important}
+  .jr-panel h3{font-size:21px!important;margin:0!important}
+  .jr-panel p{font-size:14px!important;line-height:1.5!important;margin:0!important}
+  .jr-panel ul{gap:4px!important;margin:4px 0 0!important}
+  .jr-panel li{font-size:13.5px!important}
+  .jr-get{padding:12px 14px!important;gap:4px!important;border-radius:14px!important}
+  .jr-get b{font-size:15px!important}
+  .jr-ctrl{margin-top:10px!important;gap:8px!important}
+  .jr-swipe{display:block;text-align:center;font-size:12px;color:var(--soft);margin-top:8px}
+
+  /* ---- What we do: the nine services as one row of icons; the panel shows the one in hand (swipe it) ---- */
+  .svc-list{grid-template-columns:repeat(9,minmax(0,1fr))!important;gap:2px!important;margin-inline:0!important;justify-items:center}
+  .svc-tab{min-height:0!important;aspect-ratio:1;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;border-radius:50%!important;display:grid!important;place-items:center}
+  .svc-tab .n{width:36px!important;height:36px!important;border-radius:50%!important;border:1px solid var(--line);display:grid!important;place-items:center}
+  .svc-tab .n svg{width:20px!important;height:20px!important}
+  .svc-tab b{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip-path:inset(50%)!important}
+  .svc-panel{touch-action:pan-y}
+  .sp-bg{height:120px!important}
+  .svc-panel .sp-top{margin-bottom:46px!important}
+  .svc-panel::before{background:linear-gradient(180deg,rgba(8,28,36,.3) 0,rgba(8,28,36,0) 40px,rgba(8,28,36,0) 60px,#0A2730 120px,#0A2730 100%)!important}
+  html:not([data-mode="dark"]) .svc-panel::before{background:linear-gradient(180deg,rgba(8,28,36,.3) 0,rgba(8,28,36,0) 40px,rgba(255,255,255,0) 60px,#fff 120px,#fff 100%)!important}
+  .sp-foot .sp-nav button{width:40px!important;height:40px!important}
+
+  /* ---- Universities: one list at a time (top four, or the kinds of institution), as compact rows ---- */
+  .uni-seg{display:flex;gap:4px;padding:4px;margin:4px 0 12px;border-radius:999px;background:var(--card);border:1px solid var(--line)}
+  .uni-seg button{flex:1;min-height:40px;border:0;border-radius:999px;background:transparent;color:var(--muted);font:700 14px/1 var(--body);cursor:pointer}
+  .uni-seg button[aria-selected="true"]{background:#0F3E48;color:#fff}
+  #universities:not(.seg-types) .types{display:none!important}
+  #universities.seg-types .top4{display:none!important}
+  .top4.rail-m{grid-template-columns:minmax(0,1fr)!important;gap:8px!important}
+  .uni-card{display:grid!important;grid-template-columns:40px minmax(0,1fr) auto 36px;align-items:center;column-gap:10px;padding:10px 12px!important;border-radius:16px!important}
+  .uni-card .head{display:contents!important}
+  .uni-card .crest{order:1;width:40px!important;height:40px!important}
+  .uni-card > div:not(.head){order:2;min-width:0}
+  .uni-card .qsrank{order:3;margin:0!important;align-items:flex-end!important}
+  .uni-card .uc-heart{order:4;position:static!important}
+  .uni-card h3{font-size:15px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .uni-card .glob,.uni-card dl{display:none!important}
+  .types.rail-m{grid-template-columns:minmax(0,1fr)!important;gap:8px!important}
+  .types .type{display:flex!important;align-items:center;gap:12px;padding:10px 14px!important;border-radius:16px!important}
+  .types .type .count{display:flex!important;align-items:center;gap:12px;margin:0!important}
+  .types .type .count b{font-size:24px!important;min-width:44px}
+  .types .type .count span{font-size:14px!important;font-weight:700}
+  .types .type p{display:none!important}
+  .types .type .link-cta{margin-left:auto;font-size:13px!important;white-space:nowrap}
+  .uni-more{margin-top:12px!important}
+
+  /* ---- Relocating with family: the words first, a wide photo, then the passes as a timeline ---- */
+  #family .fam-grid{gap:0!important}
+  #family .fam-grid > div:last-child{display:contents}
+  #family .kicker{order:1}#family h2{order:2}#family .lede{order:3}
+  #family .fam-photo{order:4;margin:18px 0!important;aspect-ratio:16/9!important;max-height:none!important;border-radius:20px!important}
+  #family .fam-cards{order:5}#family .fam-note{order:6}#family .fam-grid > div:last-child > p:last-child{order:7}
+  #family .fam-photo .cap b{display:none}
+  #family .fam-photo .float{font-size:12px!important;padding:6px 10px!important;top:10px!important;left:10px!important}
+  #family .fam-photo .float i{width:24px!important;height:24px!important}
+  #family .fam-nav{width:34px!important;height:34px!important}
+  .fam-cards{position:relative;gap:0!important}
+  .fam-cards::before{content:"";position:absolute;left:17px;top:20px;bottom:24px;width:2px;background:linear-gradient(#0F3E48,#D92B3A);opacity:.35}
+  .fam-card{background:none!important;border:0!important;box-shadow:none!important;padding:8px 0 14px!important}
+  .fam-card .n{position:relative;z-index:1;background:var(--card)!important;border:2px solid var(--line)}
+
+  /* ---- Tutee AI on phones: it sits in the bottom bar, out of the way of the page ---- */
+  .m-bar.has-tai{grid-template-columns:50px 1fr 1fr!important}
+}
+.lite .jr-swipe{display:none}
+.jr-swipe{display:none}
+/* the hero's place tag (Jewel / Gardens by the Bay) is for wide screens only */
+@media (max-width:760px){.wh .wh-place{display:none!important}}
+@media (max-width:359px){.svc-tab .n{width:32px!important;height:32px!important}.svc-tab .n svg{width:17px!important;height:17px!important}}

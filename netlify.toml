@@ -25,6 +25,13 @@
   status = 200
   force = true
 
+# The hero's Blender source (_source/) is in the repo but is not part of the site.
+[[redirects]]
+  from = "/_source/*"
+  to = "/404.html"
+  status = 404
+  force = true
+
 # Deep links such as /universities.html are real files, so no SPA catch-all is
 # wanted here — a bad URL should 404 rather than silently render the home page.
 

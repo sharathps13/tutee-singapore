@@ -14,16 +14,20 @@
 <meta property="og:title" content="Study in Singapore | Tutee Connect">
 <meta property="og:description" content="Study in Singapore with Tutee Connect: QS top-12 universities, the MOE Tuition Grant, Student&#39;s Pass support and a clear pathway to an Employment Pass. Free first consultation.">
 <meta property="og:image" content="assets/img/sg-jewel-day.webp">
-<script src="assets/js/sg-theme.js?v=726e693907"></script>
+<script src="assets/js/sg-theme.js?v=wh4" data-hero="welcome"></script>
 <link rel="preload" href="assets/fonts/fraunces-opsz.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/quicksand-wght.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/source-serif-4-display-600.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" as="image" href="assets/img/hero/jewel-1600.webp" imagesrcset="assets/img/hero/jewel-760.webp 760w, assets/img/hero/jewel-1200.webp 1200w, assets/img/hero/jewel-1600.webp 1600w" imagesizes="100vw" fetchpriority="high">
 <link rel="stylesheet" href="assets/css/sg-fonts.css?v=7ce39eb485">
-<link rel="stylesheet" href="assets/css/sg-landing.css?v=4197d11461">
+<link rel="stylesheet" href="assets/css/sg-landing.css?v=jh3">
+<link rel="stylesheet" href="assets/css/sg-hero-welcome.css?v=7">
+<link rel="stylesheet" href="assets/css/sg-pathway.css?v=6">
+<link rel="stylesheet" href="assets/css/sg-enhance.css?v=5">
+<link rel="stylesheet" href="assets/css/sg-select.css?v=6">
+<link rel="stylesheet" href="assets/css/sg-mobile.css?v=12">
+<script src="assets/js/sg-hero-welcome.js?v=3" defer></script>
 </head>
 <body>
-<div class="hw-intro" id="hwIntro" aria-hidden="true"><img src="assets/img/hero/jewel-1600.webp" srcset="assets/img/hero/jewel-760.webp 760w, assets/img/hero/jewel-1200.webp 1200w, assets/img/hero/jewel-1600.webp 1600w" sizes="100vw" width="1600" height="1067" alt="" fetchpriority="high"></div>
 <header class="nav" id="nav">
   <div class="nav-bar">
     <a href="#home" class="brand" aria-label="Tutee Connect home"><img class="logo" src="assets/img/tutee-connect-logo@1x.png" srcset="assets/img/tutee-connect-logo@1x.png 1x, assets/img/tutee-connect-logo@2x.png 2x, assets/img/tutee-connect-logo@3x.png 3x" alt="Tutee Connect, Study and Immigration" width="137" height="56" decoding="async"></a>
@@ -47,35 +51,57 @@
 </header>
 
 <main>
-<section class="hw" id="home" aria-labelledby="hwTitle">
-  <div class="hw-light" aria-hidden="true"></div>
-  <div class="wrap hw-grid">
-    <div class="hw-copy">
-      <h1 class="hw-title" id="hwTitle">Your journey to a Singapore degree starts with one free call.</h1>
-      <p class="hw-lede">We guide students from India and South Asia from choosing a course to their first week in the city, and stay with you through every step in between.</p>
-      <div class="hw-ctas">
-        <a class="hw-btn" href="#enquire">Start my journey</a>
-        <a class="hw-link" href="#how">See how it works</a>
+<section class="wh" id="home" aria-labelledby="hwTitle">
+  <!-- real footage on a loop: the Rain Vortex at Jewel in light mode, Gardens by the Bay at night in dark mode. A still shows at once;
+       sg-hero-welcome.js adds the video for the current theme (data-video: the files are <name>-<1920|1280>.mp4) -->
+  <div class="wh-media" aria-hidden="true">
+    <div class="wh-pan"><div class="wh-photo wh-day" data-video="assets/img/hero/hero-day"></div><div class="wh-photo wh-night" data-video="assets/img/hero/hero-night"></div></div>
+    <div class="wh-shade"></div>
+    <div class="wh-motes"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  </div>
+  <div class="wrap wh-grid">
+    <div class="wh-copy">
+      <p class="wh-live"><span class="wh-pulse" aria-hidden="true"></span><span id="jhClock">Live from Marina Bay</span></p>
+      <p class="wh-hello"><span class="wh-sr">Welcome to Singapore</span><span class="wh-words" aria-hidden="true"><span class="wh-word on" lang="en">Welcome.</span><span class="wh-word" lang="ms">Selamat datang.</span><span class="wh-word" lang="zh">欢迎</span><span class="wh-word" lang="ta">வணக்கம்.</span></span><span class="wh-langs" aria-hidden="true"><i class="on">English</i><i>Malay</i><i>Mandarin</i><i>Tamil</i></span></p>
+      <h1 class="wh-title" id="hwTitle">Your journey to a Singapore degree starts with <em>one free call.</em></h1>
+      <p class="wh-lede">We guide students from India and South Asia from choosing a course to their first week in the city, and stay with you through every step in between.</p>
+      <div class="wh-pick" role="group" aria-labelledby="jhPickL">
+        <span class="wh-pick-l" id="jhPickL">I'm looking at</span>
+        <button type="button" aria-pressed="false" data-level="Bachelor's degree" data-short="Bachelor's">Bachelor's</button>
+        <button type="button" aria-pressed="false" data-level="Master's degree" data-short="Master's">Master's</button>
+        <button type="button" aria-pressed="false" data-level="MBA" data-short="MBA">MBA</button>
+        <button type="button" aria-pressed="false" data-level="Diploma or polytechnic" data-short="Diploma">Diploma</button>
       </div>
-      <ul class="hw-proof" aria-label="Our record so far">
-        <li><b>99%</b> Student's Pass success</li>
-        <li><b>200+</b> Singapore tie&#8209;ups</li>
-        <li><b>5k+</b> students guided</li>
+      <div class="wh-ctas">
+        <a class="wh-btn" id="jhGo" href="#enquire"><span class="t">Start my journey</span><span class="wh-btn-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+        <a class="wh-link" href="#how">See how it works</a>
+      </div>
+      <ul class="wh-proof" aria-label="Our record so far">
+        <li><b>99%</b><span>Student's Pass success</span></li>
+        <li><b>200+</b><span>Singapore tie&#8209;ups</span></li>
+        <li><b>5k+</b><span>students guided</span></li>
       </ul>
     </div>
-    <figure class="hw-window" id="hwWindow">
-      <div class="hw-glow" aria-hidden="true"></div>
-      <div class="hw-bezel" aria-hidden="true"></div>
-      <div class="hw-pane">
-        <img class="hw-view" src="assets/img/hero/jewel-1600.webp" srcset="assets/img/hero/jewel-760.webp 760w, assets/img/hero/jewel-1200.webp 1200w, assets/img/hero/jewel-1600.webp 1600w" sizes="100vw" width="1600" height="1067" alt="The Rain Vortex inside Jewel Changi Airport, Singapore, seen through an aircraft window" fetchpriority="high" decoding="async">
-        <span class="hw-dim" aria-hidden="true"></span>
-        <span class="hw-glare" aria-hidden="true"></span>
-        <span class="hw-hole" aria-hidden="true"></span>
-        <div class="hw-shade" id="hwShade"><button type="button" class="hw-pull" id="hwPull" aria-controls="hwShade" aria-pressed="false" aria-label="Lower the window shade" data-tip="Lower the shade"><span aria-hidden="true"></span></button></div>
-      </div>
-      <figcaption class="hw-card"><span class="hw-card-t">World rank, QS 2027</span><span class="hw-ranks"><span><b>#10</b>NUS</span><span><b>#12</b>NTU</span></span></figcaption>
-    </figure>
+
+    <div class="wh-side">
+      <p class="wh-place"><span class="wh-pin" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg></span><span class="wh-place-day"><b>Jewel Changi Airport</b><small>The Rain Vortex, the world&#8217;s tallest indoor waterfall</small></span><span class="wh-place-night"><b>Gardens by the Bay</b><small>The Supertree Grove, lit up at night</small></span></p>
+      <!-- the boarding pass: the visitor's own trip, filled from the study-level chips and the form's guess of their city -->
+      <a class="wh-pass" id="jhPass" href="#enquire" aria-label="Reserve your free call: from India to Singapore">
+        <span class="wh-pass-main">
+          <span class="wh-pass-top"><b>Boarding pass</b><span>Tutee Connect</span></span>
+          <span class="wh-pass-route">
+            <span class="wh-port"><b id="jhFromCode">IND</b><small id="jhFromName">India</small></span>
+            <span class="wh-flight" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z" transform="rotate(90 12 12)"/></svg></span>
+            <span class="wh-port to"><b>SIN</b><small>Singapore</small></span>
+          </span>
+          <span class="wh-pass-meta"><span><small>Class</small><b id="jhClass">Your choice</b></span><span><small>Gate</small><b>Free call</b></span><span><small>Seat</small><b>1A</b></span></span>
+        </span>
+        <span class="wh-pass-stub"><small>Board</small><b>Reserve<br>my call</b><i aria-hidden="true">→</i></span>
+        <span class="wh-stamp" aria-hidden="true"><b>Welcome</b><small>SIN · Changi</small></span>
+      </a>
+    </div>
   </div>
+  <a class="wh-scroll" href="#why"><span>Start exploring</span><i aria-hidden="true"></i></a>
 </section>
 
 <section class="facts" aria-label="Singapore at a glance">
@@ -222,30 +248,47 @@
   </div>
 </section>
 
-<section class="path" id="pathway">
-  <div class="pano on-dark">
-    <div class="pano-bg" role="img" aria-label="Marina Bay Sands seen across the water"></div>
-    <div class="wrap">
-      <div class="sec-head">
-        <div><span class="kicker">Your pathway</span><h2>From student to settled</h2>
-        <p class="lede">We plan your course around where you want to be in five years, not just where you start.</p></div>
-        <a class="link-cta" href="#enquire">Map my pathway <span class="arrow" aria-hidden="true">→</span></a>
-      </div>
-      <ol class="timeline rail-m">
-        <li class="tl"><span class="dot">1</span><div class="glass-card card"><span class="when">While you study</span><h3>Student's Pass</h3><p>Issued by ICA once your university registers you in SOLAR. Lets you study full-time and work part-time at approved institutions.</p><div class="kv"><span>Apply 2–3 months ahead</span><span>Filed via SOLAR</span></div></div></li>
-        <li class="tl"><span class="dot">2</span><div class="glass-card card"><span class="when">After graduating</span><h3>Long-Term Visit Pass</h3><p>Graduates of an Institute of Higher Learning can apply to stay on while they look for a job. It is a job-search pass, so you can't work on it.</p><div class="kv"><span>Job search</span><span>No work rights</span></div></div></li>
-        <li class="tl"><span class="dot">3</span><div class="glass-card card"><span class="when">Your first job</span><h3>Employment Pass</h3><p>Sponsored by your employer. You need a qualifying salary and 40 points on MOM's COMPASS framework.</p><div class="kv"><span>Qualifying salary</span><span>COMPASS 40 pts</span></div></div></li>
-        <li class="tl"><span class="dot">4</span><div class="glass-card card"><span class="when">Once established</span><h3>Permanent Residence</h3><p>Employment Pass and S Pass holders can apply for PR online with ICA. We help you build a strong case over time.</p><div class="kv"><span>Apply via ICA e-Service</span></div></div></li>
-      </ol>
-      <p class="ep-note"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><span><b>Changing on 1 January 2027:</b> the Employment Pass salary criteria are going up, and they rise further for older applicants. If you graduate in 2027 or later, we'll plan your job search around the new rules and walk you through the exact figures in your free consultation.</span></p>
+<section class="pw on-dark" id="pathway">
+  <div class="pw-bg" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="kicker">Your pathway</span><h2>From student to settled</h2>
+      <p class="lede">We plan your course around where you want to be in five years, not just where you start. Move through the years to see which pass you'd hold, and what it lets you do.</p></div>
+      <a class="link-cta" href="#enquire">Map my pathway <span class="arrow" aria-hidden="true">→</span></a>
     </div>
+    <div class="pw-stage" id="pwStage" data-s="0">
+      <div class="pw-wallet">
+        <ol class="pw-cards" id="pwCards" aria-label="The passes, in order">
+          <li class="pw-card" data-tone="teal" data-r="yes|Full-time at your institution;part|Part-time, at approved institutions;no|Family can visit, not stay;soon|Not yet"><div class="pw-chip" aria-hidden="true"></div><span class="pw-when"><i>1</i>While you study</span><h3>Student's Pass</h3><p>Issued by ICA once your university registers you in SOLAR. Lets you study full-time and work part-time at approved institutions.</p><div class="pw-kv"><span>Apply 2–3 months ahead</span><span>Filed via SOLAR</span></div><span class="pw-stamp" aria-hidden="true">Graduated</span></li>
+          <li class="pw-card" data-tone="gold" data-r="done|Course complete;no|Job search only, no work rights;no|Family can visit, not stay;soon|Not yet"><div class="pw-chip" aria-hidden="true"></div><span class="pw-when"><i>2</i>After graduating</span><h3>Long-Term Visit Pass</h3><p>Graduates of an Institute of Higher Learning can apply to stay on while they look for a job. It is a job-search pass, so you can't work on it.</p><div class="pw-kv"><span>Job search</span><span>No work rights</span></div><span class="pw-stamp" aria-hidden="true">Hired</span></li>
+          <li class="pw-card" data-tone="red" data-r="done|Course complete;yes|Full-time, for your sponsoring employer;part|Dependant's Pass, salary criteria apply;part|You can apply for PR with ICA"><div class="pw-chip" aria-hidden="true"></div><span class="pw-when"><i>3</i>Your first job</span><h3>Employment Pass</h3><p>Sponsored by your employer. You need a qualifying salary and 40 points on MOM's COMPASS framework.</p><div class="pw-kv"><span>Qualifying salary</span><span>COMPASS 40 pts</span></div><span class="pw-stamp" aria-hidden="true">Approved</span></li>
+          <li class="pw-card" data-tone="ink" data-r="done|Course complete;yes|Your career, here;yes|Your family's routes widen;yes|Singapore is home"><div class="pw-chip" aria-hidden="true"></div><span class="pw-when"><i>4</i>Once established</span><h3>Permanent Residence</h3><p>Employment Pass and S Pass holders can apply for PR online with ICA. We help you build a strong case over time.</p><div class="pw-kv"><span>Apply via ICA e-Service</span></div></li>
+        </ol>
+      </div>
+      <div class="pw-side">
+        <p class="pw-now" aria-live="polite"><span>Right now you'd hold</span> <b id="pwNow">a Student's Pass</b></p>
+        <ul class="pw-rights" id="pwRights">
+          <li data-k="0"><span class="pw-ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2 9 2 12 0v-5"/></svg></span><b>Study</b><span class="pw-v"><i></i><em></em></span></li>
+          <li data-k="1"><span class="pw-ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg></span><b>Work</b><span class="pw-v"><i></i><em></em></span></li>
+          <li data-k="2"><span class="pw-ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5M14 20c0-2 1.5-4 4-4s3 1 3 3"/></svg></span><b>Family</b><span class="pw-v"><i></i><em></em></span></li>
+          <li data-k="3"><span class="pw-ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 4l9 7M5 10v10h14V10"/></svg></span><b>Stay for good</b><span class="pw-v"><i></i><em></em></span></li>
+        </ul>
+        <div class="pw-scrub">
+          <div class="pw-track" aria-hidden="true"><i class="pw-fill" id="pwFill"></i><b></b><b></b><b></b><b></b></div>
+          <input type="range" id="pwRange" min="0" max="300" step="1" value="0" aria-label="Move through the years" aria-valuetext="While you study: Student's Pass">
+          <div class="pw-stops" id="pwStops"><button type="button" aria-pressed="true">Study</button><button type="button" aria-pressed="false">Graduate</button><button type="button" aria-pressed="false">First job</button><button type="button" aria-pressed="false">Settle</button></div>
+          <p class="pw-hint" aria-hidden="true">Drag along the line, or tap a stop</p>
+        </div>
+      </div>
+    </div>
+    <p class="ep-note"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><span><b>Changing on 1 January 2027:</b> the Employment Pass salary criteria are going up, and they rise further for older applicants. If you graduate in 2027 or later, we'll plan your job search around the new rules and walk you through the exact figures in your free consultation.</span></p>
   </div>
 </section>
 
 <section class="family" id="family">
   <div class="wrap fam-grid">
     <div class="fam-photo">
-      <div class="fam-slides" id="famSlides"><img class="fs on" src="assets/img/sg-gardens.webp" alt="Supertree Grove at Gardens by the Bay" data-cap="Gardens by the Bay, a weekend favourite for Singapore families." style="object-position:60% center" width="1000" height="750" loading="lazy" decoding="async"><img class="fs" src="assets/img/fam-jurong-lake.webp" alt="Boardwalk and lawns at Jurong Lake Gardens" data-cap="Jurong Lake Gardens, new waterside parkland in the west." style="object-position:70% center" width="1600" height="1100" loading="lazy" decoding="async"><img class="fs" src="assets/img/fam-mbfc.webp" alt="Office towers of Marina Bay Financial Centre" data-cap="Marina Bay Financial Centre, home to many of the firms that hire graduates." style="object-position:50% center" width="1600" height="1100" loading="lazy" decoding="async"><img class="fs" src="assets/img/fam-east-coast.webp" alt="Picnic lawns under shady trees at East Coast Park" data-cap="East Coast Park: picnics, cycling and the sea in one weekend." style="object-position:40% center" width="1600" height="1100" loading="lazy" decoding="async"><img class="fs" src="assets/img/fam-cbd-night.webp" alt="The Central Business District lit up at night beside Cavenagh Bridge" data-cap="The Central Business District, where much of Singapore clocks in." style="object-position:62% center" width="1600" height="1100" loading="lazy" decoding="async"><img class="fs" src="assets/img/family-f2.webp" alt="Fireworks over Marina Bay" data-cap="Fireworks over Marina Bay, seen from Marina Barrage." style="object-position:68% center" width="1000" height="750" loading="lazy" decoding="async"></div>
+      <div class="fam-slides" id="famSlides"><img class="fs on" src="assets/img/family/fam-gardens-1600.webp" srcset="assets/img/family/fam-gardens-1600.webp 1600w, assets/img/family/fam-gardens-2400.webp 2400w" sizes="(max-width: 900px) 94vw, 620px" data-cap="Gardens by the Bay, a weekend favourite for Singapore families." style="object-position:60% center" width="1600" height="1067" loading="lazy" decoding="async"><img class="fs" src="assets/img/family/fam-jurong-lake-1600.webp" srcset="assets/img/family/fam-jurong-lake-1600.webp 1600w, assets/img/family/fam-jurong-lake-2400.webp 2400w" sizes="(max-width: 900px) 94vw, 620px" width="1600" height="1067" loading="lazy" decoding="async"><img class="fs" src="assets/img/family/fam-mbfc-1600.webp" srcset="assets/img/family/fam-mbfc-1600.webp 1600w, assets/img/family/fam-mbfc-2400.webp 2400w" sizes="(max-width: 900px) 94vw, 620px" alt="Office towers of Marina Bay Financial Centre" data-cap="Marina Bay Financial Centre, home to many of the firms that hire graduates." style="object-position:50% center" width="1600" height="1067" loading="lazy" decoding="async"><img class="fs" src="assets/img/family/fam-east-coast-1600.webp" srcset="assets/img/family/fam-east-coast-1600.webp 1600w, assets/img/family/fam-east-coast-2400.webp 2400w" sizes="(max-width: 900px) 94vw, 620px" alt="Picnic lawns under shady trees at East Coast Park" data-cap="East Coast Park: picnics, cycling and the sea in one weekend." style="object-position:40% center" width="1600" height="1067" loading="lazy" decoding="async"><img class="fs" src="assets/img/family/fam-cbd-night-1600.webp" srcset="assets/img/family/fam-cbd-night-1600.webp 1600w, assets/img/family/fam-cbd-night-2400.webp 2400w" sizes="(max-width: 900px) 94vw, 620px" alt="The Central Business District lit up at night beside Cavenagh Bridge" data-cap="The Central Business District, where much of Singapore clocks in." style="object-position:62% center" width="1600" height="1067" loading="lazy" decoding="async"><img class="fs" src="assets/img/family/fam-fireworks-1600.webp" srcset="assets/img/family/fam-fireworks-1600.webp 1600w, assets/img/family/fam-fireworks-2400.webp 2400w" sizes="(max-width: 900px) 94vw, 620px" alt="Fireworks over Marina Bay" data-cap="Fireworks over Marina Bay, seen from Marina Barrage." style="object-position:68% center" width="1600" height="1067" loading="lazy" decoding="async"></div>
       <span class="float"><i><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5M14 20c0-2 1.5-4 4-4s3 1 3 3"/></svg></i>Family routes open with your first job</span><button type="button" class="fam-nav prev" id="famPrev" aria-label="Previous photo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><button type="button" class="fam-nav next" id="famNext" aria-label="Next photo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg></button><button type="button" class="fam-zoom" id="famZoom" aria-label="View photo full size"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
       <div class="cap"><b>Build a life here, together</b><span id="famCap">Gardens by the Bay, a weekend favourite for Singapore families.</span><span class="fam-dots" role="group" aria-label="Choose a photo"><button type="button" class="on" aria-label="Photo 1"></button><button type="button" aria-label="Photo 2"></button><button type="button" aria-label="Photo 3"></button><button type="button" aria-label="Photo 4"></button><button type="button" aria-label="Photo 5"></button><button type="button" aria-label="Photo 6"></button></span></div>
     </div>
@@ -376,16 +419,21 @@
         <div class="f-brand"><span class="logo-card"><img src="assets/img/tutee-connect-logo@1x.png" srcset="assets/img/tutee-connect-logo@1x.png 1x, assets/img/tutee-connect-logo@2x.png 2x, assets/img/tutee-connect-logo@3x.png 3x" alt="Tutee Connect, Study and Immigration" width="137" height="56" loading="lazy" decoding="async"></span><p>Study-abroad and immigration advice for students who want to study, work and settle overseas.</p></div>
         <div><h4>Explore</h4><ul><li><a href="#why">Why Singapore</a></li><li><a href="#how">How it works</a></li><li><a href="#universities">Universities</a></li><li><a href="institutions.html">All 126 institutions</a></li><li><a href="#costs">Funding</a></li><li><a href="#pathway">Pathway to PR</a></li><li><a href="#faq">FAQ</a></li></ul></div>
         <div><h4>Destinations</h4><div class="dest"><span class="on">Singapore</span><span>USA</span><span>UK</span><span>Canada</span><span>Australia</span><span>New Zealand</span><span>Ireland</span><span>Germany</span><span>France</span><span>Finland</span><span>Poland</span><span>Malaysia</span><span>UAE</span><span>Mauritius</span></div></div>
-        <div><h4>Talk to us</h4><ul class="contact"><li><span class="c-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H8l-4 4z"/></svg></span><span class="c-tx"><small>WhatsApp</small><a href="https://wa.me/917358364959" target="_blank" rel="noopener">+91 73583 64959</a></span></li><li><span class="c-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></span><span class="c-tx"><small>Call</small><a href="tel:+917358364959">+91 73583 64959</a></span></li><li><span class="c-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></span><span class="c-tx"><small>Email</small><a href="mailto:info@tuteeconnect.com">info@tuteeconnect.com</a></span></li><li><span class="c-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg></span><span class="c-tx"><small>Website</small><a href="https://www.tuteeconnect.com" target="_blank" rel="noopener">www.tuteeconnect.com</a></span></li><li class="c-note"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>We reply within one working day</span></li></ul></div>
+        <div><h4>Talk to us</h4><ul class="contact"><li><span class="c-ic c-wa"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg></span><span class="c-tx"><small>WhatsApp</small><a href="https://wa.me/917358364959" target="_blank" rel="noopener">+91 73583 64959</a></span></li><li><span class="c-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></span><span class="c-tx"><small>Call</small><a href="tel:+917358364959">+91 73583 64959</a></span></li><li><span class="c-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></span><span class="c-tx"><small>Email</small><a href="mailto:info@tuteeconnect.com">info@tuteeconnect.com</a></span></li><li><span class="c-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg></span><span class="c-tx"><small>Website</small><a href="https://www.tuteeconnect.com" target="_blank" rel="noopener">www.tuteeconnect.com</a></span></li><li class="c-note"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>We reply within one working day</span></li></ul></div>
       </div>
       <div class="f-bottom">
         <div class="row"><span>© 2026 Tutee Connect. Study | Immigration.</span><span>Figures checked October 2026 against ICA, MOM and university sources. Singapore ranks: EduRank 2026 (updated March 2026). World ranks: QS World University Rankings 2027. Rules change often, so your advisor confirms them for your case.</span></div>
-        <p data-photo-credit>Photos via Wikimedia Commons. Hero: Jewel Singapore Vortex by Matteo Morando (CC BY-SA 4.0). Pexels licence: visa-stamped passport (Pexels 4922086), advisor going through loan papers (Pexels 8292887). CC0: business meeting (rawpixel), exam sheet (lecroitg), Gardens by the Bay (Balon Greyjoy), CBD skyline (DvTor8303), Marina Barrage (Shubhankar Sharma). CC BY-SA 4.0: Jurong Lake Gardens (LN9267), NTU Hall 7 (Kenrick95), Changi Terminal 1 arrival hall (Exec8), East Coast Park (Xradicon), Marina Bay Financial Centre (Zairon). CC BY 4.0: Marina Bay Sands (I) by Supanut Arunoprayote; NUS entrance (RFNirmala). CC BY 2.0: document review (Alan Cleaver), family at the airport (Familydestinationsguide.com), CBD at night (Allie Caulfield). Some images cropped.</p>
+        <p data-photo-credit>Photos via Wikimedia Commons. Hero: the Rain Vortex at Jewel Changi Airport, video by Nirjhar Basak (Pexels; cropped and looped); at night, the Supertree Grove at Gardens by the Bay, video by Viktor Kartinskii (Vecteezy; cropped and looped). Pexels licence: visa-stamped passport (Pexels 4922086), advisor going through loan papers (Pexels 8292887). CC0: business meeting (rawpixel), exam sheet (lecroitg), Gardens by the Bay (Balon Greyjoy), CBD skyline (DvTor8303), Marina Barrage (Shubhankar Sharma). CC BY-SA 4.0: Jurong Lake from the Moon Bridge (FN-082), NTU Hall 7 (Kenrick95), Changi Terminal 1 arrival hall (Exec8), East Coast Park (Xradicon), Marina Bay Financial Centre (Zairon). CC BY 4.0: Marina Bay Sands (I) by Supanut Arunoprayote; NUS entrance (RFNirmala). CC BY 2.0: document review (Alan Cleaver), family at the airport (Familydestinationsguide.com), CBD at night (Allie Caulfield). Some images cropped.</p>
       </div>
     </div>
   </div>
 </footer>
 <dialog class="lb" id="famLb" aria-label="Photo viewer"><figure><img id="lbImg" alt=""><figcaption id="lbCap"></figcaption></figure><button type="button" class="lb-x" id="lbX" aria-label="Close">×</button><button type="button" class="lb-nav prev" id="lbPrev" aria-label="Previous photo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><button type="button" class="lb-nav next" id="lbNext" aria-label="Next photo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg></button><span class="lb-n" id="lbN"></span></dialog>
-<script src="assets/js/sg-landing.js?v=664bcd9839" defer></script>
+<script src="assets/js/sg-landing.js?v=jh10" defer></script>
+<script src="assets/js/sg-pathway.js?v=6" defer></script>
+<script src="assets/js/sg-bgfx.js?v=4" defer></script>
+<script src="assets/js/sg-mobile.js?v=4" defer></script>
+<script src="assets/js/sg-select.js?v=7" defer></script>
+<script src="assets/js/sg-tutee-ai.js?v=4" defer></script>
 </body>
 </html>

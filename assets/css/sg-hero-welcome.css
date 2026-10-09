@@ -1,0 +1,259 @@
+/* Hero: "Welcome to Singapore". Real footage on a loop: the Rain Vortex at Jewel Changi Airport in light mode, the
+   Supertree Grove at Gardens by the Bay at night in dark mode (assets/js/sg-hero-welcome.js plays the one for the
+   current theme, and crossfades them when the theme changes). A still of each clip's first frame shows at once, and the
+   video fades in over it once it can play. A greeting in the four official languages, sparkles of spray, a slow settle
+   on arrival, a little parallax with the mouse and on scroll, and the boarding pass stamped "Welcome". Everything that
+   moves is a transform or opacity; it all stops off screen, and nothing moves with reduced motion (the stills stay).
+   The still sizes here must match the preloads in assets/js/sg-theme.js and the video sizes in sg-hero-welcome.js. */
+.wh{
+  --wh-ink:#0E2A2E;--wh-sub:#2F4448;--wh-bg:#F3EFE7;--wh-chip:rgba(255,255,255,.9);--wh-line:rgba(15,41,48,.14);
+  --wh-shadow:rgba(15,41,48,.3);--wh-accent:#C8402B;--wh-teal:#0F3E48;--wh-gold:#F2B544;--wh-paper:#FFFDF8;
+  --wh-serif:"Source Serif Display","Source Serif 4",Georgia,"Times New Roman",serif;--wh-ease:cubic-bezier(.22,1,.36,1);
+  position:relative;isolation:isolate;overflow:hidden;overflow:clip;padding:0;color:var(--wh-ink);background:var(--wh-bg)}
+html[data-mode="dark"] .wh{
+  --wh-ink:#F3F8F7;--wh-sub:#CFDCDA;--wh-bg:#061219;--wh-chip:rgba(9,26,33,.78);--wh-line:rgba(228,239,237,.18);
+  --wh-shadow:rgba(0,0,0,.6);--wh-accent:#FFA285}
+
+/* ---- the moving picture ---- */
+/* Real footage, cropped to the same frame and looped (_source/hero/make_hero_video.py). On wide screens the picture
+   sits to the right of the words, its edges fading into the page, so it is never behind the text; on tablets and
+   phones it sits on top, full width. */
+.wh{--wh-ar:1.4098}
+html:not([data-mode="dark"]) .wh{--wh-bg:#ECEDEA}
+html[data-mode="dark"] .wh{--wh-bg:#04090D}
+.wh-media{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.wh-pan{position:absolute;inset:0;will-change:transform}
+.wh{--pw:min(56vw,calc((min(100svh,980px) - 290px) * var(--wh-ar)))}
+.wh-photo{position:absolute;right:0;top:70px;overflow:hidden;
+  width:var(--pw);height:calc(var(--pw) / var(--wh-ar));background:no-repeat 50% 50%/cover;transform-origin:50% 45%;
+  -webkit-mask:linear-gradient(90deg,transparent 0,#000 17%),linear-gradient(180deg,transparent 0,#000 9%,#000 84%,transparent 100%);
+  -webkit-mask-composite:source-in;
+  mask:linear-gradient(90deg,transparent 0,#000 17%) intersect,linear-gradient(180deg,transparent 0,#000 9%,#000 84%,transparent 100%);
+  animation:whIn 1.2s ease-out both,whSettle 18s cubic-bezier(.2,.7,.2,1) both}
+/* the video covers the still once it is playing; until then (and with reduced motion) the still is what shows */
+.wh-photo video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1s ease-out}
+.wh-photo video.on{opacity:1}
+.wh-day{background-image:url(../img/hero/hero-day-1920.webp)}
+.wh-night{background-image:url(../img/hero/hero-night-1920.webp)}
+@media (max-width:600px),(max-width:1000px) and (max-resolution:1.49dppx){
+  .wh-day{background-image:url(../img/hero/hero-day-1280.webp)}
+  .wh-night{background-image:url(../img/hero/hero-night-1280.webp)}
+}html:not([data-mode="dark"]) .wh-night,html[data-mode="dark"] .wh-day{display:none}
+/* the theme toggle: the old photo stays on top until the new one has loaded, then fades away */
+.wh-photo.holding{display:block!important;z-index:1}
+.wh-photo.leaving{display:block!important;z-index:1;animation:whOut .9s ease-out forwards}
+@keyframes whIn{from{opacity:0}to{opacity:1}}
+@keyframes whOut{from{opacity:1}to{opacity:0}}
+@keyframes whSettle{from{transform:scale(1.06)}to{transform:scale(1)}}
+
+/* a soft light behind the words, and the hero meeting the band below */
+.wh-shade{position:absolute;inset:0;background:
+  radial-gradient(60% 70% at 18% 45%,rgba(255,255,255,.55),rgba(255,255,255,0) 70%),
+  linear-gradient(0deg,rgba(10,39,48,.18) 0,rgba(10,39,48,0) 18%)}
+html[data-mode="dark"] .wh-shade{background:
+  radial-gradient(60% 70% at 18% 45%,rgba(20,52,64,.45),rgba(20,52,64,0) 70%),
+  linear-gradient(0deg,rgba(10,39,48,.7) 0,rgba(10,39,48,0) 22%)}
+/* sparkles drifting up through the picture: spray from the waterfall by day, glinting lights at night */
+.wh-motes{position:absolute;left:52%;right:20%;top:30%;bottom:8%}
+.wh-motes i{position:absolute;bottom:0;width:6px;height:6px;margin-left:-3px;border-radius:50%;opacity:0;
+  background:radial-gradient(circle,rgba(255,255,255,.95),rgba(255,255,255,0) 70%);animation:whMote 12s linear infinite}
+html[data-mode="dark"] .wh-motes i{background:radial-gradient(circle,rgba(255,214,160,1),rgba(255,180,110,0) 70%);width:7px;height:7px}
+.wh-motes i:nth-child(1){left:8%;animation-delay:-1s}
+.wh-motes i:nth-child(2){left:22%;animation-delay:-7s;animation-duration:15s}
+.wh-motes i:nth-child(3){left:31%;animation-delay:-3s;transform:scale(.7)}
+.wh-motes i:nth-child(4){left:40%;animation-delay:-10s;animation-duration:10s}
+.wh-motes i:nth-child(5){left:46%;animation-delay:-5s;animation-duration:14s}
+.wh-motes i:nth-child(6){left:52%;animation-delay:-2s}
+.wh-motes i:nth-child(7){left:58%;animation-delay:-8s;animation-duration:11s}
+.wh-motes i:nth-child(8){left:64%;animation-delay:-4s;animation-duration:16s}
+.wh-motes i:nth-child(9){left:72%;animation-delay:-11s}
+.wh-motes i:nth-child(10){left:80%;animation-delay:-6s;animation-duration:13s}
+.wh-motes i:nth-child(11){left:88%;animation-delay:-9s;animation-duration:15s}
+.wh-motes i:nth-child(12){left:95%;animation-delay:-12s;animation-duration:12s}
+@keyframes whMote{0%{transform:translate3d(0,0,0) scale(.6);opacity:0}12%{opacity:.85}60%{opacity:.6}
+  100%{transform:translate3d(18px,-62vh,0) scale(1.15);opacity:0}}
+
+/* ---- layout ---- */
+.wh-grid{display:grid;grid-template-columns:minmax(0,600px) minmax(0,1fr);gap:clamp(24px,4vw,64px);align-items:center;
+  min-height:min(100svh,980px);padding-top:clamp(108px,13vh,132px);padding-bottom:clamp(84px,11vh,110px)}
+
+/* ---- the words ---- */
+.wh-copy > *{animation:whRise .9s var(--wh-ease) both}
+.wh-copy > :nth-child(2){animation-delay:.08s}.wh-copy > :nth-child(3){animation-delay:.16s}.wh-copy > :nth-child(4){animation-delay:.24s}
+.wh-copy > :nth-child(5){animation-delay:.32s}.wh-copy > :nth-child(6){animation-delay:.4s}.wh-copy > :nth-child(7){animation-delay:.48s}
+@keyframes whRise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.wh-live{display:inline-flex;align-items:center;gap:10px;margin:0 0 14px;padding:8px 15px 8px 12px;border-radius:999px;font:600 13.5px/1.2 var(--body);
+  color:var(--wh-ink);background:var(--wh-chip);border:1px solid var(--wh-line);box-shadow:0 10px 24px -16px var(--wh-shadow)}
+.wh-pulse{position:relative;width:9px;height:9px;border-radius:50%;background:#1FB46A;flex:none}
+.wh-pulse::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:2px solid #1FB46A;opacity:0;animation:whPing 2.2s ease-out infinite}
+@keyframes whPing{0%{transform:scale(.5);opacity:.8}100%{transform:scale(1.8);opacity:0}}
+
+/* the greeting, in English, Malay, Mandarin and Tamil */
+.wh-hello{display:flex;flex-direction:column-reverse;align-items:flex-start;gap:0;margin:0 0 6px;font:italic 500 clamp(30px,3.1vw,46px)/1.25 var(--display);color:var(--wh-accent)}
+.wh-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.wh-words{display:inline-grid;overflow:hidden;padding:.06em .1em .1em 0}
+.wh-word{grid-area:1/1;white-space:nowrap;opacity:0;transform:translateY(70%);transition:transform .7s var(--wh-ease),opacity .45s ease-out}
+.wh-word.on{opacity:1;transform:none}
+.wh-word.out{opacity:0;transform:translateY(-70%)}
+.wh-word[lang="zh"],.wh-word[lang="ta"]{font-style:normal;font-weight:600;font-family:var(--body),system-ui,sans-serif}
+.wh-langs{display:inline-grid;margin-top:4px;font:600 11.5px/1 var(--mono);font-style:normal;letter-spacing:.16em;text-transform:uppercase;color:var(--wh-sub)}
+.wh-langs i{grid-area:1/1;font-style:normal;opacity:0;transition:opacity .4s}
+.wh-langs i.on{opacity:.85}
+.wh-langs i::before{content:"";display:inline-block;width:18px;height:2px;margin:0 8px 3px 0;vertical-align:middle;background:currentColor}
+
+.wh-title{font-family:var(--wh-serif);font-weight:600;font-size:clamp(38px,3.7vw,56px);line-height:1.05;letter-spacing:-.02em;margin:0;color:var(--wh-ink);text-wrap:balance}
+.wh-title em{font-family:var(--display);font-style:italic;font-weight:500;font-variation-settings:"opsz" 144;color:var(--wh-accent);white-space:nowrap}
+.wh-lede{margin:18px 0 0;max-width:44ch;font-size:clamp(16.5px,1.3vw,18.5px);line-height:1.65;color:var(--wh-sub);font-weight:500}
+.wh-pick{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:22px}
+.wh-pick-l{width:100%;margin-bottom:4px;font:600 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--wh-sub)}
+.wh-pick button{min-height:44px;padding:0 18px;border-radius:999px;font:700 15px/1 var(--body);color:var(--wh-ink);cursor:pointer;
+  background:var(--wh-chip);border:1px solid var(--wh-line);transition:transform .25s var(--wh-ease),background-color .2s,color .2s,border-color .2s}
+.wh-pick button:hover{transform:translateY(-2px)}
+.wh-pick button[aria-pressed="true"]{background:var(--wh-teal);border-color:var(--wh-teal);color:#fff}
+html[data-mode="dark"] .wh-pick button[aria-pressed="true"]{background:var(--wh-gold);border-color:var(--wh-gold);color:#1B1300}
+.wh-pick button[aria-pressed="true"]::before{content:"✓ ";content:"✓ " / ""}
+.wh-ctas{display:flex;flex-wrap:wrap;align-items:center;gap:12px 28px;margin-top:22px}
+.wh-btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:14px;min-height:56px;padding:0 9px 0 28px;border-radius:999px;text-decoration:none;font:700 19px/1 var(--body);color:#fff;
+  background:linear-gradient(135deg,#E0532C,#BC3520);box-shadow:0 18px 34px -16px rgba(214,74,40,.8),inset 0 1px 0 rgba(255,255,255,.35);
+  transition:transform .25s var(--wh-ease),box-shadow .25s var(--wh-ease)}
+/* a sheen passes over the main button now and then */
+.wh-btn::after{content:"";position:absolute;top:0;bottom:0;left:-40%;width:30%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);
+  transform:translateX(0) skewX(-18deg);animation:whSheen 6s ease-in-out 2.2s infinite}
+@keyframes whSheen{0%,70%{transform:translateX(0) skewX(-18deg)}100%{transform:translateX(520%) skewX(-18deg)}}
+.wh-btn:hover{transform:translateY(-2px);box-shadow:0 24px 40px -16px rgba(214,74,40,.9),inset 0 1px 0 rgba(255,255,255,.35)}
+.wh-btn:active{transform:scale(.98);transition-duration:.08s}
+.wh-btn-ic{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.22);transition:transform .3s var(--wh-ease)}
+.wh-btn:hover .wh-btn-ic{transform:translateX(3px)}
+.wh-btn.pop{animation:whPop .5s var(--wh-ease)}
+@keyframes whPop{40%{transform:scale(1.05)}}
+.wh-link{display:inline-flex;align-items:center;min-height:48px;color:var(--wh-ink);font-weight:700;font-size:16.5px;text-decoration:none;
+  background:linear-gradient(currentColor,currentColor) 0 calc(100% - 10px)/100% 2px no-repeat;transition:background-size .3s var(--wh-ease)}
+.wh-link:hover{background-size:100% 4px}
+.wh-proof{list-style:none;margin:26px 0 0;padding:16px 0 0;border-top:1px solid var(--wh-line);display:flex}
+.wh-proof li{display:flex;flex-direction:column;padding-right:24px;margin-right:24px;border-right:1px solid var(--wh-line)}
+.wh-proof li:last-child{border:0;margin:0;padding:0}
+.wh-proof b{font:600 28px/1.1 var(--wh-serif);color:var(--wh-ink)}
+html:not([data-mode="dark"]) .wh-proof b{color:var(--wh-teal)}
+.wh-proof span{margin-top:4px;font-size:13.5px;font-weight:600;line-height:1.3;color:var(--wh-sub)}
+.wh :is(.wh-btn,.wh-link,.wh-pick button,.wh-pass,.wh-scroll):focus-visible{outline:3px solid var(--wh-accent);outline-offset:4px}
+
+/* ---- the place, and the boarding pass ---- */
+/* wide screens: the place sits in the top right corner of the picture, clear of the landmark; the pass sits beneath it */
+@media (min-width:1001px){
+  .wh .wh-side{animation:none}
+  .wh .wh-pass{animation:whRise 1s var(--wh-ease) .6s both}
+  .wh-grid{position:static}
+  .wh .wh-place{position:absolute;top:calc(70px + var(--pw) / var(--wh-ar) * .1);right:calc(var(--pw) * .035);max-width:300px;animation:whIn 1s ease-out .9s both}
+}
+.wh-side{align-self:end;justify-self:end;display:flex;flex-direction:column;align-items:flex-end;gap:30px;width:min(100%,440px);animation:whRise 1s var(--wh-ease) .6s both}
+.wh-place{display:flex;align-items:flex-start;gap:10px;margin:0;padding:11px 16px 11px 12px;border-radius:16px;max-width:330px;color:#fff;
+  background:rgba(7,22,28,.8);border:1px solid rgba(255,255,255,.18);box-shadow:0 14px 30px -18px rgba(0,0,0,.6)}
+.wh-pin{flex:none;display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--wh-gold);color:#2A1A00}
+.wh-place-day,.wh-place-night{display:flex;flex-direction:column;gap:2px}
+html:not([data-mode="dark"]) .wh-place-night,html[data-mode="dark"] .wh-place-day{display:none}
+.wh-place b{font:700 14px/1.25 var(--body)}
+.wh-place small{font-size:12.5px;line-height:1.35;color:rgba(255,255,255,.85)}
+.wh-pass{position:relative;display:flex;width:100%;text-decoration:none;color:#14282C;transform:rotate(-1.5deg);
+  filter:drop-shadow(0 22px 26px rgba(10,30,36,.35));transition:transform .4s var(--wh-ease)}
+html[data-mode="dark"] .wh-pass{filter:drop-shadow(0 22px 28px rgba(0,0,0,.6))}
+.wh-pass:hover{transform:rotate(0deg) translateY(-4px)}
+.wh-pass-main,.wh-pass-stub{background:var(--wh-paper)}
+.wh-pass-main{flex:1;display:flex;flex-direction:column;gap:10px;padding:14px 18px 14px 20px;border-radius:16px 0 0 16px;
+  -webkit-mask:radial-gradient(circle 9px at 100% 0,#0000 98%,#000) top/100% 51% no-repeat,radial-gradient(circle 9px at 100% 100%,#0000 98%,#000) bottom/100% 51% no-repeat;
+  mask:radial-gradient(circle 9px at 100% 0,#0000 98%,#000) top/100% 51% no-repeat,radial-gradient(circle 9px at 100% 100%,#0000 98%,#000) bottom/100% 51% no-repeat}
+.wh-pass-stub{position:relative;flex:none;width:108px;display:flex;flex-direction:column;justify-content:center;gap:4px;padding:14px 16px;border-radius:0 16px 16px 0;
+  border-left:2px dashed #D9D1BF;transition:background-color .25s,color .25s;
+  -webkit-mask:radial-gradient(circle 9px at 0 0,#0000 98%,#000) top/100% 51% no-repeat,radial-gradient(circle 9px at 0 100%,#0000 98%,#000) bottom/100% 51% no-repeat;
+  mask:radial-gradient(circle 9px at 0 0,#0000 98%,#000) top/100% 51% no-repeat,radial-gradient(circle 9px at 0 100%,#0000 98%,#000) bottom/100% 51% no-repeat}
+.wh-pass:hover .wh-pass-stub{background:#E2572F;color:#fff}
+.wh-pass-stub small{font:600 10.5px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;opacity:.7}
+.wh-pass-stub b{font:700 15px/1.2 var(--body)}
+.wh-pass-stub i{font-style:normal;font-weight:700;transition:transform .3s var(--wh-ease)}
+.wh-pass:hover .wh-pass-stub i{transform:translateX(4px)}
+.wh-pass-top{display:flex;justify-content:space-between;font:600 10.5px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:#5E6E70}
+.wh-pass-top b{color:#C8402B;font-weight:700}
+.wh-pass-route{display:flex;align-items:center;gap:10px}
+.wh-port{display:flex;flex-direction:column}
+.wh-port.to{text-align:right}
+.wh-port b{font:600 32px/1 var(--wh-serif);letter-spacing:.01em;color:#0F3E48}
+.wh-port small{margin-top:3px;font-size:12.5px;font-weight:600;color:#4E6266;white-space:nowrap}
+.wh-flight{flex:1;position:relative;display:grid;place-items:center;height:24px;color:#C8402B}
+.wh-flight::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:2px dotted #C9C0AC}
+.wh-flight svg{position:relative;padding:0 6px;background:var(--wh-paper);box-sizing:content-box;animation:whFly 3.4s var(--wh-ease) 1.2s both}
+@keyframes whFly{from{transform:translateX(-60px);opacity:0}to{transform:none;opacity:1}}
+.wh-pass-meta{display:flex;gap:22px;padding-top:9px;border-top:1px solid #ECE5D6}
+.wh-pass-meta span{display:flex;flex-direction:column;gap:2px}
+.wh-pass-meta small{font:600 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#56676A}
+.wh-pass-meta b{font:700 14px/1.2 var(--body);color:#14282C}
+.wh-pass-meta b.set{animation:whSet .5s var(--wh-ease)}
+@keyframes whSet{0%{transform:translateY(6px);opacity:0}100%{transform:none;opacity:1}}
+/* the arrival stamp, thumped onto the pass once it has landed */
+.wh-stamp{position:absolute;right:-16px;top:-40px;width:86px;height:86px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  border:2.5px solid rgba(200,64,43,.85);box-shadow:inset 0 0 0 4px var(--wh-paper),inset 0 0 0 5.5px rgba(200,64,43,.6),0 8px 18px -10px rgba(0,0,0,.5);background:var(--wh-paper);
+  color:#8E2210;transform:rotate(-14deg);pointer-events:none;animation:whStamp .55s cubic-bezier(.3,1.6,.5,1) 1.7s both}
+.wh-stamp b{font:800 13px/1 var(--body);letter-spacing:.12em;text-transform:uppercase}
+.wh-stamp small{font:600 8.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase}
+@keyframes whStamp{from{opacity:0;transform:rotate(-30deg) scale(2.2)}to{opacity:1;transform:rotate(-14deg) scale(1)}}
+
+/* ---- the invitation to scroll ---- */
+.wh-scroll{position:absolute;left:50%;bottom:22px;display:inline-flex;align-items:center;gap:10px;padding:8px 16px 8px 18px;border-radius:999px;transform:translateX(-50%);
+  text-decoration:none;font:700 13.5px/1 var(--body);color:var(--wh-ink);background:var(--wh-chip);border:1px solid var(--wh-line);
+  box-shadow:0 12px 26px -16px var(--wh-shadow);animation:whIn 1s ease-out 1.4s both}
+.wh-scroll i{position:relative;width:18px;height:26px;border-radius:10px;border:2px solid currentColor;opacity:.8}
+.wh-scroll i::after{content:"";position:absolute;left:50%;top:5px;width:3px;height:6px;margin-left:-1.5px;border-radius:2px;background:currentColor;animation:whWheel 1.8s ease-in-out infinite}
+@keyframes whWheel{0%{transform:translateY(0);opacity:1}70%{transform:translateY(8px);opacity:0}100%{transform:translateY(0);opacity:0}}
+.wh-scroll:hover{transform:translateX(-50%) translateY(-2px)}
+
+/* paused off screen (sg-landing.js marks #home .offscreen) and in a hidden tab */
+.wh.offscreen *,.wh.offscreen *::after{animation-play-state:paused!important}
+.lite .wh-motes,.lite .wh-btn::after{display:none}
+
+/* ---- laptops ---- */
+@media (min-width:1001px) and (max-width:1199px){
+  .wh-grid{grid-template-columns:minmax(0,500px) minmax(0,1fr)}
+  .wh-title{font-size:clamp(36px,4vw,46px)}
+  .wh-lede{font-size:16.5px}
+  .wh-side{width:min(100%,400px)}
+}
+/* ---- short desktop screens ---- */
+@media (min-width:1001px) and (max-height:780px){
+  .wh-proof{display:none}
+  .wh-grid{padding-top:100px;padding-bottom:76px}
+  .wh-lede{margin-top:12px}
+}
+/* ---- tablets and phones: the photograph on top, fading into the page, the words below it ---- */
+@media (max-width:1000px){
+  /* the photo across the top, under the navigation, fading into the page below */
+  .wh{--wh-top:72px;--wh-ph:calc(100vw / var(--wh-ar))}
+  .wh-photo{--pw:100vw;top:var(--wh-top);bottom:auto;margin:0;width:100%;height:var(--wh-ph);transform-origin:70% 40%;
+    -webkit-mask:linear-gradient(180deg,transparent 0,#000 7%,#000 72%,transparent 100%);mask:linear-gradient(180deg,transparent 0,#000 7%,#000 72%,transparent 100%)}
+  .wh-motes{left:45%;right:12%;top:calc(var(--wh-top) + var(--wh-ph) * .3);bottom:auto;height:calc(var(--wh-ph) * .55)}
+  .wh-shade{background:none}
+  .wh-grid{grid-template-columns:minmax(0,1fr);gap:28px;min-height:0;padding-top:calc(var(--wh-top) + var(--wh-ph) - 18px);padding-bottom:44px}
+  .wh-side{justify-self:stretch;align-items:stretch;width:100%;max-width:520px;animation:none}
+  .wh-pass{animation:whRise 1s var(--wh-ease) .5s both}
+  .wh-place{max-width:none}
+  .wh-scroll{display:none}
+}
+@media (max-width:560px){
+  .wh-hello{font-size:30px}
+  .wh-title{font-size:clamp(32px,8.6vw,40px)}
+  .wh-lede{margin-top:14px;font-size:16px}
+  .wh-pick{margin-top:20px;gap:6px}
+  .wh-pick button{padding:0 13px;font-size:14px}
+  .wh-ctas{gap:6px 22px}
+  .wh-btn{flex:1 1 100%;justify-content:space-between;font-size:18.7px}
+  .wh-proof{margin-top:24px;padding-top:16px}
+  .wh-proof li{padding-right:14px;margin-right:14px}
+  .wh-proof b{font-size:23px}.wh-proof span{font-size:12px}
+  .wh-pass-main{padding:12px 14px 12px 16px}
+  .wh-pass-stub{width:92px;padding:12px}
+  .wh-port b{font-size:28px}
+  .wh-pass-meta{gap:16px}
+  .wh-stamp{right:-6px;top:-34px;width:74px;height:74px}
+  .wh-stamp b{font-size:11px}
+}
+@media (prefers-reduced-motion:reduce){
+  .wh *,.wh *::before,.wh *::after{animation:none!important;transition:none!important}
+  .wh-motes{display:none}
+}

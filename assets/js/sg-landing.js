@@ -8,7 +8,7 @@ window.__SVC=[{"html": "<div class=\"sp-top\"><span class=\"phase-tag\"><i>1<\/i
   var hasIO='IntersectionObserver' in window;
   /* work queue: non-urgent setup runs one small job per idle slot, so first paint and early scrolling never wait on it */
   var Q=[],qOn=false,ric=window.requestIdleCallback||function(f){return setTimeout(function(){f({timeRemaining:function(){return 8;},didTimeout:true});},60);};
-  var lastScroll=0,heroEl=null,scT=0;window.addEventListener('scroll',function(){lastScroll=performance.now();
+  var lastScroll=0,heroEl=null,scT=0;window.addEventListener('scroll',function(){lastScroll=window.__lastScroll=performance.now();
     /* hero loops hold still while the page is moving, so scrolling only composites, never repaints */
     if(heroEl){if(!scT)heroEl.classList.add('scrolling');clearTimeout(scT);scT=setTimeout(function(){scT=0;heroEl.classList.remove('scrolling');},200);}},{passive:true});
   function pump(dl){
@@ -34,7 +34,8 @@ window.__SVC=[{"html": "<div class=\"sp-top\"><span class=\"phase-tag\"><i>1<\/i
     if(document.startViewTransition&&!doc.classList.contains('lite')){
       var r=tt.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,rad=Math.hypot(Math.max(x,innerWidth-x),Math.max(y,innerHeight-y));
       var t=document.startViewTransition(function(){applyMode(next);});
-      t.ready.then(function(){doc.animate({clipPath:['circle(0px at '+x+'px '+y+'px)','circle('+rad+'px at '+x+'px '+y+'px)']},{duration:550,easing:'cubic-bezier(.16,1,.3,1)',pseudoElement:'::view-transition-new(root)'});}).catch(function(){});
+      t.ready.then(function(){doc.animate({clipPath:['circle(0px at '+x+'px '+y+'px)','circle('+rad+'px at '+x+'px '+y+'px)']},{duration:420,easing:'cubic-bezier(.16,1,.3,1)',pseudoElement:'::view-transition-new(root)'});}).catch(function(){});
+    }else if(doc.classList.contains('lite')){applyMode(next);/* slow devices: switch at once; fading every colour on the page repaints it all for every frame */
     }else{doc.classList.add('theme-fade');applyMode(next);setTimeout(function(){doc.classList.remove('theme-fade');},400);}
   });
 
@@ -44,14 +45,14 @@ window.__SVC=[{"html": "<div class=\"sp-top\"><span class=\"phase-tag\"><i>1<\/i
   $$('#navLinks a').forEach(function(a){a.addEventListener('click',function(){nav.classList.remove('open');menuBtn.setAttribute('aria-expanded','false');});});
 
   /* ---------- in-page links: land exactly on the section even while far sections are still unrendered ---------- */
-  function jumpTo(t,focusForm){
+  function jumpTo(t,focusForm,instant){
     /* render every section first so nothing above the target can change height mid-scroll */
     $$('main > section, footer').forEach(function(sec){sec.classList.add('cv-on');});
     var off=(nav?nav.getBoundingClientRect().bottom:80)+12;
     /* layout position (ignores entrance-animation transforms, which would otherwise shift the landing spot) */
     function docTop(el){var y=0;while(el){y+=el.offsetTop;el=el.offsetParent;}return y;}
     function target(){return Math.max(0,docTop(t)-off);}
-    window.scrollTo({top:target(),behavior:reduce?'auto':'smooth'});
+    window.scrollTo({top:target(),behavior:(reduce||instant)?'auto':'smooth'});
     var last=-1,still=0,tries=0;
     (function check(){tries++;var y=window.scrollY;if(Math.abs(y-last)<1)still++;else still=0;last=y;
       if(still>=3||tries>120){var d=target()-window.scrollY;if(Math.abs(d)>2)window.scrollTo({top:target(),behavior:'auto'});
@@ -67,6 +68,20 @@ window.__SVC=[{"html": "<div class=\"sp-top\"><span class=\"phase-tag\"><i>1<\/i
     jumpTo(t,enq);
     if(history.replaceState)history.replaceState(null,'','#'+id);
   });
+  /* arriving with a section in the address (the institutions page's "Back to Study in Singapore", its "Free
+     consultation" links, a shared link): the browser's own jump lands short, because the sections above are not
+     rendered yet; so render them and land exactly on the section, again once fonts and images are in */
+  /* a refresh always starts at the top of the page, wherever the visitor was (links that name a section still land on it) */
+  var nav0=performance.getEntriesByType&&performance.getEntriesByType('navigation')[0];
+  if(nav0&&nav0.type==='reload'){if('scrollRestoration' in history)history.scrollRestoration='manual';
+    if(location.hash&&history.replaceState)history.replaceState(null,'',location.pathname+location.search);
+    window.scrollTo(0,0);addEventListener('load',function(){window.scrollTo(0,0);},{once:true});}
+  (function(){var id=decodeURIComponent(location.hash.slice(1));if(!id)return;var t=document.getElementById(id);if(!t||t.id==='home')return;
+    if('scrollRestoration' in history)history.scrollRestoration='manual';
+    if(t.id==='enquire'&&window.matchMedia('(max-width: 980px)').matches){var tk=document.getElementById('ticket');if(tk)t=tk;}
+    var go=function(){jumpTo(t,false,true);};go();
+    if(document.fonts&&document.fonts.ready)document.fonts.ready.then(go);
+    if(document.readyState!=='complete')addEventListener('load',function(){setTimeout(go,60);},{once:true});})();
 
   /* ---------- floating CTA (desktop) and action bar (mobile): shown after the hero ---------- */
   var fc=$('#floatDock'),mb=$('#mBar'),heroVis=true,enqVis=false;
@@ -90,9 +105,10 @@ window.__SVC=[{"html": "<div class=\"sp-top\"><span class=\"phase-tag\"><i>1<\/i
     if(i===cur)return;var first=cur<0;cur=i;
     tabs.forEach(function(t,j){t.setAttribute('aria-selected',j===i?'true':'false');t.tabIndex=j===i?0:-1;});
     var s=SVC[i];if(!s)return;
-    /* crossfade to this service's photo */
-    var next=layers[first?0:1-front];next.className='sp-layer svc-bg-'+i;void next.offsetWidth;next.classList.add('on');
-    if(!first)layers[front].classList.remove('on');front=first?0:1-front;
+    /* crossfade to this service's photo, once it is decoded (so the fade never waits on a decode mid-frame) */
+    var swap=function(){if(cur!==i)return;var next=layers[first?0:1-front];next.className='sp-layer svc-bg-'+i;void next.offsetWidth;next.classList.add('on');
+      if(!first)layers[front].classList.remove('on');front=first?0:1-front;};
+    if(first)swap();else{var done=false,go=function(){if(!done){done=true;swap();}};preload(i).then(go,go);setTimeout(go,250);}
     panel.setAttribute('data-tone',TONES[i]);
     if(!first){content.innerHTML=s.html;content.classList.remove('swap');void content.offsetWidth;content.classList.add('swap');}
     panel.setAttribute('aria-labelledby',tabs[i].id);
@@ -100,8 +116,10 @@ window.__SVC=[{"html": "<div class=\"sp-top\"><span class=\"phase-tag\"><i>1<\/i
     if(focus)tabs[i].focus();
   }
   showSvc(0);
-  var pre={};function preload(i){if(pre[i])return;pre[i]=1;var im=new Image();im.src='assets/img/services/sg-service-'+(i+1)+'.webp';}
-  tabs.forEach(function(t,i){t.addEventListener('pointerenter',function(){preload(i);});t.addEventListener('focus',function(){preload(i);});});
+  var pre={};function preload(i){if(pre[i])return pre[i];var im=new Image();im.src='assets/img/services/sg-service-'+(i+1)+'.webp';
+    pre[i]=im.decode?im.decode().catch(function(){}):Promise.resolve();return pre[i];}
+  /* load a service's photo as soon as it is hovered, focused or touched, ahead of the click */
+  tabs.forEach(function(t,i){t.addEventListener('pointerenter',function(){preload(i);});t.addEventListener('pointerdown',function(){preload(i);});t.addEventListener('focus',function(){preload(i);});});
   $('#spNext').addEventListener('pointerenter',function(){preload((cur+1)%SVC.length);});
   tabs.forEach(function(t,i){
     t.addEventListener('click',function(){showSvc(i);});
@@ -263,9 +281,15 @@ window.__SVC=[{"html": "<div class=\"sp-top\"><span class=\"phase-tag\"><i>1<\/i
     stops.forEach(function(s){var top=s.el.getBoundingClientRect().top+window.scrollY-off;s.p=h>0?Math.min(1,Math.max(0,top/h)):0;if(vert)s.b.style.top=(s.p*trackW).toFixed(1)+'px';else s.b.style.left=(28+s.p*trackW).toFixed(1)+'px';});}
   /* batch pre-render: after the first screen is up, lay out the off-screen sections one at a time in idle
      moments, so scrolling into them later costs nothing (instead of laying them out mid-scroll) */
-  function prerender(){$$('main > section, footer').forEach(function(sec){later(function(){if(sec.classList.contains('cv-on'))return;sec.classList.add('cv-on');void sec.offsetHeight;});
+  var cn=navigator.connection||{},eagerImgs=!cn.saveData&&(!cn.effectiveType||cn.effectiveType==='4g')&&!(window.matchMedia&&matchMedia('(max-width: 760px)').matches);
+  /* phones lay out only the sections the visitor is approaching (about a screen and a half ahead): laying out the whole
+     page in the first seconds kept a slow phone's main thread busy just when the visitor starts to tap and scroll */
+  var nearOnly=window.matchMedia&&matchMedia('(max-width: 760px)').matches&&'IntersectionObserver' in window;
+  var preIO=nearOnly?new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;preIO.unobserve(e.target);var s=e.target;later(function(){if(s.classList.contains('cv-on'))return;s.classList.add('cv-on');void s.offsetHeight;});});},{rootMargin:'0px 0px 150% 0px'}):null;
+  function prerender(){$$('main > section, footer').forEach(function(sec){if(preIO){preIO.observe(sec);return;}later(function(){if(sec.classList.contains('cv-on'))return;sec.classList.add('cv-on');void sec.offsetHeight;});
       /* and decode that section's first images ahead of time (one per idle slot), so they never decode mid-scroll */
-      $$('img[loading="lazy"]',sec).slice(0,4).forEach(function(im){later(function(){if(im.closest('.fam-slides')&&!im.classList.contains('on'))return;im.loading='eager';if(im.decode)im.decode().catch(function(){});});});});
+      /* not on phones, slow connections or Save-Data: there the browser's own lazy loading is kinder to the data plan */
+      if(eagerImgs)$$('img[loading="lazy"]',sec).slice(0,4).forEach(function(im){later(function(){if(im.closest('.fam-slides')&&!im.classList.contains('on'))return;im.loading='eager';if(im.decode)im.decode().catch(function(){});});});});
     later(measure);later(placeStops);later(function(){req();});}
   if(document.readyState==='complete')setTimeout(prerender,400);else window.addEventListener('load',function(){setTimeout(prerender,400);},{once:true});
   /* sections grow as they render: re-measure (batched, at idle) when the page height changes, never during a scroll frame */
@@ -303,16 +327,17 @@ window.__SVC=[{"html": "<div class=\"sp-top\"><span class=\"phase-tag\"><i>1<\/i
       links.forEach(function(a){a.classList.toggle('active',a.getAttribute('href')==='#'+current);});
       moveInd(links.filter(function(a){return a.classList.contains('active');})[0]);
     },{rootMargin:'-45% 0px -50% 0px'});
-    secs.concat($$('.hw, .enquire, #services, #family, #stories')).forEach(function(s){aio.observe(s);});
+    secs.concat($$('#home, .enquire, #services, #family, #stories')).forEach(function(s){aio.observe(s);});
   }
 
-  /* pause looping animations in sections that are off screen */
+  /* pause every looping animation in sections that are off screen (sg-landing.css: .offscreen), so only what is on
+     screen ever animates */
   if(hasIO){var pio=new IntersectionObserver(function(es){es.forEach(function(e){e.target.classList.toggle('offscreen',!e.isIntersecting);});});
-    $$('.hw, .how, .voices, .enquire, #costs, #services').forEach(function(s){pio.observe(s);});}
+    $$('main > section, footer').forEach(function(s){pio.observe(s);});}
 
   /* FAQ: phones show five questions first */
   (function(){var b=$('#faqMore');if(!b)return;b.addEventListener('click',function(){$('#faqList').classList.add('all');b.parentNode.hidden=true;});})();
-  /* =================== family photos: auto-advance every 4s while visible; arrows, dots, swipe, keys and a full-size viewer =================== */
+  /* =================== family photos: auto-advance every 3s while visible; arrows, dots, swipe, keys and a full-size viewer =================== */
   (function(){
     var box=$('#famSlides');if(!box)return;var imgs=$$('img',box),dots=$$('.fam-dots button'),cap=$('#famCap'),i=0,timer=0,vis=false,held=0;
     function warm(n){var im=imgs[(n+imgs.length)%imgs.length];if(im&&im.loading==='lazy')im.loading='eager';}
@@ -320,7 +345,7 @@ window.__SVC=[{"html": "<div class=\"sp-top\"><span class=\"phase-tag\"><i>1<\/i
       i=n;imgs[i].classList.add('on');if(dots[i]){dots[i].classList.add('on');dots[i].setAttribute('aria-current','true');}
       if(cap){cap.style.opacity='0';setTimeout(function(){cap.textContent=imgs[i].dataset.cap;cap.style.opacity='1';},250);}
       warm(i+1);warm(i-1);}
-    function start(){if(!timer&&!reduce)timer=setInterval(function(){if(!document.hidden&&Date.now()>held)show(i+1);},4000);}
+    function start(){if(!timer&&!reduce)timer=setInterval(function(){if(!document.hidden&&Date.now()>held)show(i+1);},3000);}
     function stop(){clearInterval(timer);timer=0;}
     /* any manual move pauses the auto-advance for 8 seconds */
     function go(n){held=Date.now()+8000;show(n);}
@@ -375,93 +400,6 @@ window.__SVC=[{"html": "<div class=\"sp-top\"><span class=\"phase-tag\"><i>1<\/i
       var on=SL.toggle(h.dataset.n,h.dataset.s);paintHearts();h.classList.remove('pop');void h.offsetWidth;h.classList.add('pop');
       var n=SL.get().length;show((on?'Added ':'Removed ')+(h.dataset.s||h.dataset.n)+(on?' · '+n+' in your shortlist':''));});
     window.__paintHearts=paintHearts;
-  })();
-
-  /* =================== hero: the window seat =================== */
-  (function(){
-    var hw=$('.hw');if(!hw)return;
-    var win=$('#hwWindow'),shade=$('#hwShade'),pull=$('#hwPull'),pane=$('.hw-pane',hw),view=$('.hw-view',hw),card=$('.hw-card',hw);
-    /* the load sequence is pure CSS; once it has played, hand the shade and the view over to transitions */
-    var ready=false,introOn=doc.classList.contains('hw-intro-on')&&!!$('#hwIntro');
-    function settle(){if(ready||introOn)return;ready=true;hw.classList.add('ready');}
-    if(reduce)settle();else if(!introOn){card.addEventListener('animationend',settle,{once:true});setTimeout(settle,2600);}
-
-    /* opening transition: the page opens on the full photo, then the window itself (frame, glass and view)
-       flies back into place from a scale big enough that its pane covers the screen. Two transforms and
-       one opacity, all on the compositor, so it holds 60 fps on phones too. The fixed #hwIntro image is only
-       a first-paint stand-in until this script runs; the pane shows the same file, so the swap is invisible. */
-    if(introOn)(function(){
-      var ov=$('#hwIntro'),im=ov.querySelector('img'),nav=$('#nav'),ended=false,anims=[];
-      var D=1850,E='cubic-bezier(.72,0,.18,1)';
-      function land(){if(ended)return;ended=true;introOn=false;
-        anims.forEach(function(a){try{a.cancel();}catch(e){}});win.style.transformOrigin='';
-        hw.classList.remove('intro-run');ready=true;hw.classList.add('ready');doc.classList.remove('hw-intro-on');
-        if(ov.parentNode)ov.remove();
-        if(card.animate){card.animate([{opacity:0,transform:'translate3d(0,14px,0)'},{opacity:1,transform:'none'}],{duration:700,delay:220,easing:'cubic-bezier(.22,1,.36,1)',fill:'backwards'});
-          $$('.hw-light, .hw-glow, .hw-glare',hw).forEach(function(g){g.animate([{opacity:0},{opacity:1}],{duration:900,easing:'ease-out',fill:'backwards'});});
-          try{win.animate([{opacity:0},{opacity:1}],{duration:700,easing:'ease-out',pseudoElement:'::before'});}catch(e){}
-          var bz=$('.hw-bezel',hw);if(bz)bz.animate([{boxShadow:'none'},{boxShadow:getComputedStyle(bz).boxShadow}],{duration:600,easing:'ease-out'});}}
-      function bail(){if(ended)return;if(!ov.animate||!ov.parentNode){land();return;}
-        var f=ov.animate([{opacity:1},{opacity:0}],{duration:280,easing:'ease-out',fill:'forwards'});anims.push(f);f.onfinish=land;}
-      setTimeout(function(){if(!started)bail();},2400); /* safety net */
-      addEventListener('scroll',function(){if(!ended){if(started)anims.forEach(function(a){try{a.finish();}catch(e){}});else bail();}},{once:true,passive:true});
-      var t0=performance.now(),started=false;
-      (im.decode?im.decode():Promise.resolve()).catch(function(){}).then(function(){
-        if(ended)return;
-        if(!im.complete||!im.naturalWidth||performance.now()-t0>1100||!win.animate){bail();return;}
-        setTimeout(function(){requestAnimationFrame(fly);},Math.max(0,380-(performance.now()-t0)));
-      });
-      function fly(){
-        if(ended)return;
-        var pane=$('.hw-pane',hw),r=pane.getBoundingClientRect(),wr=win.getBoundingClientRect(),W=innerWidth,H=innerHeight;
-        if(r.bottom<=0||r.top>=H||!r.width){bail();return;}
-        var cx=r.left+r.width/2,cy=r.top+r.height/2;
-        /* smallest scale at which the rounded pane, centred on the screen, contains the whole screen */
-        function fits(S){var pw=r.width*S,ph=r.height*S,rx=.44*pw,ry=.33*ph,hx=W/2+2,hy=H/2+2;if(hx>pw/2||hy>ph/2)return false;
-          var ax=hx-(pw/2-rx),ay=hy-(ph/2-ry);return ax<=0||ay<=0||(ax*ax)/(rx*rx)+(ay*ay)/(ry*ry)<=1;}
-        var S=1;for(var i=0;i<400&&!fits(S);i++)S*=1.02;
-        /* the photo inside, counter-scaled so it starts exactly screen-sized (cover), not S times too big */
-        var A=im.naturalWidth/im.naturalHeight,w=r.width,h=r.height,pw0=(w/h>A)?w:h*A,ph0=pw0/A,k=1.06;
-        var c=Math.max(W/(S*pw0*k),H/(S*ph0*k));
-        win.style.transformOrigin=(cx-wr.left).toFixed(1)+'px '+(cy-wr.top).toFixed(1)+'px';
-        var from='translate3d('+(W/2-cx).toFixed(1)+'px,'+(H/2-cy).toFixed(1)+'px,0) scale('+S.toFixed(4)+')';
-        hw.classList.add('intro-run');started=true;
-        anims.push(win.animate([{transform:from},{transform:'translate3d(0,0,0) scale(1)'}],{duration:D,easing:E,fill:'both'}));
-        anims.push(view.animate([{transform:'scale('+(k*c).toFixed(4)+')'},{transform:'scale('+k+')'}],{duration:D,easing:E,fill:'both'}));
-        if(nav)anims.push(nav.animate([{opacity:0},{opacity:1}],{duration:700,delay:D*.45,easing:'ease-out',fill:'both'}));
-        ov.remove();
-        anims[0].onfinish=land;
-      }
-    })();
-
-    /* the shade: tap the pull to lower or raise it, or drag it */
-    var shut=false;
-    function setShut(v){shut=v;hw.classList.toggle('shut',v);shade.style.transform='';
-      pull.setAttribute('aria-pressed',v?'true':'false');pull.setAttribute('aria-label',v?'Raise the window shade':'Lower the window shade');pull.setAttribute('data-tip',v?'Lift the shade':'Lower the shade');}
-    var dragging=false,dragged=false,startY=0,startF=0,curF=-.84,H=1,lastY=0,lastT=0,vel=0;
-    pull.addEventListener('click',function(){if(dragged){dragged=false;return;}settle();setShut(!shut);});
-    pull.addEventListener('keydown',function(e){if(e.key==='ArrowDown'&&!shut){e.preventDefault();settle();setShut(true);}if(e.key==='ArrowUp'&&shut){e.preventDefault();setShut(false);}});
-    pull.addEventListener('pointerdown',function(e){if(e.button>0)return;settle();H=pane.clientHeight||1;startY=lastY=e.clientY;lastT=e.timeStamp;startF=curF=shut?0:-.84;vel=0;dragging=true;dragged=false;
-      try{pull.setPointerCapture(e.pointerId);}catch(err){}});
-    pull.addEventListener('pointermove',function(e){if(!dragging)return;var dy=e.clientY-startY;
-      if(!dragged&&Math.abs(dy)>5){dragged=true;hw.classList.add('dragging');}
-      if(!dragged)return;curF=Math.max(-.84,Math.min(0,startF+dy/H));shade.style.transform='translate3d(0,'+(curF*100).toFixed(2)+'%,0)';
-      var dt=e.timeStamp-lastT;if(dt>0)vel=(e.clientY-lastY)/dt;lastY=e.clientY;lastT=e.timeStamp;});
-    function endDrag(){if(!dragging)return;dragging=false;hw.classList.remove('dragging');if(!dragged)return;
-      setShut(vel>.35?true:vel<-.35?false:curF>-.42);curF=shut?0:-.84;}
-    pull.addEventListener('pointerup',endDrag);pull.addEventListener('pointercancel',endDrag);
-
-    /* looking through glass: with a mouse, the view drifts against the pointer and the window turns a little toward it */
-    if(!fine||reduce)return;
-    var tx=0,ty=0,px=0,py=0,raf=0;
-    function step(){raf=0;px+=(tx-px)*.1;py+=(ty-py)*.1;
-      view.style.transform='translate3d('+(px*-16).toFixed(2)+'px,'+(py*-12).toFixed(2)+'px,0) scale(1.06)';
-      win.style.transform='translate3d('+(px*-6).toFixed(2)+'px,'+(py*-5).toFixed(2)+'px,0)';
-      card.style.transform='translate3d('+(px*10).toFixed(2)+'px,'+(py*8).toFixed(2)+'px,0)';
-      if(Math.abs(tx-px)>.002||Math.abs(ty-py)>.002)raf=requestAnimationFrame(step);}
-    hw.addEventListener('pointermove',function(e){if(e.pointerType!=='mouse'||!ready||dragging)return;var r=hw.getBoundingClientRect();
-      tx=Math.max(-1,Math.min(1,(e.clientX-r.left)/r.width*2-1));ty=Math.max(-1,Math.min(1,(e.clientY-r.top)/r.height*2-1));if(!raf)raf=requestAnimationFrame(step);});
-    hw.addEventListener('pointerleave',function(){tx=ty=0;if(!raf)raf=requestAnimationFrame(step);});
   })();
 
   /* =================== how it works: seven stops on a flight route =================== */
@@ -556,12 +494,21 @@ window.__SVC=[{"html": "<div class=\"sp-top\"><span class=\"phase-tag\"><i>1<\/i
     if(i===cur)return;cur=i;[].forEach.call(dots.children,function(b,k){b.classList.toggle('on',k===i);b.setAttribute('aria-current',k===i?'true':'false');});}
   rail.addEventListener('scroll',function(){cancelAnimationFrame(raf);raf=requestAnimationFrame(sync);},{passive:true});
   dots.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var i=[].indexOf.call(dots.children,b);rail.scrollTo({left:i*step(),behavior:'smooth'});});
-  addEventListener('resize',function(){clearTimeout(build.t);build.t=setTimeout(build,150);});
-  (window.requestIdleCallback||setTimeout)(build);})();
-/* runtime check: if this device can't hold a steady frame rate, switch to lite mode */
+  addEventListener('resize',function(){if(!built)return;clearTimeout(build.t);build.t=setTimeout(build,150);});
+  /* measured only as the stories come near: measuring at load forced a layout of a section the browser would otherwise skip */
+  var built=false;function first(){if(built)return;built=true;build();}
+  if('IntersectionObserver' in window){var bio=new IntersectionObserver(function(es){if(es[0].isIntersecting){bio.disconnect();first();}},{rootMargin:'600px 0px'});bio.observe(rail);}else(window.requestIdleCallback||setTimeout)(first);})();
+/* runtime check: if this device can't hold a steady frame rate, quieten the decorative effects (lite mode).
+   Frames are judged against this screen's own refresh interval (so a 30 Hz or 50 Hz screen is not "slow"), only
+   while the page is idle and visible, and the switch is cheap: lite mode only stops decorative loops and hover
+   effects; it never restyles or re-reveals the whole page at once (that alone used to freeze slow phones). */
 (function(){var doc=document.documentElement;if(doc.classList.contains('lite'))return;
-  var slow=0;
-  function sample(n){var fr=[],last=0;function f(t){if(last)fr.push(t-last);last=t;if(fr.length<60)requestAnimationFrame(f);else{fr.sort(function(a,b){return a-b;});
-    if(fr[30]>26)slow++;if(n<2)setTimeout(function(){sample(n+1);},1500);else if(slow>=2){doc.classList.add('lite');doc.classList.remove('anim');[].forEach.call(document.querySelectorAll('main > section, footer'),function(x){x.classList.add('sec-in','sec-done');});}}}
-    requestAnimationFrame(f);}
-  if(document.readyState==='complete')setTimeout(function(){sample(1);},1500);else addEventListener('load',function(){setTimeout(function(){sample(1);},1500);});})();
+  var slow=0,runs=0,base=0;
+  function sample(){if(document.hidden||performance.now()-(window.__lastScroll||0)<400){setTimeout(sample,1500);return;}
+    var fr=[],last=0;function f(t){if(last)fr.push(t-last);last=t;if(fr.length<48)requestAnimationFrame(f);else judge(fr);}requestAnimationFrame(f);}
+  function judge(fr){fr.sort(function(a,b){return a-b;});var vs=fr[3],med=fr[24];base=base?Math.min(base,vs):vs;
+    if((med>base*1.6&&med>24)||med>45)slow++;runs++;
+    if(slow>=2){doc.classList.add('lite');return;}
+    if(runs<3)setTimeout(sample,2500);}
+  function start(){setTimeout(sample,2000);}
+  if(document.readyState==='complete')start();else addEventListener('load',start);})();

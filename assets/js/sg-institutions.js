@@ -1,6 +1,6 @@
 
 (function(){
-  var D=JSON.parse(document.getElementById('data').textContent),doc=document.documentElement,HOME='./';
+  var D=JSON.parse(document.getElementById('data').textContent),doc=document.documentElement,HOME='index.html';
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   var LABEL={'Autonomous University':'Public university','Polytechnic':'Polytechnic','ITE':'ITE','Offshore Campus':'Offshore campus','Arts Institution':'Arts institution','Higher Education':'Private (degree)','Vocational':'Private (diploma)'};
   var INFO={

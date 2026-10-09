@@ -1,0 +1,49 @@
+/* Additions shared by every screen size:
+   - "Your pathway" in light mode: printed on warm paper instead of the night-blue of dark mode
+   - the footer's WhatsApp contact uses the WhatsApp mark
+   (The Tutee AI launcher lives in sg-tutee-ai.css; phone layouts in sg-mobile.css.) */
+
+/* ---- Your pathway, light mode: paper, teal guilloche, ink type; the passes keep their own colours ---- */
+html:not([data-mode="dark"]) .pw{background:#F7F2E8;color:#0F2930}
+html:not([data-mode="dark"]) .pw h2{color:#0F2930}
+html:not([data-mode="dark"]) .pw .kicker{color:#A51D2A}
+html:not([data-mode="dark"]) .pw .lede{color:#45585C}
+html:not([data-mode="dark"]) .pw .link-cta{color:#0F3E48}
+html:not([data-mode="dark"]) .pw-bg{background:
+  radial-gradient(60% 70% at 12% 20%,rgba(23,96,107,.14),transparent 70%),
+  radial-gradient(50% 60% at 92% 90%,rgba(217,43,58,.10),transparent 70%)}
+html:not([data-mode="dark"]) .pw-bg::before{background:repeating-radial-gradient(circle at 50% 50%,rgba(15,62,72,.13) 0 1px,transparent 1.5px 14px)}
+html:not([data-mode="dark"]) .pw-bg::after{background:repeating-radial-gradient(circle at 46% 54%,rgba(165,29,42,.08) 0 1px,transparent 1.5px 11px)}
+html:not([data-mode="dark"]) .pw-card{box-shadow:0 1px 0 rgba(255,255,255,.18) inset,0 26px 50px -26px rgba(15,41,48,.55),0 0 0 1px rgba(15,41,48,.08)}
+html:not([data-mode="dark"]) .pw-now span{color:#A51D2A}
+html:not([data-mode="dark"]) .pw-now b{color:#0F2930}
+html:not([data-mode="dark"]) .pw-rights li{background:#FFFFFF;border-color:#E3DACB;box-shadow:0 10px 24px -20px rgba(15,41,48,.5)}
+html:not([data-mode="dark"]) .pw-rights li[data-st="yes"]{border-color:rgba(31,140,90,.45);background:#F1FAF5}
+html:not([data-mode="dark"]) .pw-ic{background:rgba(15,62,72,.08);color:#0F3E48}
+html:not([data-mode="dark"]) .pw-rights b{color:#0F2930}
+html:not([data-mode="dark"]) .pw-v{color:#45585C}
+html:not([data-mode="dark"]) .pw-v i{background:#9AA9AD}
+html:not([data-mode="dark"]) [data-st="yes"] .pw-v i{background:#1F8C5A;box-shadow:0 0 0 4px rgba(31,140,90,.16)}
+html:not([data-mode="dark"]) [data-st="part"] .pw-v i{background:#D69A1E;box-shadow:0 0 0 4px rgba(214,154,30,.18)}
+html:not([data-mode="dark"]) [data-st="no"] .pw-v i{background:#D92B3A}
+html:not([data-mode="dark"]) [data-st="done"] .pw-v i{box-shadow:inset 0 0 0 2px #1F8C5A}
+html:not([data-mode="dark"]) [data-st="soon"] .pw-v i{box-shadow:inset 0 0 0 2px #9AA9AD}
+html:not([data-mode="dark"]) .pw-track{background:rgba(15,62,72,.15)}
+html:not([data-mode="dark"]) .pw-track b{background:#F7F2E8;border-color:rgba(15,62,72,.4)}
+html:not([data-mode="dark"]) .pw-track b.on{background:#D69A1E;border-color:#D69A1E}
+html:not([data-mode="dark"]) .pw-scrub input::-webkit-slider-thumb{border-color:#D69A1E;box-shadow:0 6px 16px -6px rgba(15,41,48,.5)}
+html:not([data-mode="dark"]) .pw-scrub input::-moz-range-thumb{border-color:#D69A1E}
+html:not([data-mode="dark"]) .pw-scrub::before{border-color:rgba(214,154,30,.7)}
+html:not([data-mode="dark"]) .pw-stops button{color:#5B6E72}
+html:not([data-mode="dark"]) .pw-stops button:hover{color:#0F2930}
+html:not([data-mode="dark"]) .pw-stops button[aria-pressed="true"]{color:#fff;background:#0F3E48}
+html:not([data-mode="dark"]) .pw-stops button:focus-visible{outline-color:#0F3E48}
+html:not([data-mode="dark"]) .pw-hint{color:#5B6E72}
+html:not([data-mode="dark"]) .pw-scrub input:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 4px #F7F2E8,0 0 0 7px #0F3E48}
+
+/* ---- footer: the WhatsApp contact wears the WhatsApp mark, in the same colour as the other contact icons ---- */
+.contact .c-ic.c-wa{box-shadow:none!important}
+.contact .c-ic.c-wa svg{width:20px;height:20px}
+
+/* ---- relocating with family: the slideshow turns every 3 s (sg-landing.js); each photo's slow zoom fits that ---- */
+.fam-slides img{transition:opacity .9s var(--ease-out),transform 3.6s linear}

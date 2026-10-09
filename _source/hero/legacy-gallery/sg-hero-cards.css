@@ -1,0 +1,187 @@
+/* Hero: an expanding gallery of four real photographs, each a way into the page, and a boarding pass
+   that fills in as the visitor chooses (assets/js/sg-hero-cards.js). Everything that moves is a transform, so the
+   GPU composites it without layout or repaint; nothing animates off screen, in a hidden tab, or with reduced motion. */
+.jh{
+  --jh-ink:#0E2A2E;--jh-sub:#3E5559;--jh-bg:#F4F0E8;--jh-chip:rgba(255,255,255,.88);--jh-line:rgba(15,41,48,.13);
+  --jh-shadow:rgba(15,41,48,.28);--jh-accent:#C8402B;--jh-teal:#0F3E48;--jh-gold:#F2B544;--jh-paper:#FFFDF8;
+  --jh-serif:"Source Serif Display","Source Serif 4",Georgia,"Times New Roman",serif;--jh-ease:cubic-bezier(.22,1,.36,1);
+  position:relative;isolation:isolate;overflow:hidden;overflow:clip;padding:0;color:var(--jh-ink);
+  background:
+    radial-gradient(48% 60% at 76% 46%,rgba(120,190,200,.32),rgba(120,190,200,0) 70%),
+    radial-gradient(34% 40% at 94% 8%,rgba(246,176,120,.30),rgba(246,176,120,0) 70%),
+    radial-gradient(44% 50% at 4% 100%,rgba(240,123,79,.10),rgba(240,123,79,0) 70%),
+    var(--jh-bg)}
+html[data-mode="dark"] .jh{
+  --jh-ink:#EEF4F2;--jh-sub:#BCCBC8;--jh-bg:#081820;--jh-chip:rgba(12,34,42,.9);--jh-line:rgba(228,239,237,.14);
+  --jh-shadow:rgba(0,0,0,.55);--jh-accent:#FF9A7A;
+  background:
+    radial-gradient(48% 60% at 76% 46%,rgba(40,120,140,.30),rgba(40,120,140,0) 70%),
+    radial-gradient(34% 40% at 94% 8%,rgba(246,150,90,.14),rgba(246,150,90,0) 70%),
+    var(--jh-bg)}
+/* the flight path behind everything: from home, across the page, to Singapore */
+.jh-route{position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+.jh-route path{fill:none;stroke:color-mix(in srgb,var(--jh-ink) 22%,transparent);stroke-width:1.5;stroke-dasharray:2 9;stroke-linecap:round}
+.jh::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.55;
+  background:linear-gradient(90deg,color-mix(in srgb,var(--jh-ink) 4%,transparent) 1px,transparent 1px) 0 0/56px 56px,
+    linear-gradient(0deg,color-mix(in srgb,var(--jh-ink) 4%,transparent) 1px,transparent 1px) 0 0/56px 56px;
+  -webkit-mask:radial-gradient(60% 70% at 70% 45%,#000 20%,transparent 75%);mask:radial-gradient(60% 70% at 70% 45%,#000 20%,transparent 75%)}
+
+.jh-grid{display:grid;grid-template-columns:minmax(0,560px) minmax(0,1fr);gap:clamp(24px,4vw,64px);align-items:center;
+  min-height:min(100svh,900px);padding-top:clamp(100px,12vh,120px);padding-bottom:clamp(28px,5vh,52px)}
+
+/* ---- copy ---- */
+.jh-live{display:inline-flex;align-items:center;gap:10px;margin:0 0 18px;padding:8px 15px 8px 12px;border-radius:999px;font:600 13.5px/1.2 var(--body);
+  background:var(--jh-chip);border:1px solid var(--jh-line);box-shadow:0 10px 24px -16px var(--jh-shadow)}
+.jh-pulse{position:relative;width:9px;height:9px;border-radius:50%;background:#1FB46A;flex:none}
+.jh-pulse::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:2px solid #1FB46A;opacity:0;animation:jhPing 2.2s ease-out infinite}
+@keyframes jhPing{0%{transform:scale(.5);opacity:.8}100%{transform:scale(1.8);opacity:0}}
+.jh.off .jh-pulse::after{animation-play-state:paused}
+.jh-title{font-family:var(--jh-serif);font-weight:600;font-size:clamp(40px,3.9vw,56px);line-height:1.05;letter-spacing:-.02em;margin:0;color:var(--jh-ink);text-wrap:balance}
+.jh-title em{font-family:var(--display);font-style:italic;font-weight:500;font-variation-settings:"opsz" 144;color:var(--jh-accent);white-space:nowrap}
+.jh-lede{margin:20px 0 0;max-width:44ch;font-size:clamp(16.5px,1.3vw,18.5px);line-height:1.65;color:var(--jh-sub)}
+.jh-pick{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:24px}
+.jh-pick-l{width:100%;margin-bottom:4px;font:600 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--jh-sub)}
+.jh-pick button{min-height:44px;padding:0 18px;border-radius:999px;font:700 15px/1 var(--body);color:var(--jh-ink);cursor:pointer;
+  background:var(--jh-chip);border:1px solid var(--jh-line);transition:transform .25s var(--jh-ease),background-color .2s,color .2s,border-color .2s}
+.jh-pick button:hover{transform:translateY(-2px)}
+.jh-pick button[aria-pressed="true"]{background:var(--jh-teal);border-color:var(--jh-teal);color:#fff}
+html[data-mode="dark"] .jh-pick button[aria-pressed="true"]{background:var(--jh-gold);border-color:var(--jh-gold);color:#1B1300}
+.jh-pick button[aria-pressed="true"]::before{content:"✓ ";content:"✓ " / ""}
+.jh-ctas{display:flex;flex-wrap:wrap;align-items:center;gap:12px 28px;margin-top:22px}
+.jh-btn{display:inline-flex;align-items:center;gap:14px;min-height:56px;padding:0 9px 0 28px;border-radius:999px;text-decoration:none;font:700 17px/1 var(--body);color:#fff;
+  background:linear-gradient(135deg,#F07B4F,#D9462A);box-shadow:0 18px 34px -16px rgba(214,74,40,.8),inset 0 1px 0 rgba(255,255,255,.35);
+  transition:transform .25s var(--jh-ease),box-shadow .25s var(--jh-ease)}
+.jh-btn:hover{transform:translateY(-2px);box-shadow:0 24px 40px -16px rgba(214,74,40,.9),inset 0 1px 0 rgba(255,255,255,.35)}
+.jh-btn:active{transform:scale(.98);transition-duration:.08s}
+.jh-btn-ic{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.22);transition:transform .3s var(--jh-ease)}
+.jh-btn:hover .jh-btn-ic{transform:translateX(3px)}
+.jh-btn.pop{animation:jhPop .5s var(--jh-ease)}
+@keyframes jhPop{40%{transform:scale(1.05)}}
+.jh-link{display:inline-flex;align-items:center;min-height:48px;color:var(--jh-ink);font-weight:700;font-size:16.5px;text-decoration:none;
+  background:linear-gradient(currentColor,currentColor) 0 calc(100% - 10px)/100% 2px no-repeat;transition:background-size .3s var(--jh-ease)}
+.jh-link:hover{background-size:100% 4px}
+.jh-proof{list-style:none;margin:28px 0 0;padding:18px 0 0;border-top:1px solid var(--jh-line);display:flex}
+.jh-proof li{display:flex;flex-direction:column;padding-right:24px;margin-right:24px;border-right:1px solid var(--jh-line)}
+.jh-proof li:last-child{border:0;margin:0;padding:0}
+.jh-proof b{font:600 28px/1.1 var(--jh-serif);color:var(--jh-ink)}
+html:not([data-mode="dark"]) .jh-proof b{color:var(--jh-teal)}
+.jh-proof span{margin-top:4px;font-size:13.5px;font-weight:600;line-height:1.3;color:var(--jh-sub)}
+.jh :is(.jh-btn,.jh-link,.jh-pick button,.jh-pass):focus-visible{outline:3px solid var(--jh-accent);outline-offset:4px}
+
+/* ---- the gallery: four tall panels side by side; the open one shows its photograph and caption, the others fold
+   into strips with their label running up the side. Each photograph is drawn at the full gallery width and only the
+   panel's window onto it changes, so opening a panel never rescales an image. ---- */
+.jh-side{display:flex;flex-direction:column;align-items:center;gap:14px}
+.jh-deck{--strip:64px;--gap:8px;position:relative;display:flex;gap:var(--gap);width:min(100%,560px);height:clamp(380px,52vh,480px);touch-action:pan-y;container-type:inline-size}
+.jh-card{position:relative;flex:0 0 var(--strip);min-width:0;overflow:hidden;border-radius:20px;text-decoration:none;color:#fff;background:#0B1F26;
+  box-shadow:0 30px 50px -30px var(--jh-shadow),0 8px 18px -12px var(--jh-shadow);
+  transition:flex-grow .75s var(--jh-ease);-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;cursor:pointer;
+  animation:jhDeal .9s var(--jh-ease) backwards;animation-delay:calc(var(--d) * 90ms)}
+.jh-card[data-p="0"]{flex-grow:1;cursor:default}
+@keyframes jhDeal{from{translate:0 60px;opacity:0}to{translate:0 0;opacity:1}}
+.jh-card img{position:absolute;top:0;left:50%;width:100cqw;max-width:none;height:100%;object-fit:cover;transform:translateX(-50%) scale(1.06);
+  transition:transform 1.2s var(--jh-ease),filter .6s;-webkit-user-drag:none;pointer-events:none}
+.jh-card[data-p="0"] img{transform:translateX(-50%)}
+/* the folded strips sit in shade, lifting a little under the mouse */
+.jh-card::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,24,30,.35),rgba(8,24,30,.78));opacity:1;transition:opacity .6s var(--jh-ease);pointer-events:none}
+.jh-card[data-p="0"]::after{opacity:0}
+.jh-card:not([data-p="0"]):hover::after{opacity:.6}
+.jh-tab{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:18px 0;transition:opacity .35s ease-out}
+.jh-tab b{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;font:700 12.5px/1 var(--mono);color:#0E2A2E;background:rgba(255,255,255,.9)}
+.jh-tab span{writing-mode:vertical-rl;transform:rotate(180deg);font:600 15px/1 var(--body);letter-spacing:.04em;white-space:nowrap;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.5)}
+.jh-card[data-p="0"] .jh-tab{opacity:0;pointer-events:none}
+.jh-loc{position:absolute;z-index:1;left:16px;top:16px;display:inline-flex;align-items:center;gap:7px;padding:6px 11px 6px 9px;border-radius:999px;white-space:nowrap;
+  font:600 12.5px/1.2 var(--body);color:#0E2A2E;background:rgba(255,255,255,.9);box-shadow:0 6px 16px -8px rgba(0,0,0,.45);opacity:0;transition:opacity .3s}
+.jh-loc::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--jh-accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--jh-accent) 25%,transparent)}
+.jh-cap{position:absolute;z-index:1;left:0;bottom:0;width:max(100%,calc(100cqw - 3 * (var(--strip) + var(--gap))));display:block;padding:60px 20px 20px;
+  background:linear-gradient(180deg,rgba(6,18,24,0),rgba(6,18,24,.6) 40%,rgba(6,18,24,.9));opacity:0;transform:translateY(10px);transition:opacity .3s ease-out,transform .5s var(--jh-ease)}
+.jh-card[data-p="0"] :is(.jh-loc,.jh-cap){opacity:1;transition-delay:.3s}
+.jh-card[data-p="0"] .jh-cap{transform:none}
+.jh-cap small{display:flex;align-items:center;gap:8px;font:600 11.5px/1.3 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#FFD08A}
+.jh-cap strong{display:block;margin-top:4px;font:600 23px/1.18 var(--jh-serif);letter-spacing:-.01em;color:#fff}
+/* the timer: a thin line filling along the bottom of the open photograph (its animationend moves the gallery on) */
+.jh-time{position:absolute;z-index:2;left:20px;right:20px;bottom:10px;height:3px;border-radius:3px;background:rgba(255,255,255,.25);overflow:hidden;opacity:0;transition:opacity .3s}
+.jh-time::after{content:"";position:absolute;inset:0;border-radius:inherit;background:#FFD08A;transform:scaleX(0);transform-origin:left}
+.jh-card[data-p="0"] .jh-time{opacity:1}
+.jh-time.run::after{animation:jhTimer 6s linear both}
+@keyframes jhTimer{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.jh.hold .jh-time::after,.jh.paused .jh-time::after,.jh.off .jh-time::after{animation-play-state:paused}
+.jh-card:focus-visible{outline:3px solid var(--jh-accent);outline-offset:3px}
+/* ---- the boarding pass ---- */
+.jh-pass{position:relative;display:flex;width:min(100%,430px);margin-top:4px;text-decoration:none;color:#14282C;transform:rotate(-1.5deg);
+  filter:drop-shadow(0 18px 22px rgba(15,41,48,.22));transition:transform .4s var(--jh-ease)}
+html[data-mode="dark"] .jh-pass{filter:drop-shadow(0 18px 24px rgba(0,0,0,.5))}
+.jh-pass:hover{transform:rotate(0deg) translateY(-4px)}
+.jh-pass-main,.jh-pass-stub{background:var(--jh-paper)}
+/* the tear line: two bites out of the paper where the stub joins */
+.jh-pass-main{flex:1;display:flex;flex-direction:column;gap:10px;padding:14px 18px 14px 20px;border-radius:16px 0 0 16px;
+  -webkit-mask:radial-gradient(circle 9px at 100% 0,#0000 98%,#000) top/100% 51% no-repeat,radial-gradient(circle 9px at 100% 100%,#0000 98%,#000) bottom/100% 51% no-repeat;
+  mask:radial-gradient(circle 9px at 100% 0,#0000 98%,#000) top/100% 51% no-repeat,radial-gradient(circle 9px at 100% 100%,#0000 98%,#000) bottom/100% 51% no-repeat}
+.jh-pass-stub{position:relative;flex:none;width:108px;display:flex;flex-direction:column;justify-content:center;gap:4px;padding:14px 16px;border-radius:0 16px 16px 0;
+  border-left:2px dashed #D9D1BF;transition:background-color .25s,color .25s;
+  -webkit-mask:radial-gradient(circle 9px at 0 0,#0000 98%,#000) top/100% 51% no-repeat,radial-gradient(circle 9px at 0 100%,#0000 98%,#000) bottom/100% 51% no-repeat;
+  mask:radial-gradient(circle 9px at 0 0,#0000 98%,#000) top/100% 51% no-repeat,radial-gradient(circle 9px at 0 100%,#0000 98%,#000) bottom/100% 51% no-repeat}
+.jh-pass:hover .jh-pass-stub{background:#E2572F;color:#fff}
+.jh-pass-stub small{font:600 10.5px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;opacity:.7}
+.jh-pass-stub b{font:700 15px/1.2 var(--body)}
+.jh-pass-stub i{font-style:normal;font-weight:700;transition:transform .3s var(--jh-ease)}
+.jh-pass:hover .jh-pass-stub i{transform:translateX(4px)}
+.jh-pass-top{display:flex;justify-content:space-between;font:600 10.5px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:#6A7A7C}
+.jh-pass-top b{color:#C8402B;font-weight:700}
+.jh-pass-route{display:flex;align-items:center;gap:10px}
+.jh-port{display:flex;flex-direction:column}
+.jh-port.to{text-align:right}
+.jh-port b{font:600 32px/1 var(--jh-serif);letter-spacing:.01em;color:#0F3E48}
+.jh-port small{margin-top:3px;font-size:12.5px;font-weight:600;color:#5B6E72;white-space:nowrap}
+.jh-flight{flex:1;position:relative;display:grid;place-items:center;height:24px;color:#C8402B}
+.jh-flight::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:2px dotted #C9C0AC}
+.jh-flight svg{position:relative;padding:0 6px;background:var(--jh-paper);box-sizing:content-box}
+.jh-pass-meta{display:flex;gap:22px;padding-top:9px;border-top:1px solid #ECE5D6}
+.jh-pass-meta span{display:flex;flex-direction:column;gap:2px}
+.jh-pass-meta small{font:600 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#7A898B}
+.jh-pass-meta b{font:700 14px/1.2 var(--body);color:#14282C}
+.jh-pass-meta b.set{animation:jhSet .5s var(--jh-ease)}
+@keyframes jhSet{0%{transform:translateY(6px);opacity:0}100%{transform:none;opacity:1}}
+
+/* ---- laptops ---- */
+@media (min-width:820px) and (max-width:1199px){
+  .jh-grid{grid-template-columns:minmax(0,440px) minmax(0,1fr)}
+  .jh-title{font-size:clamp(38px,4.2vw,50px)}
+  .jh-lede{font-size:16.5px}
+  .jh-cap strong{font-size:20px}
+}
+/* ---- short desktop screens: the pass gives way so the deck and copy fit ---- */
+@media (min-width:820px) and (max-height:760px){.jh-pass{display:none}}
+/* ---- phones and narrow tablets: the deck on top, the copy below ---- */
+@media (max-width:819px){
+  .jh-grid{grid-template-columns:minmax(0,1fr);gap:0;min-height:0;padding-top:88px;padding-bottom:44px}
+  .jh-side{order:-1;gap:8px}
+  .jh-deck{--strip:44px;--gap:6px;flex-direction:column;width:min(100%,460px);height:calc(min(56vw,250px) + 3 * (var(--strip) + var(--gap)));container-type:normal}
+  .jh-card{border-radius:16px;transition-property:flex-grow}
+  .jh-card img{left:0;top:50%;width:100%;height:min(56vw,250px);transform:translateY(-50%) scale(1.06)}
+  .jh-card[data-p="0"] img{transform:translateY(-50%)}
+  .jh-tab{flex-direction:row;justify-content:flex-start;gap:12px;padding:0 14px}
+  .jh-tab b{width:28px;height:28px;font-size:11px}
+  .jh-tab span{writing-mode:horizontal-tb;transform:none;font-size:14.5px}
+  .jh-cap{width:100%}
+  .jh-pass{display:none}
+  .jh-loc{left:14px;top:14px;font-size:11.5px}
+  .jh-cap{padding:34px 16px 14px}
+  .jh-cap strong{font-size:18.5px}
+  .jh-copy{margin-top:22px}
+  .jh-live{margin-bottom:16px}
+}
+@media (max-width:560px){
+  .jh-title{font-size:clamp(33px,9vw,40px)}
+  .jh-lede{margin-top:14px;font-size:16px}
+  .jh-pick{margin-top:20px;gap:6px}
+  .jh-pick button{padding:0 13px;font-size:14px}
+  .jh-ctas{gap:6px 22px}
+  .jh-btn{flex:1 1 100%;justify-content:space-between}
+  .jh-proof{margin-top:26px;padding-top:18px}
+  .jh-proof li{padding-right:14px;margin-right:14px}
+  .jh-proof b{font-size:23px}.jh-proof span{font-size:12px}
+}
+@media (prefers-reduced-motion:reduce){
+  .jh *,.jh *::before,.jh *::after{animation:none!important;transition:none!important}
+}

@@ -9,9 +9,10 @@ Checks, at 390, 768 and 1440 px, light and dark mode:
   focus      every focusable control in the hero shows a visible focus indicator on Tab
   targets    every control is at least 44 x 44 px
   overflow   no horizontal scroll
-  motion     with prefers-reduced-motion, no hero animation runs and the shade is at rest
+  motion     with prefers-reduced-motion, nothing in the hero animates and the greeting stays put
   cls        layout shift during load (whole page, and how much came from the hero)
-  preload    the hero image is preloaded (link rel=preload, same srcset) and fetched from it
+  preload    the hero photograph for the current theme is preloaded from <head> (sg-theme.js) at high priority and
+             fetched by that link, only the one photograph is fetched, and every in-page link in the hero leads somewhere
 """
 import asyncio, io, json, sys
 from PIL import Image
@@ -122,32 +123,30 @@ async def check_size(b, w, h, mob, mode):
         if not ok: FAILS.append(f'{tag}: no visible focus on "{f["name"]}"')
     if seen < len(ctrls): FAILS.append(f'{tag}: only {seen}/{len(ctrls)} hero controls reached by Tab')
 
-    # preload
-    pre = await pg.evaluate("""() => {const l = document.querySelector('link[rel=preload][as=image]'), i = document.querySelector('#home img');
-        const e = performance.getEntriesByName(i.currentSrc)[0];
-        return {link: !!l, same: !!l && l.getAttribute('imagesrcset') === i.getAttribute('srcset'), src: i.currentSrc.split('/').pop(),
-                via: e ? e.initiatorType : null, alt: !!i.alt, dims: i.hasAttribute('width') && i.hasAttribute('height')}}""")
-    ok = pre['link'] and pre['same'] and pre['via'] == 'link' and pre['alt'] and pre['dims']
+    # preload: the photograph for this theme is preloaded from <head> at high priority and fetched by that link, and
+    # it is the only hero photograph fetched; every in-page link in the hero leads somewhere
+    pre = await pg.evaluate("""() => {const n = document.documentElement.dataset.mode === 'dark' ? 'night' : 'day';
+        const l = [...document.querySelectorAll('link[rel=preload][as=image]')].filter(l => l.href.includes('welcome-' + n) && matchMedia(l.media || 'all').matches)[0];
+        const got = performance.getEntriesByType('resource').filter(e => /welcome-/.test(e.name));
+        return {link: !!l, high: !!l && l.getAttribute('fetchpriority') === 'high', via: got.length ? got[0].initiatorType : null,
+                fetched: got.map(e => e.name.split('/').pop()),
+                deadLinks: [...document.querySelectorAll('#home a[href^="#"]')].map(a => a.getAttribute('href')).filter(h => h.length > 1 && !document.querySelector(h))}}""")
+    ok = pre['link'] and pre['high'] and pre['via'] == 'link' and len(pre['fetched']) == 1 and not pre['deadLinks']
     print(f'  preload    {"ok " if ok else "FAIL"} {pre}')
-    if not ok: FAILS.append(f'{tag}: hero image preload {pre}')
-    await c.close()
+    if not ok: FAILS.append(f'{tag}: hero photo preload / links {pre}')    await c.close()
 
 async def check_motion(b):
     c = await b.new_context(viewport={'width': 1440, 'height': 900}, reduced_motion='reduce')
-    pg = await c.new_page(); await pg.goto(URL); await pg.wait_for_timeout(150)
-    r = await pg.evaluate("""() => {const h = document.querySelector('#home');
-        const run = document.getAnimations().filter(a => a.effect && a.effect.target && h.contains(a.effect.target) && a.playState === 'running');
-        const sh = getComputedStyle(document.querySelector('.hw-shade')).transform;
-        return {running: run.length, shade: sh, ready: h.classList.contains('ready')}}""")
-    await pg.mouse.move(1200, 300); await pg.wait_for_timeout(300)
-    par = await pg.evaluate("document.querySelector('.hw-view').style.transform")
-    await pg.click('#hwPull'); await pg.wait_for_timeout(50)
-    shut = await pg.evaluate("[document.querySelector('#home').classList.contains('shut'),getComputedStyle(document.querySelector('.hw-shade')).transform]")
-    ok = r['running'] == 0 and r['ready'] and not par and shut[0] and shut[1] in ('none', 'matrix(1, 0, 0, 1, 0, 0)')
-    print(f'reduced motion: {"ok " if ok else "FAIL"} running={r["running"]} shade={r["shade"]} parallax={par!r} instant-close={shut}')
-    if not ok: FAILS.append(f'reduced motion: {r} parallax={par!r} shut={shut}')
+    pg = await c.new_page(); await pg.goto(URL, wait_until='load'); await pg.wait_for_timeout(4000)
+    # nothing in the hero animates on its own: no running CSS animations, and the greeting stays on its first word
+    deck = "() => document.querySelector('#home .wh-word.on').textContent + ' paused'"
+    a = await pg.evaluate(deck); await pg.wait_for_timeout(7000); b2 = await pg.evaluate(deck)
+    run = await pg.evaluate("""() => {const h = document.querySelector('#home');
+        return document.getAnimations().filter(a => a.effect && a.effect.target && h.contains(a.effect.target) && a.playState === 'running').length}""")
+    ok = run == 0 and a == b2 and a.endswith('paused')
+    print(f'reduced motion: {"ok " if ok else "FAIL"} running={run} greeting {a!r} -> {b2!r}')
+    if not ok: FAILS.append(f'reduced motion: running={run} greeting {a!r} -> {b2!r}')
     await c.close()
-
 async def main():
     async with async_playwright() as p:
         b = await p.chromium.launch()

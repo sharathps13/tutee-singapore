@@ -6,6 +6,73 @@
 > old `universities.html` and `tutee-singapore-landing.html` URLs to the new pages.
 > **To deploy on Netlify and connect the form to Supabase, see [DEPLOY.md](DEPLOY.md).**
 >
+> **Hero (October 2026): "Welcome to Singapore".** One photograph, full bleed: Jewel Changi's Rain Vortex by day
+> in light mode and lit up at night in dark mode, where many students first arrive. `assets/css/sg-hero-welcome.css`
+> and `assets/js/sg-hero-welcome.js`.
+> - **The photograph** is a CSS background sized by media query (1680 px, 1200 px on laptops and tablets at 1x, a
+>   native-resolution portrait crop on phones); `assets/js/sg-theme.js` preloads the one for the saved theme from
+>   `<head>`, with the same media queries, so only one photo is ever fetched at load. On a theme change the old photo
+>   stays on top until the new one has decoded, then fades away. Desktop: a veil from the left keeps the words
+>   readable with the vortex to the right. Tablets and phones: the photo on top fading into the page, the words below.
+> - **Motion:** the photo settles in (a slow zoom), motes of light rise from the waterfall, the greeting turns
+>   through English, Malay, Mandarin and Tamil, the copy rises in, the boarding pass is stamped "Welcome", a sheen
+>   passes over the main button, and the photo leans away from the mouse and drifts with the scroll. Transform and
+>   opacity only; paused off screen and in a hidden tab; none with reduced motion; the motes are dropped in lite mode.
+> - **The boarding pass** fills in as the visitor chooses: the study-level chips set its class (and the form's
+>   *Interested in*, and the main button, "Plan my Master's"), and it mirrors the enquiry pass's guess of the
+>   visitor's city, so the two passes always show the same trip. It links to the form.
+> - **The moving picture** is real footage on a loop, made by
+>   `blender -b --factory-startup --python _source/hero/make_hero_video.py -- . [day|night]`: light mode is the Rain
+>   Vortex at Jewel Changi Airport (Nirjhar Basak, Pexels, 4K tripod shot); dark mode is the Supertree Grove at Gardens by
+>   the Bay at night, changing colour (Viktor Kartinskii, Vecteezy free licence, attribution required, 4K tripod shot). Each clip is cropped to the hero frame, its last second faded into its first so it loops
+>   without a jump, and encoded at 1920 and 1280 px with a still of its first frame. The still shows at once
+>   (preloaded by `sg-theme.js`); the video loads after the page, fades in over it, pauses off screen, and is skipped
+>   with reduced motion or Save-Data. Credited in the footer.
+> - Earlier hero versions are kept, unpublished: `_source/hero/legacy-gallery/` (the postcard deck and the expanding
+>   gallery) and `_source/hero3d/` (`legacy-live3d/`, the three.js scene; `legacy-miniature/`, the rendered turntable).
+> - `verify_hero.py` checks contrast, focus, targets, overflow, layout shift, reduced motion, the photo's preload
+>   and that every in-page link in the hero leads somewhere.
+>
+> **Phones, Tutee AI and polish (October 2026).**
+> - `assets/css/sg-mobile.css` + `assets/js/sg-mobile.js`: on phones nothing scrolls sideways any more. Why Singapore,
+>   universities, funding and stories read top to bottom (stories show three, then "More stories"); the seven stops
+>   and nine services wrap into grids. The enquiry pass is compacted (and the bottom bar steps aside while it is on
+>   screen) so the whole pass fits on one screen from 360 x 640 up.
+> - `assets/js/sg-tutee-ai.js` + `assets/css/sg-tutee-ai.css`: the Tutee AI button (bottom left). Answers come from
+>   topics written from this page (several wordings each) and, failing that, the closest FAQ or section passage; it
+>   runs in the browser, sends nothing anywhere, and points to an advisor for anything personal. Edit the `T` list
+>   to change what it knows.
+> - `assets/css/sg-enhance.css`: Your pathway on warm paper in light mode; the footer's WhatsApp mark.
+> - Arriving with a section in the address (`./#universities` from the institutions page) now lands exactly on it.
+> **Background motion (October 2026).** Sections on a plain background carry a quiet motif of their subject:
+> Services, a soft light over a dot grid that follows the stage of the selected service (teal before you apply,
+> gold getting in, red after you land);
+> Universities, places pinging on a faint campus map; Funding, a budget building bar by bar; Student stories,
+> quotation marks rising; FAQ, question marks turning into ticks. On `institutions.html` the ranking sits on the
+> same campus map and the full list has a search lens drifting over it. `assets/js/sg-bgfx.js` adds a section's
+> markup (and, once, `assets/css/sg-bgfx.css`) only when that section first comes near the screen; each runs only
+> while on screen; transform and opacity only; none with reduced motion; hidden in lite mode.
+>
+> **Your pathway (October 2026).** A wallet of the four passes (Student's Pass, Long-Term Visit Pass, Employment
+> Pass, PR) and a slider through the years (`assets/css/sg-pathway.css`, `assets/js/sg-pathway.js`). Dragging lifts
+> each pass off the stack, stamps it and tucks it behind; the panel shows what the pass in hand allows (study, work,
+> family, staying for good), read from each card's `data-r`. The slider is a native range, so keyboard and screen
+> readers work; stops, a tap on a card and a swipe also move it. Without the script the passes are simply listed.
+>
+> **Performance work (October 2026)**, measured with headless Edge over the DevTools protocol (Long Animation
+> Frames), including a phone at 390 px with the CPU slowed 4x and 6x:
+> - The frame-rate check in `sg-landing.js` used to switch slow devices to lite mode by re-revealing every section
+>   and dropping the page-wide `anim` class, which restyled the whole page at once (a 725 ms freeze on a slow phone,
+>   the "lag" seen right after load). It now judges frames against the screen's own refresh (so 30 or 50 Hz screens
+>   are not "slow"), samples only while idle and visible, and only adds `lite` (whose rules no longer use a
+>   universal selector).
+> - The stories carousel measures itself when it comes near, not at load (that forced a layout of an off-screen
+>   section). The hero no longer forces a reflow to restart its timer. Phones lay out sections as the visitor
+>   approaches them instead of all at once after load, and only fast desktop connections pre-fetch images.
+> - The hero fetches a single photograph at load (the other theme's is fetched only if the theme is switched).
+> - Result: main-thread blocking during load on the throttled phone fell from ~1.1 s to ~0.2-0.4 s; scrolling the
+>   whole page holds the display's frame rate on desktop and the throttled phone (no frame over 34 ms; at 6x, 2 of
+>   419); layout shift 0; nav links land on their section.
 > These two pages are no longer produced by `_tooling/`. Running the old
 > `assemble.py singapore` / `build_unipage.py singapore` would overwrite them,
 > so don't run those for Singapore. The notes below describe the previous build

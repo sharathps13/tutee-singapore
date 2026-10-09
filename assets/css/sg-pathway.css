@@ -1,0 +1,148 @@
+/* "Your pathway" (assets/js/sg-pathway.js): a wallet of the four passes, from Student's Pass to PR, and a slider
+   through the years. Dragging lifts each pass off the stack and tucks it behind (stamped), while the panel beside it
+   shows what the pass in hand lets you do. The section is dark in both themes, printed like a security document. */
+.pw{position:relative;isolation:isolate;overflow:hidden;color:var(--on-dark);background:#0A2730;padding-block:clamp(72px,9vw,112px)}
+.pw h2{color:#fff}
+.pw-bg{position:absolute;inset:0;z-index:-1;pointer-events:none;overflow:hidden;
+  background:radial-gradient(60% 70% at 12% 20%,rgba(23,96,107,.55),transparent 70%),radial-gradient(50% 60% at 92% 90%,rgba(142,24,35,.45),transparent 70%)}
+/* guilloche: fine concentric rings, like the print on a pass, turning very slowly */
+.pw-bg::before,.pw-bg::after{content:"";position:absolute;width:1100px;height:1100px;border-radius:50%;
+  background:repeating-radial-gradient(circle at 50% 50%,rgba(242,181,68,.10) 0 1px,transparent 1.5px 14px);
+  -webkit-mask:radial-gradient(circle,#000 20%,transparent 70%);mask:radial-gradient(circle,#000 20%,transparent 70%);
+  animation:pwTurn 140s linear infinite;animation-play-state:paused}
+.pw-bg::before{left:-380px;top:-420px}
+.pw-bg::after{right:-420px;bottom:-480px;width:1000px;height:1000px;background:repeating-radial-gradient(circle at 46% 54%,rgba(255,255,255,.06) 0 1px,transparent 1.5px 11px);animation-direction:reverse}
+.pw.pw-on .pw-bg::before,.pw.pw-on .pw-bg::after{animation-play-state:running}
+@keyframes pwTurn{to{transform:rotate(360deg)}}
+
+.pw-stage{margin-top:clamp(28px,4vw,48px);display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:clamp(28px,5vw,72px);align-items:center}
+
+/* ---- the wallet ---- */
+.pw-wallet{position:relative;padding:110px 40px 40px 26px}
+.pw-cards{list-style:none;margin:0;padding:0;position:relative;display:grid}
+.pw-card{grid-area:1/1;position:relative;min-height:300px;border-radius:24px;padding:26px 26px 24px;display:flex;flex-direction:column;gap:10px;
+  color:#fff;overflow:hidden;cursor:pointer;transform-origin:50% 100%;will-change:transform;
+  background:linear-gradient(135deg,#17606B,#0F3E48 60%,#0C3540);
+  box-shadow:0 1px 0 rgba(255,255,255,.18) inset,0 30px 60px -28px rgba(0,0,0,.75),0 0 0 1px rgba(255,255,255,.1)}
+.pw-card[data-tone="gold"]{color:#2B1C00;background:linear-gradient(135deg,#F7CB6B,#F2B544 55%,#DE9B2F)}
+.pw-card[data-tone="red"]{background:linear-gradient(135deg,#E0404D,#B3202D 55%,#8E1823)}
+.pw-card[data-tone="ink"]{background:linear-gradient(135deg,#21343C,#14232B 60%,#0D181E);box-shadow:0 0 0 1px rgba(242,181,68,.5),0 30px 60px -28px rgba(0,0,0,.8)}
+/* card print and sheen */
+.pw-card::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.5;
+  background:repeating-radial-gradient(circle at 110% -10%,rgba(255,255,255,.13) 0 1px,transparent 1.5px 9px),linear-gradient(115deg,transparent 30%,rgba(255,255,255,.16) 45%,transparent 60%)}
+.pw-card{isolation:isolate}
+/* darkening for the passes not in hand */
+.pw-card::after,.pw-dim{content:"";position:absolute;inset:0;border-radius:inherit;background:#06161C;opacity:var(--dim,0);pointer-events:none}
+.pw-js .pw-card::after{content:none}
+.pw-body{display:flex;flex-direction:column;gap:10px;flex:1 1 auto}
+.pw-card > :not(.pw-stamp){opacity:var(--c,1)}
+.pw-chip{width:46px;height:34px;border-radius:8px;margin-bottom:4px;
+  background:linear-gradient(90deg,transparent 30%,rgba(0,0,0,.18) 30% 32%,transparent 32% 68%,rgba(0,0,0,.18) 68% 70%,transparent 70%),
+  linear-gradient(0deg,transparent 45%,rgba(0,0,0,.18) 45% 55%,transparent 55%),linear-gradient(135deg,#FBE3A1,#E3B04B 60%,#C99231);box-shadow:0 0 0 1px rgba(0,0,0,.12)}
+.pw-when{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;opacity:.85}
+.pw-when i{font-style:normal;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;letter-spacing:0;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35)}
+.pw-card[data-tone="gold"] .pw-when i{background:rgba(43,28,0,.1);border-color:rgba(43,28,0,.3)}
+.pw-card h3{font-size:clamp(24px,2.4vw,30px);color:inherit;margin:0}
+.pw-card p{font-size:15px;line-height:1.55;margin:0;opacity:.88;max-width:46ch}
+.pw-kv{margin-top:auto;display:flex;flex-wrap:wrap;gap:6px;padding-top:6px}
+.pw-kv span{font-size:12.5px;font-weight:700;padding:4px 11px;border-radius:999px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25)}
+.pw-card[data-tone="gold"] .pw-kv span{background:rgba(43,28,0,.08);border-color:rgba(43,28,0,.2)}
+.pw-stamp{position:absolute;right:20px;top:16px;padding:4px 12px;border:2.5px solid currentColor;border-radius:8px;font:800 13px/1.2 var(--body);letter-spacing:.14em;text-transform:uppercase;
+  color:#F2B544;transform:rotate(-9deg) scale(calc(1.6 - var(--st,0) * .6));opacity:var(--st,0);pointer-events:none}
+.pw-card[data-tone="gold"] .pw-stamp{color:#8E1823}
+.pw-card:focus-visible{outline:3px solid var(--gold);outline-offset:4px}
+
+/* ---- what the pass lets you do ---- */
+.pw-now{margin:0 0 18px;display:flex;flex-direction:column;gap:2px}
+.pw-now span{font-size:13px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--gold)}
+.pw-now b{font:600 clamp(26px,3vw,36px)/1.15 var(--display);color:#fff}
+.pw-rights{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.pw-rights li{display:grid;grid-template-columns:38px minmax(0,1fr);grid-template-rows:auto auto;column-gap:12px;row-gap:2px;align-items:center;padding:14px;border-radius:16px;
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);transition:border-color .3s,background-color .3s}
+.pw-rights li[data-st="yes"]{border-color:rgba(74,201,138,.45);background:rgba(74,201,138,.08)}
+.pw-ic{grid-row:1/3;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:rgba(255,255,255,.1);color:var(--gold)}
+.pw-rights b{font-size:14.5px;color:#fff}
+.pw-v{display:flex;align-items:flex-start;gap:7px;font-size:13.5px;line-height:1.35;color:var(--on-dark-2)}
+.pw-v em{font-style:normal}
+.pw-v i{flex:none;width:9px;height:9px;margin-top:4px;border-radius:50%;background:#7F98A0;transition:background-color .3s,box-shadow .3s}
+[data-st="yes"] .pw-v i{background:#4AC98A;box-shadow:0 0 0 4px rgba(74,201,138,.2)}
+[data-st="part"] .pw-v i{background:var(--gold);box-shadow:0 0 0 4px rgba(242,181,68,.18)}
+[data-st="no"] .pw-v i{background:#E8616C}
+[data-st="done"] .pw-v i{background:transparent;box-shadow:inset 0 0 0 2px #4AC98A}
+[data-st="soon"] .pw-v i{background:transparent;box-shadow:inset 0 0 0 2px #7F98A0}
+
+/* ---- the slider through the years ---- */
+.pw-scrub{position:relative;margin-top:26px;padding:0 42px}
+.pw-track{position:absolute;left:42px;right:42px;top:21px;height:4px;border-radius:4px;background:rgba(255,255,255,.16)}
+.pw-fill{position:absolute;left:0;top:0;bottom:0;width:100%;border-radius:inherit;background:linear-gradient(90deg,var(--gold),#E0404D);transform-origin:0 50%;transform:scaleX(var(--f,0))}
+.pw-track b{position:absolute;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:#0A2730;border:2px solid rgba(255,255,255,.45);transition:border-color .3s,background-color .3s}
+.pw-track b:nth-of-type(1){left:0}.pw-track b:nth-of-type(2){left:33.333%}.pw-track b:nth-of-type(3){left:66.667%}.pw-track b:nth-of-type(4){left:100%}
+.pw-track b.on{background:var(--gold);border-color:var(--gold)}
+.pw-scrub input{position:relative;display:block;width:calc(100% + 28px);margin:0 -14px;height:46px;background:transparent;-webkit-appearance:none;appearance:none;cursor:grab;touch-action:pan-y}
+.pw-scrub input:active{cursor:grabbing}
+.pw-scrub input::-webkit-slider-runnable-track{height:46px;background:transparent}
+.pw-scrub input::-moz-range-track{height:46px;background:transparent}
+.pw-scrub input::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;margin-top:9px;border-radius:50%;background:#fff;border:6px solid var(--gold);box-shadow:0 6px 18px -4px rgba(0,0,0,.6)}
+.pw-scrub input::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#fff;border:6px solid var(--gold);box-shadow:0 6px 18px -4px rgba(0,0,0,.6)}
+/* until the slider is first used, a ring pulses out from the handle (which starts at the left end): transform and
+   opacity only, so it never repaints */
+.pw-scrub::before{content:"";position:absolute;left:42px;top:23px;width:28px;height:28px;margin:-14px 0 0 -14px;border-radius:50%;
+  border:3px solid rgba(242,181,68,.6);pointer-events:none;z-index:1;animation:pwNudge 2.2s ease-out infinite}
+.pw-touched .pw-scrub::before{display:none}
+.pw-scrub input:focus-visible{outline:none}
+.pw-scrub input:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 4px #0A2730,0 0 0 7px #fff}
+.pw-scrub input:focus-visible::-moz-range-thumb{box-shadow:0 0 0 4px #0A2730,0 0 0 7px #fff}
+@keyframes pwNudge{0%{transform:scale(1);opacity:.9}70%,100%{transform:scale(2.1);opacity:0}}
+.pw-stops{position:relative;height:34px}
+.pw-stops button{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap;padding:6px 10px;border-radius:999px;border:0;background:transparent;cursor:pointer;
+  font:700 13.5px/1.2 var(--body);color:var(--on-dark-3);transition:color .25s,background-color .25s}
+.pw-stops button:nth-child(1){left:0}.pw-stops button:nth-child(2){left:33.333%}.pw-stops button:nth-child(3){left:66.667%}.pw-stops button:nth-child(4){left:100%}
+.pw-stops button:hover{color:#fff}
+.pw-stops button[aria-pressed="true"]{color:#0A2730;background:var(--gold)}
+.pw-stops button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.pw-hint{margin:10px 0 0;text-align:center;font-size:13px;color:var(--on-dark-3);transition:opacity .4s}
+.pw-touched .pw-hint{opacity:0}
+
+.pw .ep-note{margin-top:clamp(28px,4vw,44px)}
+
+/* smoothness: the slider and the wallet are their own layers with their own layout, so dragging repaints only the
+   slider and moves the cards on the compositor, never repainting the section around them */
+.pw-js .pw-scrub{contain:layout paint;will-change:transform}
+.pw-js .pw-wallet{contain:layout}
+.pw-js .pw-cards{touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.pw-js .pw-rights li{contain:layout paint}
+
+/* load-in */
+.anim #pathway:not(.sec-in) :is(.pw-wallet,.pw-side){opacity:0}
+.anim #pathway.sec-in:not(.sec-done) .pw-wallet{animation:kRise .8s var(--ease-out) both .2s}
+.anim #pathway.sec-in:not(.sec-done) .pw-side{animation:kRise .8s var(--ease-out) both .35s}
+
+/* ---- tablets and phones: the cards, then the slider right under them, then what the pass allows ---- */
+@media (max-width:900px){
+  .pw-stage{grid-template-columns:minmax(0,1fr);gap:0}
+  .pw-side{display:contents}
+  .pw-wallet{order:1;padding:96px 22px 18px 12px;max-width:560px;width:100%;margin-inline:auto}
+  .pw-scrub{order:2;max-width:560px;width:100%;margin:6px auto 0}
+  .pw-now{order:3;margin-top:26px}
+  .pw-rights{order:4}
+}
+@media (max-width:560px){
+  .pw{padding-block:52px}
+  .pw-card{min-height:0;padding:22px 20px 20px}
+  .pw-card p{font-size:14.5px}
+  .pw-rights{grid-template-columns:minmax(0,1fr)}
+  .pw-rights li{padding:11px 12px}
+  .pw-scrub{padding:0 34px}.pw-track{left:34px;right:34px}.pw-scrub::before{left:34px}
+  .pw-stops button{font-size:12.5px;padding:6px 8px}
+}
+/* without the script (or with reduced motion before it runs), the passes are simply listed */
+.pw:not(.pw-js) .pw-wallet{padding:0}
+.pw:not(.pw-js) .pw-cards{gap:14px}
+.pw:not(.pw-js) .pw-card{grid-area:auto}
+.pw:not(.pw-js) .pw-scrub,.pw:not(.pw-js) .pw-now,.pw:not(.pw-js) .pw-rights{display:none}
+/* the turning print is two very large layers: on phones, tablets and slow devices it stays still */
+.lite .pw-bg::before,.lite .pw-bg::after{animation:none}
+@media (max-width:900px),(pointer:coarse){.pw-bg::before,.pw-bg::after{animation:none}}
+@media (prefers-reduced-motion:reduce){
+  .pw-bg::before,.pw-bg::after,.pw-scrub::before{animation:none}
+}
