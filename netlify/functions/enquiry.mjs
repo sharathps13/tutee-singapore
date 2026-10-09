@@ -240,11 +240,13 @@ export function buildEmail(f, country, now = new Date()) {
   }
   const ORDER = ['Destination', 'Interested in', 'Preferred call time'];
   study.sort((a, b) => ORDER.indexOf(a[0]) - ORDER.indexOf(b[0]));
-  const meta = [['Received', receivedAt(now)], ['Landing page', place]];
-  if (f.page) meta.push(['Submitted from', f.page]);
-
   const digits = f.phone.replace(/\D/g, '');
   const who = f.name || 'the student';
+  const first = (f.name || '').split(/\s+/)[0] || 'the student';
+  const level = study.find(([l]) => l === 'Interested in')?.[1] || 'Not sure yet';
+  const slot = study.find(([l]) => l === 'Preferred call time')?.[1] || 'Any time';
+  const from = contact.find(([l]) => l === 'Flying from')?.[1] || '';
+  const dest = f.destination || place;
 
   // ---------- plain text ----------
   const block = (title, rows) => [title.toUpperCase(), ...rows.map(([l, v]) => `  ${(l + ':').padEnd(24)}${v}`), ''];
@@ -255,56 +257,121 @@ export function buildEmail(f, country, now = new Date()) {
     ...(shortlist.length ? ['INSTITUTION SHORTLIST', ...shortlist.map((s, i) => `  ${i + 1}. ${s}`), ''] : []),
     ...(note ? ['NOTE FROM THE STUDENT', `  ${note}`, ''] : []),
     ...(other.length ? block('Other details', other) : []),
-    ...block('Submission', meta),
     `Reply to this email to answer ${who} directly.`,
+    '', '--', 'Tutee Connect', 'tuteeconnect.com · business@tuteeconnect.com · WhatsApp +91 73583 64959',
   ];
 
   // ---------- HTML: table layout and inline styles, so it renders the same in every mail client ----------
-  const font = 'font-family:Segoe UI,Helvetica,Arial,sans-serif';
-  const rowsHtml = (rows) => rows.map(([label, value]) =>
-    '<tr>'
-    + `<td style="padding:9px 0;width:170px;vertical-align:top;color:#5B6E72;font-size:13px;${font}">${esc(label)}</td>`
-    + `<td style="padding:9px 0;vertical-align:top;color:#0F2930;font-size:14px;font-weight:600;${font}">${esc(value)}</td>`
-    + '</tr>').join('');
-  const section = (title, inner) =>
-    '<tr><td style="padding:22px 32px 0">'
-    + `<div style="${font};font-size:11px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#A51D2A;`
-    + `padding-bottom:6px;border-bottom:1px solid #E6ECEE">${esc(title)}</div>`
-    + `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse">${inner}</table>`
-    + '</td></tr>';
-  const button = (href, label, bg) =>
-    `<a href="${esc(href)}" style="display:inline-block;margin:0 8px 8px 0;padding:10px 18px;border-radius:8px;background:${bg};`
-    + `color:#ffffff;text-decoration:none;font-size:13px;font-weight:700;${font}">${esc(label)}</a>`;
+  // The one image is the logo, loaded from the live site (mail clients block embedded data: images).
+  // Gradients carry a solid bgcolor fallback for clients (Outlook) that ignore background-image.
+  const site = (process.env.URL || 'https://singapore-landing-page.netlify.app').replace(/\/+$/, '');
+  const logo = `${site}/assets/img/email/logo-192.png`;
+  const font = 'font-family:Segoe UI,Helvetica Neue,Helvetica,Arial,sans-serif';
+  const RED = '#B3202F', MAROON = '#7A1420', TEAL = '#0E4A55', DARK = '#0F2930', GOLD = '#F2A93B',
+    INK = '#14262B', MUTED = '#6B7C80', LINE = '#ECEFF0', GREEN = '#1E9E63';
+  const T = (attrs = '') => `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" ${attrs}>`;
+  const link = (href, text, color = INK) => `<a href="${esc(href)}" style="color:${color};text-decoration:none">${esc(text)}</a>`;
+  const val = (label, value) => {
+    if (label === 'Email' && EMAIL_RE.test(value)) return link(`mailto:${value}`, value, TEAL);
+    if (label === 'Phone' && digits.length >= 7) return link(`tel:+${digits}`, value, TEAL);
+    return esc(value);
+  };
 
+  // each detail row gets a small coloured badge, so the eye finds it quickly
+  const BADGE = { Email: ['@', '#E8F1F3', TEAL], Phone: ['&#9742;', '#FDF0E1', '#C77A12'], 'Flying from': ['&#9992;', '#FBEAEC', RED],
+    Destination: ['&#9873;', '#E7F5EE', GREEN] };
+  const badge = (label) => {
+    const [g, bg, fg] = BADGE[label] || ['&#8226;', '#EEF1F2', MUTED];
+    return `<div style="width:32px;height:32px;line-height:32px;border-radius:10px;background:${bg};color:${fg};text-align:center;${font};font-size:15px;font-weight:800">${g}</div>`;
+  };
+  const section = (title, color, inner) =>
+    `<tr><td style="padding:28px 36px 0">${T()}`
+    + `<tr><td style="padding:0 0 12px;${font};font-size:12px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:${color}">`
+    + `<span style="display:inline-block;width:18px;height:3px;border-radius:2px;background:${color};vertical-align:middle;margin:-2px 10px 0 0"></span>${esc(title)}</td></tr>`
+    + `<tr><td>${inner}</td></tr></table></td></tr>`;
+  const rowsHtml = (rows) => T(`style="border:1px solid ${LINE};border-radius:14px;border-collapse:separate"`)
+    + rows.map(([label, value], i) =>
+      `<tr><td width="52" style="padding:12px 0 12px 16px;vertical-align:middle;${i ? `border-top:1px solid ${LINE};` : ''}">${badge(label)}</td>`
+      + `<td style="padding:12px 16px 12px 4px;vertical-align:middle;${i ? `border-top:1px solid ${LINE};` : ''}${font}">`
+      + `<div style="font-size:12px;color:${MUTED}">${esc(label)}</div>`
+      + `<div style="font-size:15px;font-weight:700;color:${INK};margin-top:2px">${val(label, value)}</div></td></tr>`).join('')
+    + '</table>';
+
+  const button = (href, label, bg) =>
+    `<td style="padding:0 10px 10px 0"><a href="${esc(href)}" style="display:inline-block;padding:13px 22px;border-radius:12px;`
+    + `background:${bg};color:#ffffff;text-decoration:none;${font};font-size:14px;font-weight:700">${label}</a></td>`;
   const actions = [
-    EMAIL_RE.test(f.email) ? button(`mailto:${f.email}`, 'Reply by email', '#0F3E48') : '',
-    digits.length >= 7 ? button(`tel:+${digits}`, 'Call', '#0F3E48') : '',
-    digits.length >= 7 ? button(`https://wa.me/${digits}`, 'WhatsApp', '#1F8C5A') : '',
+    EMAIL_RE.test(f.email) ? button(`mailto:${f.email}`, `&#9993;&nbsp; Reply to ${esc(first)}`, RED) : '',
+    digits.length >= 7 ? button(`https://wa.me/${digits}`, '&#128172;&nbsp; WhatsApp', GREEN) : '',
+    digits.length >= 7 ? button(`tel:+${digits}`, '&#9742;&nbsp; Call', TEAL) : '',
   ].join('');
 
-  const html = '<!doctype html><html><body style="margin:0;padding:0;background:#F2F5F6">'
-    + '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F2F5F6;padding:28px 12px">'
-    + '<tr><td align="center">'
-    + '<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;'
-    + 'background:#ffffff;border-radius:12px;border:1px solid #E1E8EA;border-collapse:separate;overflow:hidden">'
-    // header
-    + '<tr><td style="background:#A51D2A;padding:22px 32px">'
-    + `<div style="${font};font-size:12px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;color:#F6C9CD">Tutee Connect · ${esc(place)}</div>`
-    + `<div style="${font};font-size:21px;font-weight:700;color:#ffffff;margin-top:6px">New consultation request</div>`
-    + `<div style="${font};font-size:14px;color:#FBE4E6;margin-top:4px">${esc(f.name)} would like a free call with an advisor.</div>`
+  // the two facts an advisor needs first, as coloured tiles
+  const tile = (label, value, bg, fg, accent) =>
+    `<td width="50%" style="padding:0 6px;vertical-align:top">`
+    + `<div style="background:${bg};border-radius:14px;padding:16px 18px;border-top:3px solid ${accent};${font}">`
+    + `<div style="font-size:11px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:${accent}">${esc(label)}</div>`
+    + `<div style="font-size:16px;font-weight:800;color:${fg};margin-top:6px">${esc(value)}</div></div></td>`;
+
+  const html = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+    + '<meta name="color-scheme" content="light"></head>'
+    + '<body style="margin:0;padding:0;background:#EDEFF1">'
+    + `<div style="display:none;max-height:0;overflow:hidden">${esc(who)} &middot; ${esc(level)} &middot; call ${esc(slot.toLowerCase())}</div>`
+    + T('style="background:#EDEFF1"') + '<tr><td align="center" style="padding:32px 12px">'
+    + '<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;'
+    + 'background:#ffffff;border-radius:22px;border-collapse:separate;overflow:hidden;box-shadow:0 8px 30px rgba(15,41,48,.10)">'
+
+    // header: brand gradient, the request on the left, the logo top right
+    + `<tr><td bgcolor="${MAROON}" style="background:${MAROON};background-image:linear-gradient(135deg,${RED} 0%,${MAROON} 55%,${TEAL} 100%);padding:30px 36px 34px">`
+    + `${T()}<tr><td style="vertical-align:top;${font}">`
+    + `<span style="display:inline-block;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.16);color:#ffffff;font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase">`
+    + `<span style="color:${GOLD}">&#9679;</span>&nbsp; New enquiry &middot; ${esc(place)}</span>`
+    + `<div style="font-size:30px;line-height:1.15;font-weight:800;color:#ffffff;margin-top:18px;letter-spacing:-.4px">${esc(who)}</div>`
+    + `<div style="font-size:15px;line-height:1.55;color:#F6D9DC;margin-top:8px">would like a free consultation call</div>`
+    + (from ? `<div style="margin-top:14px;font-size:14px;font-weight:700;color:#ffffff">${esc(from)}`
+      + ` <span style="color:${GOLD};padding:0 6px">- - &#9992; - -</span> ${esc(dest)}</div>` : '')
+    + '</td>'
+    + `<td width="84" style="vertical-align:top;text-align:right">`
+    + `<div style="display:inline-block;background:#ffffff;border-radius:18px;padding:8px;box-shadow:0 4px 14px rgba(0,0,0,.18)">`
+    + `<img src="${logo}" width="60" height="60" alt="Tutee Connect" style="display:block;width:60px;height:60px;border:0"></div></td>`
+    + '</tr></table></td></tr>'
+
+    // tiles
+    + `<tr><td style="padding:24px 30px 0">${T()}<tr>`
+    + tile('Interested in', level, '#FBEFF0', MAROON, RED) + tile('Best time to call', slot, '#E9F3F4', DARK, TEAL)
+    + '</tr></table></td></tr>'
+
+    // quick actions
+    + `<tr><td style="padding:22px 36px 0"><table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>${actions}</tr></table></td></tr>`
+
+    // level and call time are already in the tiles, so they are not repeated here
+    + section('Student details', TEAL, rowsHtml([...contact.filter(([l]) => l !== 'Full name'),
+      ...study.filter(([l]) => l !== 'Interested in' && l !== 'Preferred call time')]))
+    + (shortlist.length ? section('Institution shortlist', '#C77A12',
+      T(`style="border:1px solid ${LINE};border-radius:14px;border-collapse:separate"`) + shortlist.map((s, i) =>
+        `<tr><td width="52" style="padding:12px 0 12px 16px;vertical-align:middle;${i ? `border-top:1px solid ${LINE};` : ''}">`
+        + `<div style="width:32px;height:32px;line-height:32px;border-radius:16px;background:${GOLD};color:#ffffff;text-align:center;${font};font-size:14px;font-weight:800">${i + 1}</div></td>`
+        + `<td style="padding:12px 16px 12px 4px;vertical-align:middle;${i ? `border-top:1px solid ${LINE};` : ''}${font};font-size:15px;font-weight:700;color:${INK}">${esc(s)}</td></tr>`).join('')
+      + '</table>') : '')
+    + (note ? section(`Note from ${first}`, RED,
+      `<div style="background:#FFF7EC;border-radius:14px;border-left:4px solid ${GOLD};padding:18px 20px;${font};font-size:15px;line-height:1.65;color:${INK}">`
+      + `<span style="font-size:28px;line-height:0;color:${GOLD};vertical-align:-10px;font-family:Georgia,serif">&ldquo;</span> ${esc(note)}</div>`) : '')
+    + (other.length ? section('Other details', MUTED, rowsHtml(other)) : '')
+
+    // footer
+    + '<tr><td style="padding:34px 0 0"></td></tr>'
+    + `<tr><td bgcolor="${DARK}" style="background:${DARK};background-image:linear-gradient(135deg,${DARK} 0%,${TEAL} 100%);padding:28px 36px;${font}">`
+    + `${T()}<tr><td style="vertical-align:middle">`
+    + '<div style="font-size:18px;font-weight:800;color:#ffffff;letter-spacing:.2px">Tutee Connect</div>'
+    + `<div style="font-size:13px;color:${GOLD};margin-top:4px;font-weight:600">Study abroad advisors</div></td>`
+    + `<td style="vertical-align:middle;text-align:right;font-size:13px;line-height:1.9">`
+    + `${link('https://tuteeconnect.com', 'tuteeconnect.com', '#ffffff')}<br>`
+    + `${link('mailto:business@tuteeconnect.com', 'business@tuteeconnect.com', '#ffffff')}<br>`
+    + `${link('https://wa.me/917358364959', 'WhatsApp +91 73583 64959', '#ffffff')}</td>`
+    + '</tr></table>'
+    + `<div style="border-top:1px solid rgba(255,255,255,.14);margin-top:20px;padding-top:16px;font-size:12px;line-height:1.6;color:#A9C1C6">`
+    + `Sent from the consultation form on the ${esc(place)} page. Reply to this email to reach ${esc(who)} directly.</div>`
     + '</td></tr>'
-    + `<tr><td style="padding:20px 32px 0">${actions}</td></tr>`
-    + section('Contact details', rowsHtml(contact))
-    + section('Study plans', rowsHtml(study))
-    + (shortlist.length ? section('Institution shortlist', shortlist.map((s, i) =>
-      `<tr><td style="padding:7px 0;${font};font-size:14px;color:#0F2930"><span style="color:#A51D2A;font-weight:700">${i + 1}.</span> ${esc(s)}</td></tr>`).join('')) : '')
-    + (note ? section('Note from the student',
-      `<tr><td style="padding:10px 0;${font};font-size:14px;line-height:1.55;color:#0F2930">${esc(note)}</td></tr>`) : '')
-    + (other.length ? section('Other details', rowsHtml(other)) : '')
-    + section('Submission', rowsHtml(meta))
-    + `<tr><td style="padding:24px 32px 26px;${font};font-size:12px;line-height:1.5;color:#7A8B8E">`
-    + `Replying to this email goes straight to ${esc(who)}. This message was sent automatically by the `
-    + 'Tutee Connect website enquiry form.</td></tr>'
     + '</table></td></tr></table></body></html>';
 
   const payload = {
