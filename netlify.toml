@@ -16,14 +16,10 @@
 [build.environment]
   NODE_VERSION = "20"
 
-# The pages post to /api/enquiry (same origin). The function also declares this
-# path itself via `export const config`, so this redirect is belt-and-braces:
-# it keeps the endpoint working on older Netlify function runtimes too.
-[[redirects]]
-  from = "/api/enquiry"
-  to = "/.netlify/functions/enquiry"
-  status = 200
-  force = true
+# The pages post to /api/enquiry (same origin). The function declares that path
+# itself via `export const config`. No redirect here: a function with its own
+# path is no longer served at /.netlify/functions/enquiry, so a redirect to that
+# address would turn every form submission into a 404.
 
 # The hero's Blender source (_source/) is in the repo but is not part of the site.
 [[redirects]]
