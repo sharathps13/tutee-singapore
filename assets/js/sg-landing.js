@@ -248,6 +248,10 @@ window.__SVC=[{"html": "<div class=\"sp-top\"><span class=\"phase-tag\"><i>1<\/i
     /* fast flings: anything that has gone past the bottom edge is entered by the observer below */
     var pio2=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting&&e.boundingClientRect.top<0){enter(e.target);pio2.unobserve(e.target);}});});
     SECTIONS.forEach(function(s){if(!s.classList.contains('hero'))pio2.observe(s);});
+    /* and a very fast fling can jump clean over a section without the observers ever seeing it on screen: once
+       scrolling settles, enter every section that starts above the bottom of the screen (reads layout only then) */
+    var settleT=0;addEventListener('scroll',function(){clearTimeout(settleT);settleT=setTimeout(function(){var vb=window.innerHeight;
+      SECTIONS.forEach(function(s){if(!s.classList.contains('sec-in')&&!s.classList.contains('hero')&&s.getBoundingClientRect().top<vb)enter(s);});},140);},{passive:true});
   }
 
   /* counters: the final value is in the HTML; JS only animates it on arrival */
@@ -352,8 +356,9 @@ window.__SVC=[{"html": "<div class=\"sp-top\"><span class=\"phase-tag\"><i>1<\/i
     $('#famPrev').addEventListener('click',function(){go(i-1);});
     $('#famNext').addEventListener('click',function(){go(i+1);});
     dots.forEach(function(d,k){d.addEventListener('click',function(){go(k);});});
-    var x0=null;box.addEventListener('touchstart',function(e){x0=e.touches[0].clientX;},{passive:true});
-    box.addEventListener('touchend',function(e){if(x0===null)return;var dx=e.changedTouches[0].clientX-x0;x0=null;if(Math.abs(dx)>40)go(dx<0?i+1:i-1);},{passive:true});
+    /* swipe anywhere on the photo (its caption and shading sit above the slides, so listen on the whole photo) */
+    var ph=box.parentNode,x0=null,y0=0;ph.addEventListener('touchstart',function(e){if(e.target.closest('button'))return;x0=e.touches[0].clientX;y0=e.touches[0].clientY;},{passive:true});
+    ph.addEventListener('touchend',function(e){if(x0===null)return;var dx=e.changedTouches[0].clientX-x0,dy=e.changedTouches[0].clientY-y0;x0=null;if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)*1.2)go(dx<0?i+1:i-1);},{passive:true});
     if(hasIO)new IntersectionObserver(function(es){vis=es[0].isIntersecting;if(vis){warm(1);start();}else stop();},{threshold:.2}).observe(box);else start();
     /* full-size viewer */
     var lb=$('#famLb'),li=$('#lbImg'),lc=$('#lbCap'),ln=$('#lbN'),lastF=null;

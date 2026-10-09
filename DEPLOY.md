@@ -1,4 +1,4 @@
-# Deploying the Singapore page to Netlify (with Supabase)
+﻿# Deploying the Singapore page to Netlify (with Supabase)
 
 ## What's in this folder
 
@@ -71,3 +71,32 @@ status       new
 - A hidden honeypot field drops bot submissions.
 - Visitors can heart institutions on either page. The list (in their order of preference) travels with the form as `shortlist` and shows in the email and in Supabase.
 - The server re-checks every field, whatever the browser sent.
+
+## Form emails and Google Sheet
+
+Each ticket is added as a row in a Google Sheet and emailed to business@tuteeconnect.com. Both are done by the small
+Apps Script in `_source/google-sheet/Code.gs`, running as your Workspace account, so no Gmail password is needed.
+(Optional: setting `GMAIL_USER` and `GMAIL_APP_PASSWORD` in Netlify makes the site send the email itself instead.)
+
+1. Create a Google Sheet (e.g. "Tutee Connect enquiries") with the Workspace account.
+2. In the Sheet: Extensions, then **Apps Script**. Replace the code with `_source/google-sheet/Code.gs`.
+   Change `SECRET` to a long random value (a password generator works) and save.
+3. **Deploy, then New deployment**, type **Web app**, Execute as **Me**, Who has access **Anyone**. Deploy,
+   approve the permissions, and copy the web app URL (ends in `/exec`).
+4. Netlify, then Environment variables: add `SHEET_WEBHOOK_URL` (that URL) and `SHEET_SECRET` (the same secret). Redeploy.
+
+The first submission creates an "Enquiries" tab with a header row. If you edit the script later, use
+Deploy, then Manage deployments, then edit, then New version, so the URL stays the same.
+
+### Test before going live
+
+Create `.env.local` in this folder (it is in `.gitignore`, so it is never committed):
+
+```
+SHEET_WEBHOOK_URL=https://script.google.com/macros/s/.../exec
+SHEET_SECRET=the-same-secret
+SITE_COUNTRY=Singapore
+```
+
+Run `node _source/dev/form-test-server.mjs`, open http://localhost:8888, fill in the ticket and press
+**Reserve my free call**. The email arrives at business@tuteeconnect.com and a row appears in the Sheet.

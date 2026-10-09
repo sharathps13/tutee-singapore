@@ -47,3 +47,27 @@ html:not([data-mode="dark"]) .pw-scrub input:focus-visible::-webkit-slider-thumb
 
 /* ---- relocating with family: the slideshow turns every 3 s (sg-landing.js); each photo's slow zoom fits that ---- */
 .fam-slides img{transition:opacity .9s var(--ease-out),transform 3.6s linear}
+
+/* ---- entrances for sections that had none (sg-landing.js adds .sec-in as each section arrives) ---- */
+/* How it works: the heading slides in, the 7-years stamp spins in, the route draws, the stops pop in one by one, then the card rises */
+.anim #how:not(.sec-in) :is(.jr-head > div > *,.jr-stamp,.jr-line,.jr-plane,.jr-stops li,.jr-stage,.jr-ctrl,.jr-swipe){opacity:0}
+.anim #how.sec-in:not(.sec-done) .jr-head > div > *{animation:kFromLeft .7s var(--ease-out) both}
+.anim #how.sec-in:not(.sec-done) .jr-head > div > :nth-child(2){animation-delay:.1s}
+.anim #how.sec-in:not(.sec-done) .jr-head > div > :nth-child(3){animation-delay:.2s}
+.anim #how.sec-in:not(.sec-done) .jr-stamp{animation:kPopSpin .8s var(--ease-spring,cubic-bezier(.34,1.56,.64,1)) .35s both}
+.anim #how.sec-in:not(.sec-done) .jr-line{animation:kDrawX 1s var(--ease-out) .3s both;transform-origin:0 50%}
+.anim #how.sec-in:not(.sec-done) .jr-plane{animation:kFade .5s ease-out 1.1s both}
+.anim #how.sec-in:not(.sec-done) .jr-stops li{animation:kScaleIn .5s var(--ease-out) both}
+.anim #how.sec-in:not(.sec-done) .jr-stops li:nth-child(1){animation-delay:.35s}
+.anim #how.sec-in:not(.sec-done) .jr-stops li:nth-child(2){animation-delay:.43s}
+.anim #how.sec-in:not(.sec-done) .jr-stops li:nth-child(3){animation-delay:.51s}
+.anim #how.sec-in:not(.sec-done) .jr-stops li:nth-child(4){animation-delay:.59s}
+.anim #how.sec-in:not(.sec-done) .jr-stops li:nth-child(5){animation-delay:.67s}
+.anim #how.sec-in:not(.sec-done) .jr-stops li:nth-child(6){animation-delay:.75s}
+.anim #how.sec-in:not(.sec-done) .jr-stops li:nth-child(7){animation-delay:.83s}
+.anim #how.sec-in:not(.sec-done) .jr-stage{animation:kRise .8s var(--ease-out) .6s both}
+.anim #how.sec-in:not(.sec-done) :is(.jr-ctrl,.jr-swipe){animation:kFade .6s ease-out .9s both}
+
+/* footer: the call to action and the columns rise in turn */
+.anim footer:not(.sec-in) :is(.f-cta,.f-cols > div,.f-bottom){opacity:0}
+.anim footer.sec-in:not(.sec-done) :is(.f-cta,.f-cols > div,.f-bottom){animation:kRiseSm .6s var(--ease-out) both;animation-delay:calc(var(--i,0)*90ms + .15s)}

@@ -31,5 +31,5 @@
 .pass-wrap,html[data-mode="dark"] .pass-wrap{filter:none}.pass-wrap{position:relative;isolation:isolate}.pass-wrap::before{content:"";position:absolute;inset:30px 18px 6px;border-radius:26px;z-index:-1;pointer-events:none;box-shadow:0 34px 60px -14px rgba(8,28,36,.38),0 2px 6px rgba(8,28,36,.08)}html[data-mode="dark"] .pass-wrap::before{box-shadow:0 34px 60px -12px rgba(0,0,0,.6)}.sl-box[hidden]{display:none!important}
 /* smoothness: off screen every loop holds still (sg-landing.js marks each section .offscreen), so only what is on
    screen ever animates; the WhatsApp button pulses a few times to be noticed, then rests */
-.offscreen *,.offscreen *::before,.offscreen *::after{animation-play-state:paused!important}
+.offscreen:is(.sec-done,:not(.sec-in)) *,.offscreen:is(.sec-done,:not(.sec-in)) *::before,.offscreen:is(.sec-done,:not(.sec-in)) *::after{animation-play-state:paused!important}
 .wa-btn::after{animation-iteration-count:4}

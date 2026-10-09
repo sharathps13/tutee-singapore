@@ -318,3 +318,90 @@
 /* the hero's place tag (Jewel / Gardens by the Bay) is for wide screens only */
 @media (max-width:760px){.wh .wh-place{display:none!important}}
 @media (max-width:359px){.svc-tab .n{width:32px!important;height:32px!important}.svc-tab .n svg{width:17px!important;height:17px!important}}
+
+/* ================= phone fixes, round 3 ================= */
+.fund-body,.fund-in{display:contents}
+@media (max-width:640px){
+  /* ---- How it works: the seven stops as one row of full-size, easy-to-tap icons, evenly spaced ---- */
+  .jr-stops{padding:0!important;margin-inline:-4px!important}
+  .jr-stops::before{left:7%!important;right:7%!important;top:22px!important}
+  .jr-stop{min-height:48px;justify-content:center}
+  .jr-dot{transform:none!important;margin:0!important;width:44px!important;height:44px!important}
+  .jr-dot svg{width:20px!important;height:20px!important}
+  .jr-dot i{width:17px!important;height:17px!important;font-size:10px!important;top:-4px!important;right:-4px!important}
+  .jr-stage{padding:0!important}
+  .jr-panel{margin:0!important}
+
+  /* ---- What we do: the nine services in two even rows (five and four) of large icons ---- */
+  .svc-list{display:flex!important;flex-wrap:wrap!important;justify-content:center!important;gap:10px 12px!important;padding:0 8px!important}
+  .svc-tab{flex:0 0 calc((100% - 48px) / 5)!important;max-width:56px;aspect-ratio:auto!important;display:flex!important;justify-content:center}
+  .svc-tab .n{width:48px!important;height:48px!important}
+  .svc-tab .n svg{width:22px!important;height:22px!important}
+
+  /* ---- Universities: rows that line up; names on up to two lines; no duplicate links ---- */
+  .uni-card::before{display:none!important}
+  .uni-card{grid-template-columns:42px minmax(0,1fr) 40px 36px!important;min-height:64px}
+  .uni-card h3{white-space:normal!important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:14.5px!important;line-height:1.25!important}
+  .uni-card .loc{font-size:12px!important;margin-top:2px}
+  .uni-card .qsrank{justify-self:end;text-align:right}
+  .uni-card .qsrank b{font-size:20px!important}
+  .types .type{min-height:58px;flex-direction:row!important;align-items:center!important;flex-wrap:nowrap!important}
+  .jr-map{margin-inline:0!important}
+  .types .type .count{flex:1;justify-content:flex-start!important;text-align:left}
+  .types .type .count b{min-width:52px!important;text-align:left}
+  .types .type .count span{text-align:left!important;flex:1}
+  .types .type .link-cta{font-size:0!important;margin:0!important;padding:0!important;border:0!important;background:none!important;width:36px;height:36px;display:grid!important;place-items:center;border-radius:50%;flex:none}
+  .types .type .link-cta .arrow{font-size:18px}
+  #universities .sec-head .btn{width:100%;justify-content:center;padding:14px 18px!important;font-size:16px!important}
+  .uni-more{display:none!important}
+
+  /* ---- Making it affordable: the details slide open and shut ---- */
+  .fund .fund-body{grid-column:1/-1;display:grid!important;grid-template-rows:0fr;opacity:0;margin-top:-8px;transition:grid-template-rows .35s cubic-bezier(.16,1,.3,1),opacity .25s ease,margin-top .35s cubic-bezier(.16,1,.3,1)}
+  .fund.open .fund-body{grid-template-rows:1fr;opacity:1;margin-top:0}
+  .fund .fund-in{display:block!important;min-height:0;overflow:hidden}
+  .fund .fund-in > *{display:block!important;margin:0 0 8px!important}
+  .fund .fund-in > .pills{display:flex!important}
+  .fund .fund-in > :last-child{margin-bottom:2px!important}
+
+  /* ---- Your pathway: room between the stack and the slider; what the pass allows as a 2 x 2 grid of tiles ---- */
+  .pw-wallet{padding:70px 18px 34px 8px!important}
+  .pw-scrub{margin-top:14px!important}
+  .pw-rights{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+  .pw-rights li{display:flex!important;flex-direction:column;align-items:flex-start;gap:6px;padding:12px!important;border-radius:14px!important;min-width:0}
+  .pw-rights .pw-ic{width:32px!important;height:32px!important;border-radius:10px!important}
+  .pw-rights .pw-ic svg{width:17px;height:17px}
+  .pw-rights b{font-size:14px!important}
+  .pw-v{font-size:12.5px!important;line-height:1.35!important}
+  .pw-v i{margin-top:3px!important;width:8px!important;height:8px!important}
+  .pw-now b{font-size:24px!important}
+
+  /* ---- Relocating with family: the photo takes a swipe ---- */
+  #family .fam-photo{touch-action:pan-y}
+}
+@media (max-width:359px){.svc-tab .n{width:42px!important;height:42px!important}.jr-dot{width:38px!important;height:38px!important}}
+
+/* ---- phone entrances for the parts whose wrappers are flattened on phones ---- */
+@media (max-width:640px){
+  .anim #services:not(.sec-in) .svc-tab{opacity:0}
+  .anim #services.sec-in:not(.sec-done) .svc-tab{animation:kScaleIn .45s var(--ease-out) both}
+  .anim #services.sec-in:not(.sec-done) .phase:nth-child(1) .svc-tab:nth-of-type(1){animation-delay:250ms}
+  .anim #services.sec-in:not(.sec-done) .phase:nth-child(1) .svc-tab:nth-of-type(2){animation-delay:305ms}
+  .anim #services.sec-in:not(.sec-done) .phase:nth-child(1) .svc-tab:nth-of-type(3){animation-delay:360ms}
+  .anim #services.sec-in:not(.sec-done) .phase:nth-child(2) .svc-tab:nth-of-type(1){animation-delay:415ms}
+  .anim #services.sec-in:not(.sec-done) .phase:nth-child(2) .svc-tab:nth-of-type(2){animation-delay:470ms}
+  .anim #services.sec-in:not(.sec-done) .phase:nth-child(2) .svc-tab:nth-of-type(3){animation-delay:525ms}
+  .anim #services.sec-in:not(.sec-done) .phase:nth-child(3) .svc-tab:nth-of-type(1){animation-delay:580ms}
+  .anim #services.sec-in:not(.sec-done) .phase:nth-child(3) .svc-tab:nth-of-type(2){animation-delay:635ms}
+  .anim #services.sec-in:not(.sec-done) .phase:nth-child(3) .svc-tab:nth-of-type(3){animation-delay:690ms}
+  .anim #universities:not(.sec-in) .uni-seg{opacity:0}
+  .anim #universities.sec-in:not(.sec-done) .uni-seg{animation:kRise .7s var(--ease-out) .2s both}
+  .anim #pathway:not(.sec-in) :is(.pw-scrub,.pw-now,.pw-rights li,.pw-hint){opacity:0}
+  .anim #pathway.sec-in:not(.sec-done) .pw-scrub{animation:kFade .6s ease-out .45s both}
+  .anim #pathway.sec-in:not(.sec-done) .pw-now{animation:kFromLeft .7s var(--ease-out) .5s both}
+  .anim #pathway.sec-in:not(.sec-done) .pw-rights li{animation:kRiseSm .55s var(--ease-out) both}
+  .anim #pathway.sec-in:not(.sec-done) .pw-rights li:nth-child(1){animation-delay:.6s}.anim #pathway.sec-in:not(.sec-done) .pw-rights li:nth-child(2){animation-delay:.68s}
+  .anim #pathway.sec-in:not(.sec-done) .pw-rights li:nth-child(3){animation-delay:.76s}.anim #pathway.sec-in:not(.sec-done) .pw-rights li:nth-child(4){animation-delay:.84s}
+  .anim #pathway.sec-in:not(.sec-done) .pw-hint{animation:kFade .5s ease-out .7s both}
+  .anim #stories:not(.sec-in) .v-more{opacity:0}
+  .anim #stories.sec-in:not(.sec-done) .v-more{animation:kFade .5s ease-out .5s both}
+}

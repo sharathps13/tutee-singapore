@@ -21,3 +21,7 @@ _navtest.html
 # encoded copies in assets/img/hero/. Keep these masters on disk or in cloud storage, not in Git.
 _source/hero/src/*.mov
 _source/hero/src/*.mp4
+
+# local secrets for the form test server (_source/dev/form-test-server.mjs)
+.env.local
+.env

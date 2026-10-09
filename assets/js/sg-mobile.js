@@ -16,6 +16,9 @@
   var funds=Array.prototype.slice.call(document.querySelectorAll('.fund-grid .fund'));
   funds.forEach(function(f,i){var h=f.querySelector('h3');if(!h)return;if(i===0)f.classList.add('open');
     var ch=document.createElement('span');ch.className='fund-chev';ch.setAttribute('aria-hidden','true');h.parentNode.insertBefore(ch,h.nextSibling);
+    /* the details go in one wrapper that slides open and shut */
+    var body=document.createElement('div'),inner=document.createElement('div');body.className='fund-body';inner.className='fund-in';body.appendChild(inner);
+    Array.prototype.slice.call(f.children).forEach(function(k){if(k.tagName==='P'||k.tagName==='UL'||k.classList.contains('pills'))inner.appendChild(k);});f.appendChild(body);
     var aria=function(){if(mq.matches){f.setAttribute('role','button');f.tabIndex=0;f.setAttribute('aria-expanded',f.classList.contains('open')?'true':'false');}
       else{f.removeAttribute('role');f.removeAttribute('tabindex');f.removeAttribute('aria-expanded');}};aria();if(mq.addEventListener)mq.addEventListener('change',aria);
     /* one way to pay open at a time: opening one closes the others */

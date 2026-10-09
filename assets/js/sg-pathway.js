@@ -21,8 +21,8 @@
 
   /* where a card sits for its distance d from the pass in hand (d<0: already used, d>0: still to come) */
   function place(c,d){
-    var x,y,r,s,z,dim,cv,st;
-    if(d>=0){x=d*22;y=d*18;r=d*2.4;s=1-d*.05;z=100-d*10;dim=Math.min(d,1)*.35;cv=Math.max(0,1-d*1.6);st=0;}
+    var x,y,r,s,z,dim,cv,st,k=narrow?.45:1;
+    if(d>=0){x=d*22*k;y=d*18*k;r=d*2.4*k;s=1-d*.05;z=100-d*10;dim=Math.min(d,1)*.35;cv=Math.max(0,1-d*1.6);st=0;}
     else{var p=-d,q=Math.min(p,1),k=p-q,arc=Math.sin(q*Math.PI);
       x=-q*16-arc*34-k*10;y=-arc*120-q*52-k*16;r=-q*5-arc*3-k*2;s=1-q*.07-k*.03;
       z=q<.5?110:60-p*10;dim=q*.25+k*.12;cv=1;st=Math.min(1,q*1.6);}
@@ -43,6 +43,9 @@
     Array.prototype.slice.call(c.children).forEach(function(k){if(k!==stamp)body.appendChild(k);});c.insertBefore(body,c.firstChild);
     var dim=document.createElement('i');dim.className='pw-dim';dim.setAttribute('aria-hidden','true');c.appendChild(dim);
     c.__w={dim:dim,stamp:stamp,body:body};});
+  /* phones: the passes still to come peek out less, so the stack stays inside the screen and clear of the slider */
+  var nmq=window.matchMedia&&matchMedia('(max-width: 640px)'),narrow=!!(nmq&&nmq.matches);
+  if(nmq&&nmq.addEventListener)nmq.addEventListener('change',function(){narrow=nmq.matches;cards.forEach(function(c){c.__w.tf=null;});render(v);});
   var shown=-1,v=0;
   function render(val){
     v=Math.max(0,Math.min(MAX,val));
