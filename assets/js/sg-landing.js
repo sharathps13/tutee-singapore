@@ -28,14 +28,20 @@ window.__SVC=[{"html": "<div class=\"sp-top\"><span class=\"phase-tag\"><i>1<\/i
   var tt=$('#themeToggle');
   function applyMode(m){if(window.__heroLoad)window.__heroLoad(m);doc.setAttribute('data-mode',m);tt.setAttribute('aria-pressed',m==='dark'?'true':'false');tt.setAttribute('aria-label',m==='dark'?'Switch to light mode':'Switch to dark mode');try{localStorage.setItem('tc-mode',m);}catch(e){}}
   applyMode(doc.getAttribute('data-mode')==='dark'?'dark':'light');
+  /* a theme switch would otherwise start every colour transition on the page at once (about 450 of them: buttons,
+     borders, cards), each restyling and repainting its element on every frame under the reveal. The reveal (or the
+     instant switch) is the whole effect, so those jump straight to their end */
+  var COLOR_T=/color|background|border|shadow|fill|stroke/;
+  function settleColours(){if(!document.getAnimations)return;var an=document.getAnimations();
+    for(var i=0;i<an.length;i++){var a=an[i];if(a.transitionProperty&&COLOR_T.test(a.transitionProperty))try{a.finish();}catch(e){}}}
   tt.addEventListener('click',function(){
     var next=doc.getAttribute('data-mode')==='dark'?'light':'dark';
-    if(reduce){applyMode(next);return;}
+    if(reduce){applyMode(next);settleColours();return;}
     if(document.startViewTransition&&!doc.classList.contains('lite')){
       var r=tt.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,rad=Math.hypot(Math.max(x,innerWidth-x),Math.max(y,innerHeight-y));
-      var t=document.startViewTransition(function(){applyMode(next);});
+      var t=document.startViewTransition(function(){applyMode(next);settleColours();});
       t.ready.then(function(){doc.animate({clipPath:['circle(0px at '+x+'px '+y+'px)','circle('+rad+'px at '+x+'px '+y+'px)']},{duration:420,easing:'cubic-bezier(.16,1,.3,1)',pseudoElement:'::view-transition-new(root)'});}).catch(function(){});
-    }else if(doc.classList.contains('lite')){applyMode(next);/* slow devices: switch at once; fading every colour on the page repaints it all for every frame */
+    }else if(doc.classList.contains('lite')){applyMode(next);settleColours();/* slow devices: switch at once; fading every colour on the page repaints it all for every frame */
     }else{doc.classList.add('theme-fade');applyMode(next);setTimeout(function(){doc.classList.remove('theme-fade');},400);}
   });
 
@@ -241,7 +247,6 @@ window.__SVC=[{"html": "<div class=\"sp-top\"><span class=\"phase-tag\"><i>1<\/i
       /* when the choreography is over, drop it so hover effects run freely */
       setTimeout(function(){sec.classList.add('sec-done');},2600);
     }
-    var vh=window.innerHeight;
     var sio=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){enter(e.target);sio.unobserve(e.target);}});},{rootMargin:'0px 0px -12% 0px',threshold:0});
     SECTIONS.forEach(function(s){if(!s.classList.contains('hero'))sio.observe(s);});
     /* fast flings: once scrolling settles, enter any section already passed */
@@ -294,7 +299,9 @@ window.__SVC=[{"html": "<div class=\"sp-top\"><span class=\"phase-tag\"><i>1<\/i
       /* and decode that section's first images ahead of time (one per idle slot), so they never decode mid-scroll */
       /* not on phones, slow connections or Save-Data: there the browser's own lazy loading is kinder to the data plan */
       if(eagerImgs)$$('img[loading="lazy"]',sec).slice(0,4).forEach(function(im){later(function(){if(im.closest('.fam-slides')&&!im.classList.contains('on'))return;im.loading='eager';if(im.decode)im.decode().catch(function(){});});});});
-    later(measure);later(placeStops);later(function(){req();});}
+    later(measure);later(placeStops);later(function(){req();});
+    /* the big city photo behind Why Singapore is decoded in a quiet moment, before the visitor scrolls to it */
+    later(function(){var im=new Image();im.decoding='async';im.src=new URL('assets/img/sg-cbd.webp',document.baseURI).href;if(im.decode)im.decode().catch(function(){});});}
   if(document.readyState==='complete')setTimeout(prerender,400);else window.addEventListener('load',function(){setTimeout(prerender,400);},{once:true});
   /* sections grow as they render: re-measure (batched, at idle) when the page height changes, never during a scroll frame */
   if(window.ResizeObserver){var roT=0;new ResizeObserver(function(){clearTimeout(roT);roT=setTimeout(function(){later(measure);later(placeStops);later(req);},250);}).observe(document.body);}
@@ -317,7 +324,8 @@ window.__SVC=[{"html": "<div class=\"sp-top\"><span class=\"phase-tag\"><i>1<\/i
   /* pause decorative loops while scrolling, so scrolling always gets the whole frame budget */
   window.addEventListener('scroll',req,{passive:true});
   var rsT=0;window.addEventListener('resize',function(){clearTimeout(rsT);rsT=setTimeout(function(){measure();placeStops();req();},150);},{passive:true});
-  frame();
+  /* first paint of the bar on the next frame: reading the scroll position now would force a layout before the page has painted */
+  req();
 
   /* active section indicator in the nav */
   var links=$$('#navLinks a:not(.btn)'),ind=document.createElement('span');ind.className='nav-ind';ind.setAttribute('aria-hidden','true');
@@ -425,7 +433,7 @@ window.__SVC=[{"html": "<div class=\"sp-top\"><span class=\"phase-tag\"><i>1<\/i
     function sync(){if(play)play.setAttribute('aria-pressed',auto?'true':'false');sec.classList.toggle('playing',auto&&vis);restart();}
     function restart(){clearTimeout(timer);if(auto&&vis&&!hover&&!document.hidden)timer=setTimeout(function(){go(cur+1,false);},T);
       /* restart the progress bar on the active stop */
-      var bar=stops[cur].querySelector('.jr-bar');if(bar){bar.style.display='none';void bar.offsetWidth;bar.style.display='';}}
+      var bar=stops[cur].querySelector('.jr-bar');if(bar&&auto&&vis&&!hover){bar.style.display='none';void bar.offsetWidth;bar.style.display='';}}
     stops.forEach(function(b,k){b.addEventListener('click',function(){go(k,true);});});
     rail.addEventListener('keydown',function(e){var k=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0;if(e.key==='Home'){k=-cur;}if(e.key==='End'){k=stops.length-1-cur;}
       if(k){e.preventDefault();go(cur+k,true);stops[cur].focus({preventScroll:true});}});
@@ -438,7 +446,11 @@ window.__SVC=[{"html": "<div class=\"sp-top\"><span class=\"phase-tag\"><i>1<\/i
     /* swipe between stops on the stage */
     var sx=null;stage.addEventListener('touchstart',function(e){sx=e.touches[0].clientX;},{passive:true});
     stage.addEventListener('touchend',function(e){if(sx===null)return;var dx=e.changedTouches[0].clientX-sx;sx=null;if(Math.abs(dx)>50)go(cur+(dx<0?1:-1),true);},{passive:true});
-    if(hasIO)new IntersectionObserver(function(es){vis=es[0].isIntersecting;sync();},{threshold:.35}).observe(sec);
+    /* the tour runs only while its card is properly on screen (the middle 60% of the viewport), and the first time
+       the visitor gets there it starts afresh from step 1, so no step has ticked by before they arrive */
+    var arrived=false;
+    if(hasIO)new IntersectionObserver(function(es){vis=es[0].isIntersecting;
+      if(vis&&!arrived){arrived=true;if(cur!==0&&auto)go(0,false);}sync();},{rootMargin:'-20% 0px -20% 0px',threshold:0}).observe(stage||sec);
     document.addEventListener('visibilitychange',restart);
     later(place);var pt=0;addEventListener('resize',function(){clearTimeout(pt);pt=setTimeout(place,150);},{passive:true});
     if(window.ResizeObserver)new ResizeObserver(function(){place();}).observe($('.jr-map'));

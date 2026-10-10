@@ -89,6 +89,12 @@ html[data-mode="dark"] .fx-glow.b{--g:217,43,58}
 .fx-dots{position:absolute;inset:0;background:radial-gradient(rgba(var(--fx),.14) 1px,transparent 1.5px) 0 0/22px 22px;
   -webkit-mask:radial-gradient(80% 90% at 70% 40%,#000 10%,transparent 75%);mask:radial-gradient(80% 90% at 70% 40%,#000 10%,transparent 75%)}
 
+/* phones and tablets: the soft lights hold still. Each drifting light is a separate, mostly see-through layer two
+   thirds the size of its section that the graphics chip blends over the page on every frame; held still, it is
+   simply part of the section's background and costs nothing (the colour is the same) */
+@media (max-width:900px),(pointer:coarse){
+  .fx-glow,.fx-sv-glow i,.fx-sv-warm{animation:none}
+}
 /* phones: fewer, smaller pieces, kept to the edges */
 @media (max-width:760px){
   .fx-bars{gap:9px;height:30%}.fx-bars i{width:11px}.fx-bars i:nth-child(n+6){display:none}

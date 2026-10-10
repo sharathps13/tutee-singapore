@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Local form test server: the site plus the real enquiry function, so the consultation form can be tested end to
  * end (a real email to business@tuteeconnect.com, sent through Google Workspace) before the site is deployed.
  *
@@ -18,6 +18,7 @@ import http from 'node:http';
 import { readFileSync, existsSync, statSync, createReadStream } from 'node:fs';
 import { join, extname, normalize, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { createGzip } from 'node:zlib';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const PORT = Number(process.argv[2]) || 8888;
@@ -32,6 +33,7 @@ if (existsSync(envFile)) {
 }
 
 const { handle, health } = await import(pathToFileURL(join(ROOT, 'netlify', 'functions', 'enquiry.mjs')).href);
+const { getNews } = await import(pathToFileURL(join(ROOT, 'netlify', 'functions', 'news.mjs')).href);
 
 const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.mjs': 'text/javascript',
   '.json': 'application/json', '.webp': 'image/webp', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml',
@@ -39,6 +41,7 @@ const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 
 
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://localhost');
+  if (url.pathname === '/api/news') { const { status, payload } = await getNews(); res.writeHead(status, { 'Content-Type': 'application/json' }); return res.end(JSON.stringify(payload)); }
   if (url.pathname === '/api/enquiry') {
     if (req.method === 'GET') { res.writeHead(200, { 'Content-Type': 'application/json' }); return res.end(JSON.stringify(health(), null, 2)); }
     if (req.method !== 'POST') { res.writeHead(405); return res.end(); }
@@ -55,8 +58,11 @@ const server = http.createServer(async (req, res) => {
   if (!file.startsWith(ROOT) || !existsSync(file) || !statSync(file).isFile() || /^_source|^\.env/.test(path)) {
     res.writeHead(404); return res.end('Not found');
   }
-  res.writeHead(200, { 'Content-Type': TYPES[extname(file).toLowerCase()] || 'application/octet-stream', 'Cache-Control': 'no-store' });
-  createReadStream(file).pipe(res);
+  // text files are gzipped, as Netlify does, so page-load tests here match the live site
+  const type = TYPES[extname(file).toLowerCase()] || 'application/octet-stream';
+  const zip = /text|javascript|json|svg/.test(type) && /gzip/.test(req.headers['accept-encoding'] || '');
+  res.writeHead(200, { 'Content-Type': type, 'Cache-Control': 'no-store', ...(zip ? { 'Content-Encoding': 'gzip', Vary: 'Accept-Encoding' } : {}) });
+  (zip ? createReadStream(file).pipe(createGzip()) : createReadStream(file)).pipe(res);
 });
 
 server.listen(PORT, () => {

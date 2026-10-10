@@ -22,14 +22,14 @@ html[data-mode="dark"] .wh{
 html:not([data-mode="dark"]) .wh{--wh-bg:#ECEDEA}
 html[data-mode="dark"] .wh{--wh-bg:#04090D}
 .wh-media{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
-.wh-pan{position:absolute;inset:0;will-change:transform}
+.wh-pan{position:absolute;inset:0}
 .wh{--pw:min(56vw,calc((min(100svh,980px) - 290px) * var(--wh-ar)))}
 .wh-photo{position:absolute;right:0;top:70px;overflow:hidden;
   width:var(--pw);height:calc(var(--pw) / var(--wh-ar));background:no-repeat 50% 50%/cover;transform-origin:50% 45%;
   -webkit-mask:linear-gradient(90deg,transparent 0,#000 17%),linear-gradient(180deg,transparent 0,#000 9%,#000 84%,transparent 100%);
   -webkit-mask-composite:source-in;
   mask:linear-gradient(90deg,transparent 0,#000 17%) intersect,linear-gradient(180deg,transparent 0,#000 9%,#000 84%,transparent 100%);
-  animation:whIn 1.2s ease-out both,whSettle 18s cubic-bezier(.2,.7,.2,1) both}
+  animation:whIn 1.2s ease-out both}
 /* the video covers the still once it is playing; until then (and with reduced motion) the still is what shows */
 .wh-photo video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1s ease-out}
 .wh-photo video.on{opacity:1}
@@ -191,8 +191,10 @@ html[data-mode="dark"] .wh-pass{filter:drop-shadow(0 22px 28px rgba(0,0,0,.6))}
 .wh-stamp{position:absolute;right:-16px;top:-40px;width:86px;height:86px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
   border:2.5px solid rgba(200,64,43,.85);box-shadow:inset 0 0 0 4px var(--wh-paper),inset 0 0 0 5.5px rgba(200,64,43,.6),0 8px 18px -10px rgba(0,0,0,.5);background:var(--wh-paper);
   color:#8E2210;transform:rotate(-14deg);pointer-events:none;animation:whStamp .55s cubic-bezier(.3,1.6,.5,1) 1.7s both}
-.wh-stamp b{font:800 13px/1 var(--body);letter-spacing:.12em;text-transform:uppercase}
-.wh-stamp small{font:600 8.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase}
+.wh-stamp b{font:800 13px/1 var(--body);letter-spacing:.12em;text-transform:uppercase;text-indent:.12em}
+/* one line, centred: letter spacing also trails the last letter, so the same amount leads the first (text-indent) */
+.wh-stamp small{display:flex;align-items:center;gap:3px;white-space:nowrap;font:600 8px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;padding-left:.08em}
+.wh-stamp small i{font-style:normal;font-size:8px;line-height:1;color:#C8402B}
 @keyframes whStamp{from{opacity:0;transform:rotate(-30deg) scale(2.2)}to{opacity:1;transform:rotate(-14deg) scale(1)}}
 
 /* ---- the invitation to scroll ---- */
@@ -252,6 +254,7 @@ html[data-mode="dark"] .wh-pass{filter:drop-shadow(0 22px 28px rgba(0,0,0,.6))}
   .wh-pass-meta{gap:16px}
   .wh-stamp{right:-6px;top:-34px;width:74px;height:74px}
   .wh-stamp b{font-size:11px}
+  .wh-stamp small{font-size:7px;gap:2px}.wh-stamp small i{font-size:7px}
 }
 @media (prefers-reduced-motion:reduce){
   .wh *,.wh *::before,.wh *::after{animation:none!important;transition:none!important}

@@ -25,7 +25,9 @@
     if(d>=0){x=d*22*k;y=d*18*k;r=d*2.4*k;s=1-d*.05;z=100-d*10;dim=Math.min(d,1)*.35;cv=Math.max(0,1-d*1.6);st=0;}
     else{var p=-d,q=Math.min(p,1),k=p-q,arc=Math.sin(q*Math.PI);
       x=-q*16-arc*34-k*10;y=-arc*120-q*52-k*16;r=-q*5-arc*3-k*2;s=1-q*.07-k*.03;
-      z=q<.5?110:60-p*10;dim=q*.25+k*.12;cv=1;st=Math.min(1,q*1.6);}
+      z=q<.5?110:60-p*10;dim=q*.25+k*.12;cv=1;st=Math.min(1,q*1.6);
+      /* phones: the used passes tuck in close behind, so none of them pokes past the edge of the screen */
+      if(narrow){x*=.3;r*=.5;y*=.8;}}
     /* write only what changed: a new stacking order or a changed variable restyles the card, so those are rounded
        and skipped when equal (z only changes as cards pass each other) */
     /* opacity is written straight onto the few elements that fade (not as inherited variables, which would restyle
@@ -46,8 +48,12 @@
   /* phones: the passes still to come peek out less, so the stack stays inside the screen and clear of the slider */
   var nmq=window.matchMedia&&matchMedia('(max-width: 640px)'),narrow=!!(nmq&&nmq.matches);
   if(nmq&&nmq.addEventListener)nmq.addEventListener('change',function(){narrow=nmq.matches;cards.forEach(function(c){c.__w.tf=null;});render(v);});
-  var shown=-1,v=0;
+  var shown=-1,v=0,mvT=0,moving=false;
+  /* while the passes move, their fading parts get layers of their own (sg-pathway.css .pw-moving), dropped again
+     shortly after the last frame */
+  function moved(){if(!moving){moving=true;sec.classList.add('pw-moving');}clearTimeout(mvT);mvT=setTimeout(function(){moving=false;sec.classList.remove('pw-moving');},600);}
   function render(val){
+    if(shown>=0)moved();
     v=Math.max(0,Math.min(MAX,val));
     cards.forEach(function(c,i){place(c,i-v);});
     fill.style.setProperty('--f',(v/MAX).toFixed(4));
@@ -112,9 +118,6 @@
   wallet.addEventListener('pointerup',function(e){if(sx===null)return;var dx=e.clientX-sx,dy=e.clientY-sy;sx=null;
     if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)*1.2){swiped=true;go(Math.round(v0)+(dx<0?1:-1));}else if(dragging){swiped=true;go(Math.round(v));}dragging=false;});
   wallet.addEventListener('pointercancel',function(){if(dragging)go(Math.round(v));sx=null;dragging=false;});
-
-  /* the printed background only turns while the section is on screen */
-  if('IntersectionObserver' in window)new IntersectionObserver(function(es){sec.classList.toggle('pw-on',es[0].isIntersecting);}).observe(sec);
 
   render(0);
 })();

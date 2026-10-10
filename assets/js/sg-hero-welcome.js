@@ -3,8 +3,7 @@
    - The greeting turns through English, Malay, Mandarin and Tamil.
    - The moving picture: plays the current theme's looped video over its still, once the page has loaded. The theme
      toggle (sg-landing.js calls window.__heroLoad before switching) keeps the old picture on top until the new one's
-     still has loaded, then fades it away. It also leans a little away from the mouse and drifts with the scroll,
-     written once per frame and only while the hero is on screen.
+     still has loaded, then fades it away. The picture itself holds still.
    - The study-level chips fill in the boarding pass's class, the main button and the enquiry form's level; the pass
      mirrors the enquiry pass's guess of the visitor's city, so the two passes always show the same trip.
    Nothing moves with reduced motion. */
@@ -36,7 +35,7 @@
      never competes with the page itself, and fades in over the still when it can play. No video with reduced motion
      or when the visitor has asked to save data; it pauses off screen and in a hidden tab. */
   var day=$('.wh-day'),night=$('.wh-night');
-  var conn=navigator.connection||{},lean=conn.saveData||/(^|-)2g$/.test(conn.effectiveType||'');
+  var conn=navigator.connection||{},lean=conn.saveData||/(^|-)[23]g$/.test(conn.effectiveType||'');
   var small=window.matchMedia&&matchMedia('(max-width: 600px), (max-width: 1000px) and (max-resolution: 1.49dppx)').matches;
   var loaded=document.readyState==='complete';
   function modeNow(){return document.documentElement.getAttribute('data-mode')==='dark'?'dark':'light';}
@@ -67,6 +66,14 @@
   if(loaded)setTimeout(start,0);else addEventListener('load',function(){setTimeout(start,150);});
   if('IntersectionObserver' in window)new IntersectionObserver(function(es){visible=es[0].isIntersecting;sync();},{threshold:0}).observe(sec);
   document.addEventListener('visibilitychange',sync);
+  /* the observer above can report late on a busy phone (its callbacks wait for a quiet moment), and a 1080p video kept
+     decoding through the first screens of a scroll. So the scroll itself also pauses it, as soon as the hero has mostly
+     gone; its height is measured only at load and on resize, never during a scroll */
+  var heroH=0;function measureHero(){heroH=sec.offsetHeight;}
+  if(loaded)measureHero();else addEventListener('load',measureHero);
+  var rzT=0;addEventListener('resize',function(){clearTimeout(rzT);rzT=setTimeout(measureHero,200);},{passive:true});
+  addEventListener('scroll',function(){if(!heroH)return;var past=(window.scrollY||0)>heroH*.85;
+    if(past&&visible){visible=false;sync();}else if(!past&&!visible&&(window.scrollY||0)<heroH*.8){visible=true;sync();}},{passive:true});
 
   /* the theme toggle (sg-landing.js calls this inside its circular reveal, before switching). The new picture's still
      is normally already decoded (above), so the picture simply changes with the rest of the page, inside the reveal.
@@ -85,21 +92,7 @@
     setTimeout(go,2500);
   };
 
-  /* ---------------- parallax: the mouse, and the scroll ---------------- */
-  var pan=$('.wh-pan');
-  if(pan&&!reduce){
-    var fine=window.matchMedia&&matchMedia('(hover: hover) and (pointer: fine)').matches;
-    var tx=0,ty=0,x=0,y=0,raf=0;
-    function frame(){raf=0;
-      var sy=Math.min(window.scrollY||0,1200)*.18;x+=(tx-x)*.08;y+=(ty-y)*.08;
-      pan.style.transform='translate3d('+x.toFixed(2)+'px,'+(y+sy).toFixed(2)+'px,0)';
-      if(Math.abs(tx-x)>.1||Math.abs(ty-y)>.1)kick();}
-    function kick(){if(!raf&&visible&&!hidden)raf=requestAnimationFrame(frame);}
-    if(fine)sec.addEventListener('pointermove',function(e){if(e.pointerType!=='mouse')return;
-      tx=-(e.clientX/innerWidth-.5)*22;ty=-(e.clientY/innerHeight-.5)*14;kick();},{passive:true});
-    sec.addEventListener('pointerleave',function(){tx=0;ty=0;kick();});
-    addEventListener('scroll',kick,{passive:true});
-  }
+  /* the picture holds still: no lean towards the mouse, no drift with the scroll, no slow zoom (only the video moves) */
 
   /* ---------------- the boarding pass ---------------- */
   var pass=$('#jhPass'),cls=$('#jhClass'),fromCode=$('#jhFromCode'),fromName=$('#jhFromName');
@@ -113,7 +106,7 @@
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(watchFrom,0);});else watchFrom();
 
   /* ---------------- study-level chips: the pass's class, the main button, and the enquiry form ---------------- */
-  var go=$('#jhGo'),goTxt=go?go.querySelector('.t'):null,LABEL={"Bachelor's degree":"Plan my Bachelor's","Master's degree":"Plan my Master's","MBA":"Plan my MBA","Diploma or polytechnic":"Plan my diploma"};
+  var go=$('#jhGo'),goTxt=go?go.querySelector('.t'):null,LABEL={"Bachelor's degree":"Plan my Bachelor's","Master's degree":"Plan my Master's","MBA":"Plan my MBA","Diploma or polytechnic":"Plan my diploma","PhD":"Plan my PhD"};
   $$('.wh-pick button').forEach(function(b){b.addEventListener('click',function(){
     var on=b.getAttribute('aria-pressed')!=='true';
     $$('.wh-pick button').forEach(function(x){x.setAttribute('aria-pressed','false');});

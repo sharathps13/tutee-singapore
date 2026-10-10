@@ -42,7 +42,7 @@
     set();if(list&&window.MutationObserver)new MutationObserver(set).observe(list,{attributes:true,subtree:true,attributeFilter:['aria-selected']});
   }
   var cssOn=false;
-  function css(){if(cssOn)return;cssOn=true;var l=document.createElement('link');l.rel='stylesheet';l.href=new URL('../css/sg-bgfx.css?v=4',SRC).href;document.head.appendChild(l);}
+  function css(){if(cssOn)return;cssOn=true;var l=document.createElement('link');l.rel='stylesheet';l.href=new URL('../css/sg-bgfx.css?v=5',SRC).href;document.head.appendChild(l);}
   var run=new IntersectionObserver(function(es){es.forEach(function(e){e.target.classList.toggle('fx-run',e.isIntersecting);});});
   var near=new IntersectionObserver(function(es){es.forEach(function(e){
     if(!e.isIntersecting)return;near.unobserve(e.target);var s=e.target,make=FX[s.id];if(!make)return;

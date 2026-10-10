@@ -255,7 +255,9 @@
   .jr-panel li{font-size:13.5px!important}
   .jr-get{padding:12px 14px!important;gap:4px!important;border-radius:14px!important}
   .jr-get b{font-size:15px!important}
-  .jr-ctrl{margin-top:10px!important;gap:8px!important}
+  /* the card has no padding of its own on phones, so the controls get the panel's inset: buttons line up with the
+     words above them instead of touching the card's edges */
+  .jr-ctrl{margin-top:0!important;gap:8px!important;padding:12px 16px 16px!important}
   .jr-swipe{display:block;text-align:center;font-size:12px;color:var(--soft);margin-top:8px}
 
   /* ---- What we do: the nine services as one row of icons; the panel shows the one in hand (swipe it) ---- */
@@ -404,4 +406,31 @@
   .anim #pathway.sec-in:not(.sec-done) .pw-hint{animation:kFade .5s ease-out .7s both}
   .anim #stories:not(.sec-in) .v-more{opacity:0}
   .anim #stories.sec-in:not(.sec-done) .v-more{animation:kFade .5s ease-out .5s both}
+}
+
+/* ---- alignment fixes, every phone width ---- */
+@media (max-width:640px){
+  /* the bottom bar: "Free consultation" stays on one line, centred */
+  .m-bar a{min-width:0;white-space:nowrap;padding:0 10px}
+  .m-bar .mb-cta{font-size:clamp(13.5px,3.9vw,16px)!important}
+  /* universities: every part of a row has its own fixed place (logo, name, rank, heart), so nothing can wrap onto a
+     second line; the hover glare (added when a mouse is present, e.g. a phone preview in a desktop browser) took a
+     grid cell of its own and pushed the heart under the logo */
+  .uni-card .glare{display:none!important}
+  .uni-card .crest{grid-column:1;grid-row:1}
+  .uni-card > div:not(.head){grid-column:2;grid-row:1}
+  .uni-card .qsrank{grid-column:3;grid-row:1}
+  .uni-card .uc-heart{grid-column:4;grid-row:1}
+  .uni-card .loc{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex!important;align-items:center;gap:4px}
+  .uni-card .loc svg{flex:none}
+}
+@media (max-width:360px){
+  /* narrow phones: WhatsApp keeps its icon (and its name for screen readers), giving the consultation button room */
+  .m-bar.has-tai{grid-template-columns:50px 50px 1fr!important}
+  .m-bar .mb-wa{padding:0}
+  .m-bar .mb-t{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+  .uni-card{grid-template-columns:36px minmax(0,1fr) 30px 32px!important;column-gap:8px!important;padding:10px!important}
+  .uni-card .crest{width:36px!important;height:36px!important;font-size:11px!important}
+  .uni-card .qsrank b{font-size:17px!important}
+  .uni-card h3{font-size:13.5px!important}
 }

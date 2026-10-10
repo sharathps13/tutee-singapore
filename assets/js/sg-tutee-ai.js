@@ -7,7 +7,8 @@
 (function(){
   if(!document.getElementById('home'))return;
   var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var ICON=(document.querySelector('.ph-brand img')||{}).src||'assets/img/tutee-connect-icon.png';
+  /* the round Tutee Connect mark, sharp at every screen density (assets/img/brand, made from the master logo) */
+  var ICON='assets/img/brand/tc-icon-48.webp',ICONS='assets/img/brand/tc-icon-48.webp 1x, assets/img/brand/tc-icon-96.webp 2x, assets/img/brand/tc-icon-144.webp 3x, assets/img/brand/tc-icon-192.webp 4x';
   function pick(a){return a[Math.floor(Math.random()*a.length)];}
   function esc(t){return String(t).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 
@@ -141,7 +142,7 @@
   function addButton(){
     btn=document.createElement('button');btn.type='button';btn.className='tai-btn';btn.setAttribute('aria-haspopup','dialog');btn.setAttribute('aria-expanded','false');
     btn.setAttribute('aria-label','Ask Tutee AI');
-    btn.innerHTML='<img src="'+esc(ICON)+'" alt="" width="40" height="40"><span class="tai-btn-t">Ask Tutee AI</span>';
+    btn.innerHTML='<img src="'+esc(ICON)+'" srcset="'+ICONS+'" alt="" width="40" height="40"><span class="tai-btn-t">Ask Tutee AI</span>';
     btn.addEventListener('click',function(){open?close():show();});
     document.body.appendChild(btn);
     /* phones: the button sits in the bottom action bar instead of floating over the page */
@@ -153,7 +154,7 @@
   }
   function build(){built=true;
     box=document.createElement('div');box.className='tai';box.id='taiBox';box.setAttribute('role','dialog');box.setAttribute('aria-label','Tutee AI chat');box.hidden=true;
-    box.innerHTML='<header class="tai-h"><img src="'+esc(ICON)+'" alt="" width="36" height="36"><div><b>Tutee AI</b><small><i></i>Answers from this page, instantly</small></div>'+
+    box.innerHTML='<header class="tai-h"><img src="'+esc(ICON)+'" srcset="'+ICONS+'" alt="" width="36" height="36"><div><b>Tutee AI</b><small><i></i>Answers from this page, instantly</small></div>'+
       '<button type="button" class="tai-x" aria-label="Close chat"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></header>'+
       '<div class="tai-log" role="log" aria-live="polite"></div><div class="tai-chips" role="group" aria-label="Suggested questions"></div>'+
       '<form class="tai-f"><label class="sr-only" for="taiIn">Your question</label><input id="taiIn" autocomplete="off" maxlength="240" placeholder="Ask about universities, visas, costs..."><button type="submit" aria-label="Send"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M2.5 19.5 21.5 12 2.5 4.5 2.5 10.3 15 12 2.5 13.7z"/></svg></button></form>'+

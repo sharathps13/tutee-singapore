@@ -71,3 +71,74 @@ html:not([data-mode="dark"]) .pw-scrub input:focus-visible::-webkit-slider-thumb
 /* footer: the call to action and the columns rise in turn */
 .anim footer:not(.sec-in) :is(.f-cta,.f-cols > div,.f-bottom){opacity:0}
 .anim footer.sec-in:not(.sec-done) :is(.f-cta,.f-cols > div,.f-bottom){animation:kRiseSm .6s var(--ease-out) both;animation-delay:calc(var(--i,0)*90ms + .15s)}
+/* the 7-years note is a hover/focus tooltip only: no section entrance may fade it in (one did, so it showed by itself
+   for a couple of seconds as How it works arrived) */
+.jr-stamp-tip{animation:none!important}
+
+/* What we do, Financial aid: frame the desk (loan papers, the calculator, the hands going through the numbers), not the faces */
+.svc-bg-5{background-position:72% 92%!important}
+
+/* What we do, Family migration: a real photo (a mother and daughter with their suitcase at the airport); a new file name so
+   no browser keeps showing the old drawing from its cache */
+.svc-bg-8{background-image:url("../img/services/sg-service-family.webp")!important;background-position:50% 6%!important}
+
+/* How it works: the dark "You get" card starts with three facts about the step (it used to be empty above the words) */
+.jr-get .jr-facts{list-style:none;margin:0 0 auto;padding:0 0 16px;display:grid;gap:12px;position:relative;z-index:1;border-bottom:1px solid rgba(255,255,255,.12)}
+.jr-get .jr-facts li{display:flex;align-items:center;gap:12px}
+.jr-get .jr-facts i{flex:none;display:grid;place-items:center;width:36px;height:36px;border-radius:11px;background:rgba(242,181,68,.14);color:#F2B544}
+.jr-get .jr-facts span{display:flex;flex-direction:column;gap:2px;min-width:0}
+.jr-get .jr-facts small{font:700 11px/1.2 var(--body);letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.6)}
+.jr-get .jr-facts b{font:600 15px/1.35 var(--body);color:#fff}
+.jr-get .jr-facts + small{margin-top:14px}
+/* phones keep the compact card: the facts repeat the list beside it */
+@media (max-width:640px){.jr-get .jr-facts{display:none}}
+/* How it works: each step's card has its own colour, so moving through the tour feels like moving along the route */
+#jrp0 .jr-get{background:linear-gradient(150deg,#0F3E48,#0A2730)}                 /* counselling: Tutee teal */
+#jrp1 .jr-get{background:linear-gradient(150deg,#1F3C78,#132550)}                 /* assessment: ink blue */
+#jrp2 .jr-get{background:linear-gradient(150deg,#5A2150,#371232)}                 /* university documents: plum */
+#jrp3 .jr-get{background:linear-gradient(150deg,#0F5C45,#083A2C)}                 /* finance: deep green */
+#jrp4 .jr-get{background:linear-gradient(150deg,#8E1823,#560E16)}                 /* visa documents: passport red */
+#jrp5 .jr-get{background:linear-gradient(150deg,#3D3270,#221B47)}                 /* submission: violet */
+#jrp6 .jr-get{background:linear-gradient(150deg,#7A4512,#4A2808)}                 /* landing: warm bronze */
+html[data-mode="dark"] #jrp0 .jr-get{background:linear-gradient(150deg,#17606B,#0E3A44)}
+html[data-mode="dark"] #jrp1 .jr-get{background:linear-gradient(150deg,#2B4F94,#1A3066)}
+html[data-mode="dark"] #jrp2 .jr-get{background:linear-gradient(150deg,#73306A,#481A42)}
+html[data-mode="dark"] #jrp3 .jr-get{background:linear-gradient(150deg,#16775A,#0C4A38)}
+html[data-mode="dark"] #jrp4 .jr-get{background:linear-gradient(150deg,#A8222F,#6C121C)}
+html[data-mode="dark"] #jrp5 .jr-get{background:linear-gradient(150deg,#4F4290,#2D245C)}
+html[data-mode="dark"] #jrp6 .jr-get{background:linear-gradient(150deg,#94561A,#5E340C)}
+/* the ring in the corner takes a lighter shade of the same colour */
+#jrp1 .jr-get::after{border-color:rgba(120,165,255,.18)}
+#jrp2 .jr-get::after{border-color:rgba(240,140,210,.16)}
+#jrp3 .jr-get::after{border-color:rgba(110,220,170,.16)}
+#jrp4 .jr-get::after{border-color:rgba(255,160,150,.16)}
+#jrp5 .jr-get::after{border-color:rgba(175,160,255,.18)}
+#jrp6 .jr-get::after{border-color:rgba(255,200,120,.2)}
+/* Why Singapore: the city photo behind the section keeps one layer of its own, so its zoom-out entrance doesn't draw the
+   whole photo twice (once while zooming, again when the zoom ends), which was a visible hitch on laptop graphics */
+.why-bg{will-change:transform}
+
+/* the logo: shown large enough that "STUDY | IMMIGRATION" stays readable, from sharpened lossless files sized for
+   each screen (srcset in the page) */
+html body .nav .logo,html[data-mode] body .nav .logo{height:57px!important;width:auto!important;image-rendering:auto}
+html body .nav.scrolled .logo,html[data-mode] body .nav.scrolled .logo{height:52px!important}
+html body .f-brand .logo-card img,html[data-mode] body .f-brand .logo-card img{height:77px!important;width:auto!important}
+@media (max-width:640px){
+  html body .nav .logo,html[data-mode] body .nav .logo,html body .nav.scrolled .logo,html[data-mode] body .nav.scrolled .logo{height:47px!important}
+}
+/* the logo as the round mark plus real text: text is drawn by the browser fitted to the screen's pixels, so
+   "Tutee Connect" and "STUDY | IMMIGRATION" stay sharp at small sizes, where any picture of text blurs */
+.tc-wm{--h:57px;display:inline-flex;align-items:center;gap:calc(var(--h)*.04);height:var(--h);line-height:1;white-space:nowrap}
+.tc-wm-mark{height:var(--h);width:var(--h);flex:none;display:block}
+.tc-wm-t{display:flex;flex-direction:column;align-items:flex-end;margin-top:calc(var(--h)*.16)}
+.tc-wm-t b{font:600 calc(var(--h)*.36)/1 "Source Serif Display","Source Serif 4",Georgia,serif;letter-spacing:-.01em}
+.tc-wm-t i{font-style:normal}
+.tc-wm-t .a{color:#054041;margin-right:.18em}
+.tc-wm-t .b{color:#8c0304}
+.tc-wm-t small{margin-top:calc(var(--h)*.06);font:700 calc(var(--h)*.185)/1 "Source Serif Display","Source Serif 4",Georgia,serif;letter-spacing:.04em;text-transform:uppercase;color:#8c0304}
+.tc-wm-t small span{margin:0 .3em;font-weight:400}
+.nav .tc-wm{--h:52px}
+.nav.scrolled .tc-wm{--h:48px}
+.f-brand .tc-wm{--h:72px}
+@media (max-width:640px){.nav .tc-wm,.nav.scrolled .tc-wm{--h:44px}}.tc-wm,.tc-wm *{text-decoration:none!important}
+.brand:has(.tc-wm){text-decoration:none}

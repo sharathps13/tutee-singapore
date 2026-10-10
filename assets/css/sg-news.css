@@ -1,0 +1,51 @@
+/* Live news ticker between "Why Singapore" and "How it works" (assets/js/sg-news.js). A slim pill of headlines
+   that glides sideways on the compositor (transform only), pauses on hover, focus and off
+   screen, and becomes a plain scrollable row with reduced motion. */
+.news-band{position:relative;z-index:2;padding:22px clamp(16px,4vw,40px) 0}
+.nb-in{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:12px;height:54px;padding:0 8px;border-radius:999px;
+  background:var(--card,#fff);border:1px solid var(--line,#E1E8EA);box-shadow:0 18px 40px -28px rgba(15,41,48,.45);overflow:hidden}
+.nb-tag{flex:none;display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 14px;border-radius:999px;background:#D92B3A;color:#fff;
+  font:800 12px/1 var(--body,system-ui),system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap}
+.nb-tag i{position:relative;width:8px;height:8px;border-radius:50%;background:#fff}
+.nb-tag i::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:2px solid rgba(255,255,255,.8);animation:nbPing 2s ease-out infinite}
+@keyframes nbPing{0%{transform:scale(.5);opacity:.9}100%{transform:scale(1.7);opacity:0}}
+.nb-tag-l{letter-spacing:.06em;text-transform:none;font-weight:700;font-size:13px}
+.nb-view{flex:1;min-width:0;overflow:hidden;-webkit-mask:linear-gradient(90deg,transparent,#000 28px,#000 calc(100% - 28px),transparent);mask:linear-gradient(90deg,transparent,#000 28px,#000 calc(100% - 28px),transparent)}
+.nb-track{display:flex;align-items:center;gap:40px;width:max-content;margin:0;padding:0 28px;list-style:none;white-space:nowrap}
+.nb-track li{display:flex;align-items:center;gap:10px;font:600 14.5px/1.2 var(--body,system-ui),system-ui,sans-serif;color:var(--ink,#0F2930)}
+.nb-track li::before{content:"";width:6px;height:6px;border-radius:50%;background:#F2B544;flex:none}
+.nb-track li.nb-wait::before{background:var(--line,#D5E1E5);animation:nbBlink 1s ease-in-out infinite alternate}
+@keyframes nbBlink{to{opacity:.3}}
+.nb-wait{color:var(--soft,#5B6E72)!important;font-weight:500!important}
+.nb-track a{color:inherit;text-decoration:none}
+.nb-track a:hover,.nb-track a:focus-visible{color:#D92B3A;text-decoration:underline;text-underline-offset:3px}
+.nb-src{font:800 11px/1 var(--body,system-ui),system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#C8402B}
+html[data-mode="dark"] .nb-src{color:#FF9AA0}
+.nb-time{font-weight:500;font-size:12.5px;color:var(--soft,#5B6E72)}
+/* the glide: the list is written twice, so moving it by half its width loops seamlessly */
+.nb-track.run{animation:nbGlide var(--nb-d,80s) linear infinite}
+@keyframes nbGlide{to{transform:translate3d(-50%,0,0)}}
+/* hover, focus, off screen or a hidden tab: the headlines hold exactly where they are, so the one under the pointer
+   can be clicked (paused, never restarted) */
+.news-band:hover .nb-track,.news-band:focus-within .nb-track,.news-band.nb-off .nb-track,.news-band.nb-off .nb-tag i::after{animation-play-state:paused}
+/* the band arrives with a short rise, like the sections around it */
+.news-band.nb-in-view .nb-in{animation:nbRise .7s cubic-bezier(.16,1,.3,1) both}
+@keyframes nbRise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@media (max-width:640px){
+  .news-band{padding-top:16px}
+  .nb-in{height:46px;gap:8px;padding:0 5px}
+  .nb-tag{height:34px;padding:0 11px;font-size:11px}
+  .nb-tag-l{display:none}
+  .nb-track{gap:28px;padding:0 18px}
+  .nb-track li{font-size:13.5px}
+  }
+@media (prefers-reduced-motion:reduce){
+  .nb-track.run{animation:none}
+  .nb-view{overflow-x:auto;-webkit-mask:none;mask:none}
+  .nb-tag i::after{animation:none}
+}
+
+/* the ticker takes the place of the old empty gap between the two sections, so the space around it is kept short */
+section#why{padding-bottom:clamp(24px,3.4vw,44px)!important}
+section#how{padding-top:clamp(30px,4.4vw,60px)!important}
+.news-band{padding-top:0}
