@@ -10,8 +10,9 @@
 var SECRET = 'PASTE-A-LONG-RANDOM-SECRET-HERE';
 var SHEET_NAME = 'Enquiries';
 var MAIL_TO = 'business@tuteeconnect.com';   // fixed here, so a request can never send mail anywhere else
-var HEADERS = ['Received (IST)', 'Full name', 'Email', 'Phone', 'Flying from', 'Destination', 'Interested in',
-  'Preferred call time', 'Institution shortlist', 'Note from the student', 'Submitted from'];
+var HEADERS = ['Date (IST)', 'Time (IST)', 'Full name', 'Email', 'Phone', 'State of residence', 'Flying from',
+  'Destination', 'Interested in', 'Preferred call time', 'Institution shortlist', 'Note from the student',
+  'Submitted from'];
 
 function doPost(e) {
   try {
@@ -27,10 +28,16 @@ function doPost(e) {
         sh.appendRow(HEADERS);
         sh.getRange(1, 1, 1, HEADERS.length).setFontWeight('bold').setBackground('#A51D2A').setFontColor('#ffffff');
         sh.setFrozenRows(1);
+      } else if (sh.getRange(1, 1).getValue() === 'Received (IST)') {
+        // an older sheet: add the Time and State columns, so earlier rows keep lining up
+        sh.insertColumnAfter(1);
+        sh.insertColumnAfter(5);
+        sh.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS])
+          .setFontWeight('bold').setBackground('#A51D2A').setFontColor('#ffffff');
       }
       // a leading = + - @ would make Sheets treat the text as a formula
       var safe = function (v) { v = String(v == null ? '' : v); return /^[=+\-@]/.test(v) ? "'" + v : v; };
-      sh.appendRow([d.received, d.name, d.email, d.phone, d.flying_from, d.destination, d.interested_in,
+      sh.appendRow([d.date, d.time, d.name, d.email, d.phone, d.state, d.flying_from, d.destination, d.interested_in,
         d.call_time, d.shortlist, d.note, d.page].map(safe));
     } finally {
       lock.releaseLock();

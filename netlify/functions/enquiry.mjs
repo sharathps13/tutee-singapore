@@ -195,6 +195,7 @@ const EXTRA_LABELS = {
   study_level: ['study', 'Interested in'],
   call_slot: ['study', 'Preferred call time'],
   origin_city: ['contact', 'Flying from'],
+  state: ['contact', 'State of residence'],
   shortlist: ['study', 'Institution shortlist'],
   description: ['note', 'Note from the student'],
 };
@@ -212,6 +213,15 @@ function receivedAt(now = new Date()) {
       hour: 'numeric', minute: '2-digit', hour12: true,
     }).format(now) + ' IST';
   } catch { return now.toISOString(); }
+}
+
+/** The same moment as two Sheet cells: date ("12 Oct 2026") and time ("3:45 pm"), India time. */
+function receivedParts(now = new Date()) {
+  try {
+    const fmt = (o) => new Intl.DateTimeFormat('en-IN', { timeZone: 'Asia/Kolkata', ...o }).format(now);
+    return { date: fmt({ day: 'numeric', month: 'short', year: 'numeric' }),
+      time: fmt({ hour: 'numeric', minute: '2-digit', hour12: true }) };
+  } catch { const s = now.toISOString(); return { date: s.slice(0, 10), time: s.slice(11, 16) + ' UTC' }; }
 }
 
 /** The message (sent through Gmail): a plain, professional notification with the
@@ -531,7 +541,9 @@ async function storeInSheet(f, country, mail = null, now = new Date()) {
   const row = {
     secret,
     received: receivedAt(now),
+    ...receivedParts(now),
     name: f.name, email: f.email, phone: f.phone,
+    state: ex.state || '',
     flying_from: ex.origin_city || '',
     destination: f.destination || country || '',
     interested_in: ex.study_level || '',

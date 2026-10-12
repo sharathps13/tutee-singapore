@@ -142,3 +142,7 @@ html body .f-brand .logo-card img,html[data-mode] body .f-brand .logo-card img{h
 .f-brand .tc-wm{--h:72px}
 @media (max-width:640px){.nav .tc-wm,.nav.scrolled .tc-wm{--h:44px}}.tc-wm,.tc-wm *{text-decoration:none!important}
 .brand:has(.tc-wm){text-decoration:none}
+
+/* enquiry form: required and optional markers */
+#enq abbr.req{color:#A51D2A;text-decoration:none;border:0;font-weight:700;margin-left:2px;cursor:help}
+#enq em.opt{font-style:normal;font-weight:400;opacity:.65;font-size:.9em}
