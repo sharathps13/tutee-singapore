@@ -27,14 +27,14 @@
 <link rel="preload" href="assets/fonts/quicksand-wght.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/source-serif-4-display-600.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/css/sg-fonts.css?v=7ce39eb485">
-<link rel="stylesheet" href="assets/css/sg-landing.css?v=jh4">
+<link rel="stylesheet" href="assets/css/sg-landing.css?v=jh10">
 <link rel="stylesheet" href="assets/css/sg-hero-welcome.css?v=9">
 <link rel="stylesheet" href="assets/css/sg-pathway.css?v=8">
 <link rel="stylesheet" href="assets/css/sg-enhance.css?v=14">
-<link rel="stylesheet" href="assets/css/sg-select.css?v=6">
-<link rel="stylesheet" href="assets/css/sg-mobile.css?v=17">
+<link rel="stylesheet" href="assets/css/sg-select.css?v=7">
+<link rel="stylesheet" href="assets/css/sg-mobile.css?v=19">
 <link rel="stylesheet" href="assets/css/sg-news.css?v=3">
-<script src="assets/js/sg-hero-welcome.js?v=7" defer></script>
+<script src="assets/js/sg-hero-welcome.js?v=8" defer></script>
 </head>
 <body>
 <header class="nav" id="nav">
@@ -398,21 +398,31 @@
       <div class="pass-tear" aria-hidden="true"></div>
       <div class="pass-body" id="tMain">
         <form id="enq" novalidate data-lead-form>
-          <div class="pf full" data-f="name"><label for="f-name">Full name <abbr class="req" title="required">*</abbr></label><input id="f-name" name="name" autocomplete="name" placeholder="As on your passport" required><span class="err" id="e-name"></span></div>
-          <div class="pf" data-f="phone_number"><label for="f-phone">Phone <abbr class="req" title="required">*</abbr></label><div class="phone"><select id="f-cc" name="country_code" aria-label="Country code"><option value="+91">+91</option><option value="+971">+971</option><option value="+974">+974</option><option value="+968">+968</option><option value="+966">+966</option><option value="+965">+965</option><option value="+973">+973</option><option value="+94">+94</option><option value="+977">+977</option><option value="+880">+880</option><option value="+960">+960</option><option value="+60">+60</option><option value="+62">+62</option><option value="+63">+63</option><option value="+84">+84</option><option value="+44">+44</option><option value="+254">+254</option><option value="+234">+234</option><option value="+65">+65</option><option value="+1">+1</option><option value="+61">+61</option></select><input id="f-phone" name="phone_number" type="tel" autocomplete="tel-national" placeholder="98765 43210" required></div><span class="err" id="e-phone_number"></span></div>
-          <div class="pf" data-f="email"><label for="f-email">Email <abbr class="req" title="required">*</abbr></label><input id="f-email" name="email" type="email" autocomplete="email" placeholder="you@email.com" required><span class="err" id="e-email"></span></div>
-          <div class="pf"><label for="f-state">State of residence <em class="opt">(optional)</em></label><select id="f-state" name="state" autocomplete="address-level1"><option value="">Prefer not to say</option><optgroup label="States"><option>Andhra Pradesh</option><option>Arunachal Pradesh</option><option>Assam</option><option>Bihar</option><option>Chhattisgarh</option><option>Goa</option><option>Gujarat</option><option>Haryana</option><option>Himachal Pradesh</option><option>Jharkhand</option><option>Karnataka</option><option>Kerala</option><option>Madhya Pradesh</option><option>Maharashtra</option><option>Manipur</option><option>Meghalaya</option><option>Mizoram</option><option>Nagaland</option><option>Odisha</option><option>Punjab</option><option>Rajasthan</option><option>Sikkim</option><option>Tamil Nadu</option><option>Telangana</option><option>Tripura</option><option>Uttar Pradesh</option><option>Uttarakhand</option><option>West Bengal</option></optgroup><optgroup label="Union territories"><option>Andaman and Nicobar Islands</option><option>Chandigarh</option><option>Dadra and Nagar Haveli and Daman and Diu</option><option>Delhi</option><option>Jammu and Kashmir</option><option>Ladakh</option><option>Lakshadweep</option><option>Puducherry</option></optgroup><option>Outside India</option></select></div>
-          <div class="pf"><label for="f-level">Interested in</label><select id="f-level" name="study_level"><option>Not sure yet</option><option>Bachelor's degree</option><option>Master's degree</option><option>MBA</option><option>Diploma or polytechnic</option><option>PhD</option></select></div>
-          <div class="pf"><label for="f-slot">Best time to call</label><select id="f-slot" name="call_slot"><option value="">Pick a slot</option><option>Morning, 9am–12pm</option><option>Afternoon, 12–4pm</option><option>Evening, 4–8pm</option><option>Weekend</option></select></div>
-          <details class="pf full note"><summary>Add a note for your advisor (optional)</summary><textarea id="f-msg" name="description" aria-label="Note for your advisor" placeholder="Your grades, preferred course or questions"></textarea></details>
-          <div class="pf full sl-box" id="slBox" hidden><div class="sl-top"><span class="sl-h"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>Your shortlist <b id="slN">0</b></span><a class="sl-add" href="institutions.html#ranked">+ Add more</a></div><ul class="sl-chips" id="slChips" aria-label="Institutions you shortlisted"></ul><input type="hidden" name="shortlist" id="f-shortlist" value=""></div>
-          <input type="hidden" name="destination" value="Singapore">
-          <input type="hidden" name="from_name" value="Tutee Connect Singapore">
+          <input type="hidden" name="subject" value="New Lead from Tutee Connect Landing Page!">
+          <input type="hidden" name="from_name" value="Tutee Connect Notification System">
+          <input type="hidden" name="form_location" value="Consultation form">
+          <input type="hidden" name="destination" id="f-dest" value="General Singapore Inquiry">
           <input type="hidden" name="origin_city" id="f-origin-h" value="India">
           <input class="hp" type="checkbox" name="botcheck" id="f-bot" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <div class="pf full" data-f="name"><label for="f-name">Full name <abbr class="req" title="required">*</abbr></label><input id="f-name" name="name" autocomplete="name" placeholder="As on your passport" maxlength="120" required><span class="err" id="e-name"></span></div>
+          <div class="pf" data-f="phone_number"><label for="f-phone">Phone <abbr class="req" title="required">*</abbr></label><div class="phone"><select id="f-cc" name="country_code" aria-label="Country code"><option value="+91">+91</option><option value="+971">+971</option><option value="+974">+974</option><option value="+968">+968</option><option value="+966">+966</option><option value="+965">+965</option><option value="+973">+973</option><option value="+94">+94</option><option value="+977">+977</option><option value="+880">+880</option><option value="+960">+960</option><option value="+60">+60</option><option value="+62">+62</option><option value="+63">+63</option><option value="+84">+84</option><option value="+44">+44</option><option value="+254">+254</option><option value="+234">+234</option><option value="+65">+65</option><option value="+1">+1</option><option value="+61">+61</option></select><input id="f-phone" name="phone_number" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="9876543210" maxlength="15" required></div><span class="err" id="e-phone_number"></span></div>
+          <div class="pf" data-f="email"><label for="f-email">Email <abbr class="req" title="required">*</abbr></label><input id="f-email" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="you@email.com" maxlength="200" required><span class="err" id="e-email"></span></div>
+          <div class="pf-duo full"><div class="pf" data-f="state"><label for="f-state">State <abbr class="req" title="required">*</abbr></label><select id="f-state" name="state" autocomplete="address-level1" required><option value="" selected>Select</option><optgroup label="States"><option>Andhra Pradesh</option><option>Arunachal Pradesh</option><option>Assam</option><option>Bihar</option><option>Chhattisgarh</option><option>Goa</option><option>Gujarat</option><option>Haryana</option><option>Himachal Pradesh</option><option>Jharkhand</option><option>Karnataka</option><option>Kerala</option><option>Madhya Pradesh</option><option>Maharashtra</option><option>Manipur</option><option>Meghalaya</option><option>Mizoram</option><option>Nagaland</option><option>Odisha</option><option>Punjab</option><option>Rajasthan</option><option>Sikkim</option><option>Tamil Nadu</option><option>Telangana</option><option>Tripura</option><option>Uttar Pradesh</option><option>Uttarakhand</option><option>West Bengal</option></optgroup><optgroup label="Union territories"><option>Andaman and Nicobar Islands</option><option>Chandigarh</option><option>Dadra and Nagar Haveli and Daman and Diu</option><option>Delhi</option><option>Jammu and Kashmir</option><option>Ladakh</option><option>Lakshadweep</option><option>Puducherry</option></optgroup><option>Outside India</option></select><span class="err" id="e-state"></span></div>
+          <div class="pf" data-f="call_time"><label for="f-slot">Call time</label><select id="f-slot" name="call_time"><option value="" selected>Select</option><option>Morning (9 am – 12 pm)</option><option>Afternoon (12 – 4 pm)</option><option>Evening (4 – 8 pm)</option><option>Weekend</option><option>Anytime</option></select></div></div>
+          <div class="pf full" data-f="course"><label for="f-course">Subject <em class="opt">(optional)</em></label><input id="f-course" name="course" autocomplete="off" placeholder="e.g. Computer Science" maxlength="120"></div>
+          <div class="pf-duo full"><div class="pf" data-f="study_level"><label for="f-level">Level <abbr class="req" title="required">*</abbr></label><select id="f-level" name="study_level" required><option value="" selected>Select</option><option>Bachelor's degree</option><option>Master's degree</option><option>MBA</option><option>Diploma or polytechnic</option><option>PhD</option><option>Not sure yet</option></select><span class="err" id="e-study_level"></span></div>
+          <div class="pf" data-f="intake"><label for="f-intake">Start</label><select id="f-intake" name="intake"><option value="Next intake" selected>Next intake</option><option value="Within 12 months">Within 12 months</option><option value="Later">Later / exploring</option></select></div></div>
+          <div class="pf full sl-box" id="slBox" hidden><div class="sl-top"><span class="sl-h"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg>Your shortlist <b id="slN">0</b></span><a class="sl-add" href="institutions.html#ranked">+ Add more</a></div><ul class="sl-chips" id="slChips" aria-label="Institutions you shortlisted"></ul><input type="hidden" name="shortlist" id="f-shortlist" value=""></div>
           <button class="btn pass-btn full" type="submit" id="f-submit">Reserve my free call <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
           <p class="form-msg full" id="f-msg-box" role="alert" hidden></p>
         </form>
+        <div class="done" id="tDone" role="status" tabindex="-1" hidden>
+          <span class="stamp">CONFIRMED</span>
+          <span class="done-kick">Form completed</span>
+          <h3 id="tDoneH">Your call is reserved!</h3>
+          <p id="tDoneP">An advisor will call you within one working day to plan your Singapore journey.</p>
+          <button type="button" class="done-again" id="tAgain">+ Submit another enquiry</button>
+        </div>
       </div>
       <div class="pass-tear small" aria-hidden="true"></div>
       <div class="pass-foot">
@@ -448,12 +458,12 @@
   </div>
 </footer>
 <dialog class="lb" id="famLb" aria-label="Photo viewer"><figure><img id="lbImg" alt=""><figcaption id="lbCap"></figcaption></figure><button type="button" class="lb-x" id="lbX" aria-label="Close">×</button><button type="button" class="lb-nav prev" id="lbPrev" aria-label="Previous photo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><button type="button" class="lb-nav next" id="lbNext" aria-label="Next photo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg></button><span class="lb-n" id="lbN"></span></dialog>
-<script src="assets/js/sg-landing.js?v=jh18" defer></script>
+<script src="assets/js/sg-landing.js?v=jh20" defer></script>
 <script src="assets/js/sg-pathway.js?v=10" defer></script>
 <script src="assets/js/sg-bgfx.js?v=5" defer></script>
 <script src="assets/js/sg-mobile.js?v=5" defer></script>
-<script src="assets/js/sg-select.js?v=7" defer></script>
-<script src="assets/js/sg-tutee-ai.js?v=5" defer></script>
+<script src="assets/js/sg-select.js?v=11" defer></script>
+<script src="assets/js/sg-tutee-ai.js?v=8" defer></script>
 <script src="assets/js/sg-news.js?v=3" defer></script>
 <script src="assets/js/sg-leave.js?v=1" defer></script>
 </body>

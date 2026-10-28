@@ -1,17 +1,18 @@
 /**
- * Local form test server: the site plus the real enquiry function, so the consultation form can be tested end to
- * end (a real email to business@tuteeconnect.com, sent through Google Workspace) before the site is deployed.
+ * Local form test server: the site plus the real enquiry function, so the consultation form and the Tutee AI
+ * callback can be tested end to end (a real row in the "Singapore Leads" tab and a real email to
+ * business@tuteeconnect.com, both from the shared Apps Script in apps-script/) before the site is deployed.
  *
  *   node _source/dev/form-test-server.mjs          then open http://localhost:8888
  *
- * Put the Workspace login in a file called .env.local in the site's root folder (that file is ignored by Git, so
- * the password never reaches GitHub):
+ * Put the same values as on Netlify in a file called .env.local in the site's root folder (that file is ignored by
+ * Git, so the token never reaches GitHub):
  *
- *   GMAIL_USER=business@tuteeconnect.com
- *   GMAIL_APP_PASSWORD=abcd efgh ijkl mnop
+ *   APPS_SCRIPT_URL=https://script.google.com/macros/s/.../exec
+ *   APPS_SCRIPT_TOKEN=this site's own token (LEADS_TOKEN_SINGAPORE in the script)
  *   SITE_COUNTRY=Singapore
  *
- * Supabase is skipped unless SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are also set.
+ * RESEND_API_KEY (the fallback when the script can't be reached) and Supabase are optional.
  * For testing only: it is not part of the site (Netlify serves nothing under /_source).
  */
 import http from 'node:http';
@@ -68,8 +69,7 @@ const server = http.createServer(async (req, res) => {
 server.listen(PORT, () => {
   const h = health();
   console.log(`\n  Tutee Connect form test server: http://localhost:${PORT}`);
-  console.log(`  Emails go to: ${h.recipient}   from: ${h.from}`);
-  console.log(`  Google Workspace login loaded: ${h.gmail_configured ? 'yes' : 'NO - add GMAIL_USER and GMAIL_APP_PASSWORD to .env.local'}`);
-  console.log(`  Google Sheet: ${h.sheet_configured ? 'on' : 'off - add SHEET_WEBHOOK_URL and SHEET_SECRET to .env.local'}`);
-  console.log(`  Supabase: ${h.supabase_configured ? 'on' : 'off (email only)'}\n  Press Ctrl+C to stop.\n`);
+  console.log(`  Leads for: ${h.country}   emailed to: ${h.recipient}`);
+  console.log(`  Website Leads sheet (Apps Script): ${h.sheet_configured ? 'on' : 'OFF - add APPS_SCRIPT_URL and APPS_SCRIPT_TOKEN to .env.local'}`);
+  console.log(`  Resend fallback: ${h.resend_configured ? 'on' : 'off'}   Supabase: ${h.supabase_configured ? 'on' : 'off'}\n  Press Ctrl+C to stop.\n`);
 });

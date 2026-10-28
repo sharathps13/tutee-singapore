@@ -17,10 +17,10 @@
     flask:ic('<path d="M9 3h6M10 3v6L4.5 18.5A2 2 0 0 0 6.3 21h11.4a2 2 0 0 0 1.8-2.5L14 9V3"/><path d="M7 15h10"/>'),help:ic('<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17h.01"/>'),
     sunrise:ic('<path d="M12 3v3M4.9 7.9l2.1 2.1M19.1 7.9 17 10M2 18h20M6 18a6 6 0 0 1 12 0"/>'),sun:ic('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'),
     sunset:ic('<path d="M12 10V3M8 6l4 4 4-4M2 18h20M6 18a6 6 0 0 1 12 0M4.9 13.9 6.3 15M19.1 13.9 17.7 15"/>'),cal:ic('<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M8 14h2M14 14h2M8 17h2"/>'),
-    clock:ic('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>')};
+    clock:ic('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),pin:ic('<path d="M12 21s-7-6-7-11a7 7 0 0 1 14 0c0 5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>')};
   var CC={'+91':'India','+971':'United Arab Emirates','+974':'Qatar','+968':'Oman','+966':'Saudi Arabia','+965':'Kuwait','+973':'Bahrain','+94':'Sri Lanka','+977':'Nepal','+880':'Bangladesh','+960':'Maldives',
     '+60':'Malaysia','+62':'Indonesia','+63':'Philippines','+84':'Vietnam','+44':'United Kingdom','+254':'Kenya','+234':'Nigeria','+65':'Singapore','+1':'USA or Canada','+61':'Australia'};
-  var LV={"Not sure yet":[I.help,'We\'ll help you decide'],"Bachelor's degree":[I.cap,'Undergraduate degree'],"Master's degree":[I.book,'Postgraduate degree'],"MBA":[I.brief,'Business school'],
+  var LV={"Select":[I.help,'What are you aiming for?'],"Not sure yet":[I.help,'We\'ll help you decide'],"Bachelor's degree":[I.cap,'Undergraduate degree'],"Master's degree":[I.book,'Postgraduate degree'],"MBA":[I.brief,'Business school'],
     "Diploma or polytechnic":[I.tool,'Polytechnic or private institution'],"PhD":[I.flask,'Research degree']};
   var DIAL={'+91':'in','+971':'ae','+974':'qa','+968':'om','+966':'sa','+965':'kw','+973':'bh','+94':'lk','+977':'np','+880':'bd','+960':'mv','+60':'my','+62':'id','+63':'ph','+84':'vn','+44':'gb','+254':'ke','+234':'ng','+65':'sg','+1':'us','+61':'au'};
   var CITY={IN:'in',MAA:'in',BLR:'in',HYD:'in',BOM:'in',DEL:'in',COK:'in',CCU:'in',PNQ:'in',AMD:'in',CJB:'in',TRV:'in',DXB:'ae',AUH:'ae',SHJ:'ae',DOH:'qa',MCT:'om',RUH:'sa',JED:'sa',KWI:'kw',BAH:'bh',
@@ -30,9 +30,13 @@
   function look(sel,o){var v=o.value,t=o.textContent,g=o.parentNode.tagName==='OPTGROUP'?o.parentNode.label:'';
     if(sel.id==='f-origin'){var fc=CITY[v];return {flag:fc,icon:fc?null:I.help,main:t,sub:v==='IN'?'Anywhere in India':v==='ANY'?'Somewhere else':(CNAME[fc]||g)+' · '+v};}
     if(sel.id==='f-cc')return {flag:DIAL[v],main:CC[v]||v,sub:v,short:v,wide:1};
-    if(sel.id==='f-level'){var l=LV[t]||[I.cap,''];return {icon:l[0],main:t,sub:l[1]};}
-    if(sel.id==='f-slot'){if(!v)return {icon:I.clock,main:t,sub:'Choose when we call you'};var m=t.split(', ');
-      return {icon:/Morning/.test(t)?I.sunrise:/Afternoon/.test(t)?I.sun:/Evening/.test(t)?I.sunset:I.cal,main:m[0],sub:m[1]||'Saturday or Sunday',short:t};}
+    if(sel.id==='f-level'){var l=LV[t]||[I.cap,''];return {icon:l[0],main:t,sub:l[1],short:t==='Diploma or polytechnic'?'Diploma':t};}
+    if(sel.id==='f-slot'){if(!v)return {icon:I.clock,main:t,sub:'Choose when we call you'};var m=t.match(/^(.*?)\s*\((.*)\)$/)||[t,t,''];
+      return {icon:/Morning/.test(t)?I.sunrise:/Afternoon/.test(t)?I.sun:/Evening/.test(t)?I.sunset:/Any/.test(t)?I.clock:I.cal,main:m[1],sub:m[2]||(/Any/.test(t)?'Whenever suits us both':'Saturday or Sunday'),short:m[1]};}
+    /* the box beside "Call time" is half the form wide, so the longest names show shortened there (in full in the list) */
+    if(sel.id==='f-state'){return {icon:I.pin,main:t,sub:!v?'Where you live now':g==='Union territories'?'Union territory':g==='States'?'State':'',
+      short:{'Andaman and Nicobar Islands':'Andaman & Nicobar','Dadra and Nagar Haveli and Daman and Diu':'Dadra, Daman & Diu','Jammu and Kashmir':'Jammu & Kashmir'}[t]||t};}
+    if(sel.id==='f-intake'){return {icon:/Next/.test(v)?I.sunrise:/12/.test(v)?I.cal:I.clock,main:t,sub:/Next/.test(v)?'The next August or private intake':/12/.test(v)?'Some time in the next year':'Just looking for now'};}
     return {main:t};}
   function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function lead(L){if(L.flag)return '<span class="dd-f"><img src="'+FLAGS+L.flag+'.svg" alt="" width="28" height="21" loading="lazy" decoding="async"></span>';return L.icon?'<span class="dd-i">'+L.icon+'</span>':L.badge?'<span class="dd-b">'+esc(L.badge)+'</span>':'';}

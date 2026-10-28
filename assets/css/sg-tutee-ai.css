@@ -80,3 +80,17 @@ html[data-mode="dark"] .tai-note{color:#9DB0AC}
 .tai-btn.tai-in-bar img{width:44px!important;height:44px!important}
 .tai-btn.tai-in-bar::after{display:none}
 .tai-btn.tai-in-bar .tai-btn-t{display:none}
+/* answers with several paragraphs and lists; the "new chat" button beside close */
+.tai-h{gap:10px}
+.tai-h .tai-x{flex:none}
+.tai-new{margin-left:2px}
+.tai-m p + p,.tai-m p + ul,.tai-m ul + p{margin-top:7px}
+.tai-m ul{margin:6px 0 0;padding-left:18px}
+.tai-m li{margin:3px 0;padding-left:2px}
+.tai-m li::marker{color:#D92B3A}
+.tai-m{overflow-wrap:anywhere}
+.tai-m.bot a{overflow-wrap:anywhere}
+html[data-mode="dark"] .tai-m li::marker{color:#FF9AA0}
+/* the green "online" dot sits on the subtitle's first line, even when the subtitle wraps on a narrow phone */
+.tai-h small{align-items:flex-start}
+.tai-h small i{flex:none;margin-top:.42em}

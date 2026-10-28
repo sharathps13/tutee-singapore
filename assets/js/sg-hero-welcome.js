@@ -111,7 +111,7 @@
     var on=b.getAttribute('aria-pressed')!=='true';
     $$('.wh-pick button').forEach(function(x){x.setAttribute('aria-pressed','false');});
     if(on)b.setAttribute('aria-pressed','true');
-    var lv=on?b.getAttribute('data-level'):'Not sure yet';
+    var lv=on?b.getAttribute('data-level'):'';
     if(goTxt)goTxt.textContent=on?LABEL[lv]:'Start my journey';
     if(cls){if(on)cls.dataset.set='1';else delete cls.dataset.set;setText(cls,on?b.getAttribute('data-short'):'Your choice');passLabel();}
     var sel=document.getElementById('f-level');

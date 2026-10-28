@@ -172,41 +172,93 @@ window.__SVC=[{"html": "<div class=\"sp-top\"><span class=\"phase-tag\"><i>1<\/i
   function notch(){var t=passEl.querySelectorAll('.pass-tear');if(t[0])passEl.style.setProperty('--t1',(t[0].offsetTop+1)+'px');if(t[1]&&t[0]){var a=t[0].offsetTop+1,b=t[1].offsetTop+1,m=Math.round((a+b)/2);passEl.style.setProperty('--tm',m+'px');passEl.style.setProperty('--t2b',(b-m)+'px');}}
   if(window.ResizeObserver)new ResizeObserver(function(){requestAnimationFrame(notch);}).observe(passEl);
   $('#f-name').addEventListener('input',function(e){$('#s-name').textContent=e.target.value.trim()||'Future student';drawBarcode();});
-  $('#f-level').addEventListener('change',function(e){$('#s-class').textContent=e.target.value.replace(' degree','').replace(' or polytechnic','');});
-  $('#f-slot').addEventListener('change',function(e){$('#s-slot').textContent=e.target.value?e.target.value.split(',')[0]:'Your chosen slot';});
+  $('#f-level').addEventListener('change',function(e){$('#s-class').textContent=(e.target.value||'Not sure yet').replace(' degree','').replace(' or polytechnic','');});
+  $('#f-slot').addEventListener('change',function(e){$('#s-slot').textContent=e.target.value?e.target.value.replace(/\s*\(.*\)/,''):'Your chosen slot';});
   oSel.addEventListener('change',function(){setOrigin(oSel.value,true);});
   setOrigin(TZ[tz]||FALLBACK,false);
 
-  /* ---------- enquiry submit: same JSON payload as main.js, posted to the shared /api/enquiry function ---------- */
+  /* ---------- enquiry: the same fields as the Finland and New Zealand forms, posted to this site's /api/enquiry,
+     which adds the lead to the "Singapore Leads" sheet and emails the team. No URL or token is in the page. ---------- */
   var form=$('#enq'),btn=$('#f-submit'),box=$('#f-msg-box'),btnHTML=btn.innerHTML;
-  function setErr(f,msg){var el=form.querySelector('[data-f="'+f+'"]'),inp=el.querySelector('input');el.classList.toggle('bad',!!msg);$('#e-'+f).textContent=msg||'';inp.setAttribute('aria-invalid',msg?'true':'false');inp.setAttribute('aria-describedby','e-'+f);}
-  form.addEventListener('input',function(e){var p=e.target.closest('.pf');if(p&&p.dataset.f)setErr(p.dataset.f,'');box.hidden=true;});
-  function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
-  function done(first,slot,preview){
-    $('#tMain').innerHTML='<div class="done" role="status"><span class="stamp">CONFIRMED</span><h3>Your call is reserved, '+esc(first)+'!</h3><p>An advisor will call you '+(slot?'in your chosen slot ('+esc(slot.toLowerCase())+')':'within one working day')+' to plan your Singapore journey.</p>'+(preview?'<p style="font-size:13px;color:#5B6E72">Preview copy of the page: nothing was sent. The form sends once the page is live on the site.</p>':'')+'</div>';
+  /* field checks shared by the live hints and the submit; each returns an error message, or '' when the value is fine */
+  var RULES={
+    name:function(f){return f.name.value.trim().replace(/[^A-Za-zÀ-ɏ]/g,'').length>=2?'':'Please enter your full name.';},
+    email:function(f){var v=f.email.value.trim();if(!v)return 'Please enter your email address.';
+      return /^[^\s@]+@[^\s@.]+(\.[^\s@.]+)*\.[A-Za-z]{2,}$/.test(v)?'':'Enter a valid email address, like name@example.com.';},
+    phone_number:function(f){var d=f.phone_number.value.replace(/\D/g,'');if(!d)return 'Please enter your phone number.';
+      if(f.country_code.value==='+91')return /^[6-9]\d{9}$/.test(d)?'':'Indian mobile numbers have 10 digits and start with 6, 7, 8 or 9.';
+      return /^\d{7,15}$/.test(d)?'':'Phone numbers have 7 to 15 digits.';},
+    state:function(f){return f.state.value?'':'Please select your state.';},
+    study_level:function(f){return f.study_level.value?'':'Choose what you’re aiming for.';}
+  };
+  function setErr(f,msg){var el=form.querySelector('[data-f="'+f+'"]'),inp=form.elements[f],dd=el.querySelector('.dd-btn');
+    el.classList.toggle('bad',!!msg);el.classList.toggle('good',!msg&&!!String(inp.value).trim());$('#e-'+f).textContent=msg||'';
+    [inp,dd].forEach(function(x){if(!x)return;x.setAttribute('aria-invalid',msg?'true':'false');if(msg)x.setAttribute('aria-describedby','e-'+f);else x.removeAttribute('aria-describedby');});}
+  function check(f){var msg=RULES[f](form.elements);setErr(f,msg);return msg;}
+  /* errors show as the visitor types (once a field has been visited) or leaves a field */
+  var touched={};
+  Object.keys(RULES).forEach(function(f){var inp=form.elements[f];
+    if(f==='phone_number')inp.addEventListener('input',function(){var c=inp.value.replace(/\D/g,'').slice(0,15);if(c!==inp.value)inp.value=c;});
+    inp.addEventListener('input',function(){if(touched[f])check(f);});
+    inp.addEventListener('change',function(){touched[f]=true;check(f);});
+    inp.addEventListener('blur',function(){if(String(inp.value).trim()){touched[f]=true;check(f);}});});
+  form.elements.country_code.addEventListener('change',function(){if(touched.phone_number)check('phone_number');});
+  form.addEventListener('input',function(){box.hidden=true;});
+  function validateAll(){var first=null;Object.keys(RULES).forEach(function(f){touched[f]=true;if(check(f)&&!first)first=f;});return first;}
+
+  /* campaign tags from the landing URL, kept for the visit */
+  var UTM_KEYS=['utm_source','utm_medium','utm_campaign','utm_content'],UTM={};
+  try{var qs=new URLSearchParams(location.search),st=JSON.parse(sessionStorage.getItem('tcUtm')||'{}');
+    UTM_KEYS.forEach(function(k){if(qs.get(k))st[k]=qs.get(k).slice(0,100);});sessionStorage.setItem('tcUtm',JSON.stringify(st));UTM=st;}catch(e){}
+
+  /* a sent form stays "Form completed" in this browser for 30 days, so the same person isn't asked again */
+  var LEAD_DONE_KEY='tc_sg_lead_done',doneBox=$('#tDone');
+  function leadDone(){try{var d=JSON.parse(localStorage.getItem(LEAD_DONE_KEY)||'null');return d&&Date.now()-d.at<30*864e5?d:null;}catch(e){return null;}}
+  function showLeadDone(d,animate,preview){
+    var first=String(d.name||'').trim().split(/\s+/)[0];
+    $('#tDoneH').textContent='Your call is reserved'+(first?', '+first:'')+'!';
+    var when=!d.call_time||/^any/i.test(d.call_time)?'':/^weekend/i.test(d.call_time)?' at the weekend':' in the '+d.call_time.replace(/\s*\(.*\)/,'').toLowerCase();
+    $('#tDoneP').textContent=preview?'Preview copy of the page: nothing was sent. The form sends once the page is live on the site.'
+      :'An advisor will call you'+when+' within one working day to plan your Singapore journey.';
+    if(first)$('#s-name').textContent=d.name;
+    form.hidden=true;doneBox.hidden=false;doneBox.classList.toggle('is-enter',!!animate&&!reduce);
+    if(animate)doneBox.focus({preventScroll:true});
     notch();
   }
+  /* "+ Submit another enquiry": forget the sent flag and bring back a fresh form */
+  $('#tAgain').addEventListener('click',function(){
+    try{localStorage.removeItem(LEAD_DONE_KEY);}catch(e){}
+    form.reset();touched={};
+    $$('select',form).forEach(function(s){s.dispatchEvent(new Event('change',{bubbles:true}));});
+    Object.keys(RULES).forEach(function(f){setErr(f,'');form.querySelector('[data-f="'+f+'"]').classList.remove('good');});
+    setOrigin(oSel.value,false);SL.set(SL.get());
+    $('#s-name').textContent='Future student';drawBarcode();box.hidden=true;
+    doneBox.hidden=true;doneBox.classList.remove('is-enter');form.hidden=false;notch();
+    $('#f-name').focus({preventScroll:true});
+  });
+  var sent=leadDone();if(sent)showLeadDone(sent,false);
+
   form.addEventListener('submit',function(e){
-    e.preventDefault();box.hidden=true;var ok=true,data={};
-    new FormData(form).forEach(function(v,k){data[k]=typeof v==='string'?v.trim():v;});
-    if(String(data.name||'').length<2){setErr('name','Enter your full name.');ok=false;}
-    var d=String(data.phone_number||'').replace(/\D/g,'');
-    if(d.length<7||d.length>15){setErr('phone_number','Enter a phone number of 7 to 15 digits.');ok=false;}
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email||'')){setErr('email','Enter a valid email, like you@email.com.');ok=false;}
-    if(!ok){var b=form.querySelector('.bad input');if(b)b.focus();return;}
-    var first=data.name.split(/\s+/)[0],slot=data.call_slot;
+    e.preventDefault();box.hidden=true;
+    if(leadDone())return;
+    var bad=validateAll();
+    if(bad){var el=form.elements[bad],tgt=(el.closest('.dd')&&el.closest('.dd').querySelector('.dd-btn'))||el;
+      tgt.focus({preventScroll:true});tgt.scrollIntoView({block:'center',behavior:reduce?'auto':'smooth'});return;}
+    var data={};new FormData(form).forEach(function(v,k){data[k]=typeof v==='string'?v.trim():v;});
     data.phone=data.country_code+' '+data.phone_number;delete data.country_code;delete data.phone_number;
-    if(!data.call_slot)delete data.call_slot;if(!data.description)delete data.description;if(!data.shortlist)delete data.shortlist;
     if(data.botcheck!=='on')delete data.botcheck;
     try{data.page=location.host+location.pathname;}catch(err){}
+    UTM_KEYS.forEach(function(k){if(UTM[k])data[k]=UTM[k];});
+    var d={name:data.name,call_time:data.call_time||'',at:Date.now()};
     var live=/^https?:$/.test(location.protocol)&&!/claude|anthropic|usercontent/.test(location.hostname);
-    if(!live){done(first,slot,true);return;}
+    if(!live){showLeadDone(d,true,true);return;}
     btn.disabled=true;btn.textContent='Reserving…';
     fetch('/api/enquiry',{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify(data)})
       .then(function(r){return r.json().catch(function(){return {success:false};});})
-      .then(function(res){if(res&&res.success){done(first,slot,false);}else{box.textContent=(res&&res.message)||'We couldn’t send that just now. Try again, or WhatsApp us on +91 73583 64959.';box.hidden=false;}})
+      .then(function(res){if(res&&res.success){try{localStorage.setItem(LEAD_DONE_KEY,JSON.stringify(d));}catch(err){}showLeadDone(d,true);}
+        else{box.textContent=(res&&res.message)||'We couldn’t send that just now. Try again, or WhatsApp us on +91 73583 64959.';box.hidden=false;}})
       .catch(function(){box.textContent='Your connection dropped before we got your details. Check it and try again, or WhatsApp us on +91 73583 64959.';box.hidden=false;})
-      .then(function(){if(document.body.contains(btn)){btn.disabled=false;btn.innerHTML=btnHTML;}});
+      .then(function(){btn.disabled=false;btn.innerHTML=btnHTML;});
   });
 
   });

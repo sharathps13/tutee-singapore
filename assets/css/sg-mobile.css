@@ -433,4 +433,12 @@
   .uni-card .crest{width:36px!important;height:36px!important;font-size:11px!important}
   .uni-card .qsrank b{font-size:17px!important}
   .uni-card h3{font-size:13.5px!important}
+}/* phones: nothing is cut short. University names, their area and the short descriptions wrap to as many lines as
+   they need instead of being clamped or ending in "…" */
+@media (max-width:640px){
+  .why-card p,.types .type p,.uni-card h3{display:block!important;-webkit-line-clamp:unset!important;overflow:visible!important}
+  .uni-card .loc{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;align-items:flex-start!important}
+  .uni-card .loc svg{margin-top:2px}
 }
+/* the pass's summary row (passenger, class, boarding) wraps a long name instead of cutting it with "…" */
+.pass-meta dd{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:anywhere;line-height:1.25}

@@ -38,10 +38,16 @@
 >   universities, funding and stories read top to bottom (stories show three, then "More stories"); the seven stops
 >   and nine services wrap into grids. The enquiry pass is compacted (and the bottom bar steps aside while it is on
 >   screen) so the whole pass fits on one screen from 360 x 640 up.
-> - `assets/js/sg-tutee-ai.js` + `assets/css/sg-tutee-ai.css`: the Tutee AI button (bottom left). Answers come from
->   topics written from this page (several wordings each) and, failing that, the closest FAQ or section passage; it
->   runs in the browser, sends nothing anywhere, and points to an advisor for anything personal. Edit the `T` list
->   to change what it knows.
+> - `assets/js/sg-tutee-ai.js` + `assets/css/sg-tutee-ai.css`: the Tutee AI button (bottom left). It answers in the
+>   browser from the 126 institutions on `institutions.html` (any one by name, which teach a subject, the
+>   polytechnics, comparisons), from topics written from this page (edit the `T` list) and from the page's own
+>   passages (FAQ, steps, services), with synonyms, typo tolerance and follow-ups ("and its ranking?"). Questions
+>   stay in the browser; the one thing it sends is a callback request ("Request a callback", "talk to a
+>   counsellor", "call me"), which goes to `/api/enquiry` like the form.
+>
+> **Leads (October 2026).** The consultation pass and the Tutee AI callback post to this site's `/api/enquiry`,
+> which forwards them to the shared Apps Script (Website Leads sheet, "Singapore Leads" tab, plus an email to
+> business@tuteeconnect.com). See [DEPLOY.md](DEPLOY.md) and [apps-script/README.md](apps-script/README.md).
 > - `assets/css/sg-enhance.css`: Your pathway on warm paper in light mode; the footer's WhatsApp mark.
 > - Arriving with a section in the address (`./#universities` from the institutions page) now lands exactly on it.
 > **Background motion (October 2026).** Sections on a plain background carry a quiet motif of their subject:

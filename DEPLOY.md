@@ -1,4 +1,4 @@
-﻿# Deploying the Singapore page to Netlify (with Supabase)
+﻿# Deploying the Singapore page to Netlify
 
 ## What's in this folder
 
@@ -10,93 +10,69 @@
 | `assets/img/hero/hero-<day|night>-*.mp4`, `.webp` | The hero's looped videos, Jewel's Rain Vortex (light mode) and the Supertree Grove at night (dark mode), at 1920 and 1280 px, with their first-frame stills; made by `_source/hero/make_hero_video.py` (credited in the footer) |
 | `assets/fonts/*.woff2` | Self-hosted fonts: Fraunces, Quicksand and JetBrains Mono. No Google Fonts calls are made |
 | `_redirects` | Sends the old `/universities.html` and `/tutee-singapore-landing.html` to the new pages |
-| `netlify/functions/enquiry.mjs` | Receives the form, saves the lead in Supabase, then emails it. Updated in this version so the university shortlist (up to 12 names) is not cut short |
-| `supabase/leads.sql` | One-time SQL that creates the `leads` table the function writes to |
+| `netlify/functions/enquiry.mjs` | Receives the consultation form and the Tutee AI callback requests at `/api/enquiry` and forwards each lead to the shared Apps Script (the same copy as the Finland and New Zealand sites; only the fallback country differs) |
+| `apps-script/` | A reference copy of the shared Apps Script web app (`Code.gs`) and how it is set up (`README.md`) |
+| `supabase/leads.sql` | Optional: SQL for a Supabase `leads` table, if `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are ever set |
 
-`netlify.toml` is unchanged. There is no build step: Netlify publishes the folder as it is.
+There is no build step: Netlify publishes the folder as it is.
 
-## 1. Netlify
-
-1. Push this folder to the GitHub repo, then in Netlify choose **Add new site, then Import an existing project** and pick the repo.
-2. Leave the build command empty and set the publish directory to `.`. `netlify.toml` already sets both.
-3. Go to **Site configuration, then Environment variables**, and add:
-
-| Variable | Value |
-|---|---|
-| `SITE_COUNTRY` | `Singapore` |
-| `SUPABASE_URL` | `https://owjioobpcdipxnkpanyg.supabase.co` (Supabase, then Project Settings, then API) |
-| `SUPABASE_SERVICE_ROLE_KEY` | The **service_role** key from the same page. This one is secret: never put it in a page or a commit |
-| `RESEND_API_KEY` | Your Resend key, which starts with `re_`. Needed for the email alert to business@tuteeconnect.com |
-| `MAIL_FROM` | Optional, e.g. `Tutee Connect Website <enquiries@tuteeconnect.com>`. Its domain must be verified in Resend |
-
-4. Redeploy so the function picks up the variables. Variables only apply to new deploys.
-
-## 2. Supabase
-
-1. Go to **Supabase, then SQL Editor, then New query**, paste the contents of `supabase/leads.sql`, and click **Run**.
-   - It is safe to run again. It only creates what is missing.
-2. If you ran it before, run it again once: it adds a `shortlist` column to the `leads_singapore` view.
-3. This creates:
-   - **`public.leads`**: every form submission, from every country page.
-   - **`public.leads_singapore`**: a view of the Singapore leads, with the form's extra answers as their own columns (study level, call slot, country, note).
-4. Row Level Security is on with no public policies. The public anon key used by the website cannot read leads. Only the Netlify function, which uses the service role key, can write them, and you see them in the Supabase dashboard.
-
-## 3. Check it works
-
-1. Open `https://<your-site>.netlify.app/api/enquiry` in a browser. You should see `"supabase_configured": true` and `"resend_configured": true`.
-2. Fill in the form on the live page with test details.
-3. In Supabase, run `select * from public.leads_singapore limit 5;`. Your test row should be there.
-4. Check the business@tuteeconnect.com inbox for the email.
-
-## What one submission looks like in `leads`
+## How a lead travels
 
 ```
-country      Singapore
-name         Test Student
-email        test@example.com
-phone        +91 9876543210
-destination  Singapore
-source       Tutee Connect Singapore
-page         <your-domain>/
-extras       {"study_level":"Bachelor's degree","call_slot":"Evening, 4–8pm",
-              "origin_city":"India","description":"Interested in NUS computing",
-              "shortlist":"1. NUS (National University of Singapore); 2. SMU (Singapore Management University)"}
-status       new
+consultation form / Tutee AI chat → /api/enquiry (this site) → Apps Script web app → "Singapore Leads" tab + email
 ```
+
+- The page only ever posts to its own `/api/enquiry`. The Apps Script URL and this site's token live in Netlify's
+  environment, so they never reach the browser or this repo. `netlify.toml` has **no** redirect for `/api/enquiry`:
+  the function claims that path itself.
+- The script adds a row to the **Singapore Leads** tab of the **Website Leads** sheet (Date, Time, Full Name, Phone
+  Number, Email, State, Shortlisted Universities, Course, Lead Source, Preferred Call Time) and emails a formatted
+  summary to business@tuteeconnect.com with Reply-To set to the student and the subject `New Singapore Lead – <name>`.
+- Lead Source reads `Singapore Landing Page – Consultation form` or `Singapore Landing Page – Tutee AI chat`, plus
+  any campaign tags, e.g. `(google / cpc / sg-oct)`.
+- If the script can't be reached, the function emails the lead through Resend instead (when `RESEND_API_KEY` is
+  set): one email per lead, never two. If neither works the visitor sees "We could not send your enquiry right now",
+  and nothing is marked as sent.
+
+## Netlify environment variables
+
+| Key | Value | Scopes |
+|---|---|---|
+| `APPS_SCRIPT_URL` | the same `/exec` URL as the Finland site | all deploy contexts |
+| `APPS_SCRIPT_TOKEN` | this site's own token, saved as `LEADS_TOKEN_SINGAPORE` in the script (mark as secret) | Production, Deploy Previews |
+| `SITE_COUNTRY` | `Singapore` | all deploy contexts |
+| `RESEND_API_KEY` | optional: the fallback email, if you use Resend | Production |
+
+Variables only apply to new deploys, so trigger one after changing them. Setting up the token in the script is in
+[`apps-script/README.md`](apps-script/README.md).
+
+## Check it works
+
+1. Open `https://<your-site>/api/enquiry` in a browser. It should show `"sheet_configured": true` and
+   `"country": "Singapore"`.
+2. Send one test enquiry through the consultation pass and one through Tutee AI ("Request a callback").
+3. Both appear in the **Singapore Leads** tab and arrive at business@tuteeconnect.com.
 
 ## How the form behaves
 
-- If Supabase saves the lead but the email fails, the student still sees "reserved". The lead is safe, and the failure shows in the Netlify function log.
-- If both fail, the student sees an error asking them to try again or WhatsApp +91 73583 64959.
+- Email and phone are checked as the visitor types or leaves a field (Indian mobiles: 10 digits starting 6–9;
+  elsewhere 7–15 digits); name, state and level are required. The server re-checks everything, whatever the
+  browser sent.
 - A hidden honeypot field drops bot submissions.
-- Visitors can heart institutions on either page. The list (in their order of preference) travels with the form as `shortlist` and shows in the email and in Supabase.
-- The server re-checks every field, whatever the browser sent.
+- Visitors can heart institutions on either page. The list (in their order of preference) travels with the form as
+  `shortlist`.
+- After a successful submit the pass shows "Form completed" instead of the form, remembered in this browser for 30
+  days; "+ Submit another enquiry" brings back a fresh form.
 
-## Form emails and Google Sheet
+## Test before going live
 
-Each ticket is added as a row in a Google Sheet and emailed to business@tuteeconnect.com. Both are done by the small
-Apps Script in `_source/google-sheet/Code.gs`, running as your Workspace account, so no Gmail password is needed.
-(Optional: setting `GMAIL_USER` and `GMAIL_APP_PASSWORD` in Netlify makes the site send the email itself instead.)
-
-1. Create a Google Sheet (e.g. "Tutee Connect enquiries") with the Workspace account.
-2. In the Sheet: Extensions, then **Apps Script**. Replace the code with `_source/google-sheet/Code.gs`.
-   Change `SECRET` to a long random value (a password generator works) and save.
-3. **Deploy, then New deployment**, type **Web app**, Execute as **Me**, Who has access **Anyone**. Deploy,
-   approve the permissions, and copy the web app URL (ends in `/exec`).
-4. Netlify, then Environment variables: add `SHEET_WEBHOOK_URL` (that URL) and `SHEET_SECRET` (the same secret). Redeploy.
-
-The first submission creates an "Enquiries" tab with a header row. If you edit the script later, use
-Deploy, then Manage deployments, then edit, then New version, so the URL stays the same.
-
-### Test before going live
-
-Create `.env.local` in this folder (it is in `.gitignore`, so it is never committed):
+Create `.env.local` in this folder (it is in `.gitignore`, so it is never committed) with the same values as Netlify:
 
 ```
-SHEET_WEBHOOK_URL=https://script.google.com/macros/s/.../exec
-SHEET_SECRET=the-same-secret
+APPS_SCRIPT_URL=https://script.google.com/macros/s/.../exec
+APPS_SCRIPT_TOKEN=this site's own token
 SITE_COUNTRY=Singapore
 ```
 
-Run `node _source/dev/form-test-server.mjs`, open http://localhost:8888, fill in the ticket and press
-**Reserve my free call**. The email arrives at business@tuteeconnect.com and a row appears in the Sheet.
+Run `node _source/dev/form-test-server.mjs`, open http://localhost:8888, and send a test enquiry. A row appears in
+the Singapore Leads tab and the email arrives at business@tuteeconnect.com.
