@@ -142,6 +142,13 @@ html body .f-brand .logo-card img,html[data-mode] body .f-brand .logo-card img{h
 .f-brand .tc-wm{--h:72px}
 @media (max-width:640px){.nav .tc-wm,.nav.scrolled .tc-wm{--h:44px}}.tc-wm,.tc-wm *{text-decoration:none!important}
 .brand:has(.tc-wm){text-decoration:none}
+/* official logo artwork, unaltered (assets/img/brand/tc-logo-*.webp from _source/brand/tutee-connect-logo-master.webp) */
+.tc-logo{display:block;height:var(--h,65px);width:auto;max-width:none;image-rendering:auto}
+.nav .tc-logo{--h:65px;transition:height .25s}
+.nav.scrolled .tc-logo{--h:56px}
+.f-brand .tc-logo{--h:94px}
+.f-brand .logo-card:has(.tc-logo){display:inline-block}
+@media (max-width:640px){.nav .tc-logo,.nav.scrolled .tc-logo{--h:52px}}
 
 /* enquiry form: required and optional markers */
 #enq abbr.req{color:#A51D2A;text-decoration:none;border:0;font-weight:700;margin-left:2px;cursor:help}
