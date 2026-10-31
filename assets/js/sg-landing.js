@@ -90,8 +90,8 @@ window.__SVC=[{"html": "<div class=\"sp-top\"><span class=\"phase-tag\"><i>1<\/i
     if(document.readyState!=='complete')addEventListener('load',function(){setTimeout(go,60);},{once:true});})();
 
   /* ---------- floating CTA (desktop) and action bar (mobile): shown after the hero ---------- */
-  var fc=$('#floatDock'),mb=$('#mBar'),heroVis=true,enqVis=false;
-  function upd(){fc.classList.toggle('show',!heroVis&&!enqVis);mb.classList.toggle('show',!heroVis&&!enqVis);}
+  var fc=$('#floatDock'),mb=$('#mBar'),heroVis=true,enqVis=false,dockOn=false,dockFns=[];
+  function upd(){dockOn=!heroVis&&!enqVis;fc.classList.toggle('show',dockOn);mb.classList.toggle('show',dockOn);dockFns.forEach(function(f){f();});}
   if(hasIO){
     new IntersectionObserver(function(e){heroVis=e[0].isIntersecting;upd();},{threshold:.15}).observe($('#home'));
     new IntersectionObserver(function(e){enqVis=e[0].isIntersecting;upd();},{threshold:.1}).observe($('#enquire'));
@@ -442,7 +442,8 @@ window.__SVC=[{"html": "<div class=\"sp-top\"><span class=\"phase-tag\"><i>1<\/i
     function get(){try{var v=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(v)?v.filter(function(x){return x&&x.n;}):[];}catch(e){return [];}}
     function set(l){try{localStorage.setItem(KEY,JSON.stringify(l.slice(0,12)));}catch(e){}subs.forEach(function(f){f(get());});}
     function has(n){return get().some(function(x){return x.n===n;});}
-    function toggle(n,sh){var l=get(),i=-1;l.forEach(function(x,k){if(x.n===n)i=k;});if(i>-1)l.splice(i,1);else l.push({n:n,s:sh||''});set(l);return i<0;}
+    /* true = added, false = removed, null = full (12, as on the institutions page) */
+    function toggle(n,sh){var l=get(),i=-1;l.forEach(function(x,k){if(x.n===n)i=k;});if(i>-1)l.splice(i,1);else{if(l.length>=12)return null;l.push({n:n,s:sh||''});}set(l);return i<0;}
     addEventListener('storage',function(e){if(e.key===KEY)subs.forEach(function(f){f(get());});});
     return {get:get,set:set,has:has,toggle:toggle,on:function(f){subs.push(f);f(get());}};
   })();
@@ -451,10 +452,40 @@ window.__SVC=[{"html": "<div class=\"sp-top\"><span class=\"phase-tag\"><i>1<\/i
     SL.on(function(l){box.hidden=!l.length;n.textContent=l.length;
       inp.value=l.map(function(x,i){return (i+1)+'. '+(x.s&&x.s!==x.n?x.s+' ('+x.n+')':x.n);}).join('; ');
       ul.innerHTML=l.map(function(x,i){return '<li><span class="k">'+(i+1)+'</span>'+escH(x.s||x.n)+'<button type="button" data-n="'+escH(x.n)+'" aria-label="Remove '+escH(x.n)+'">×</button></li>';}).join('');});
-    ul.addEventListener('click',function(e){var b=e.target.closest('button[data-n]');if(b)SL.toggle(b.getAttribute('data-n'));});
+    /* × removes a chip; keyboard focus moves on to the next chip (or "+ Add more") instead of dropping to the page */
+    ul.addEventListener('click',function(e){var b=e.target.closest('button[data-n]');if(!b)return;var i=$$('button[data-n]',ul).indexOf(b);SL.toggle(b.getAttribute('data-n'));
+      var bs=$$('button[data-n]',ul),nx=bs[Math.min(i,bs.length-1)]||(!box.hidden&&$('.sl-add',box));if(nx)nx.focus({preventScroll:true});});
   })();
 
-  /* every heart on the page adds to / removes from the shortlist, with a small toast */
+  /* the floating shortlist button: beside "Reserve a free call" on wide screens, above the bottom bar on phones; shown
+     with the dock (after the hero, away while the form is on screen). Every add makes it bump and read "Added: NUS"
+     for a moment; it glows now and then until it is first used */
+  var slFab=(function(){
+    var fab=$('#slFab');if(!fab)return null;
+    var cnt=$('#slFabN'),lbl=$('#slFabL'),mm=window.matchMedia&&matchMedia('(max-width: 640px)'),prev=null,addT=0,adding=false,seen=false,intro=false;
+    try{seen=localStorage.getItem('tc-slfab-seen')==='1';}catch(e){}
+    function words(n){return n+(n===1?' institution':' institutions')+' shortlisted';}
+    function replay(el,c){el.classList.remove('intro','bump','settle');void el.offsetWidth;el.classList.add(c);}
+    function up(){return dockOn&&!fab.hidden;}
+    function vis(){fab.classList.toggle('show',dockOn);
+      if(up()&&!intro){intro=true;if(!reduce)replay(fab,'intro');}}
+    function place(){if(!mm)return;if(mm.matches){if(fab.parentNode!==document.body)document.body.appendChild(fab);}else if(fab.parentNode!==fc)fc.insertBefore(fab,fc.firstChild);}
+    place();if(mm&&mm.addEventListener)mm.addEventListener('change',place);
+    dockFns.push(vis);
+    SL.on(function(l){var n=l.length,names=l.map(function(x){return x.n;});
+      fab.hidden=!n;cnt.textContent=n;fab.classList.toggle('idle',!seen&&n>0);
+      var added=prev?l.filter(function(x){return prev.indexOf(x.n)<0;}).pop():null;
+      if(prev&&n>prev.length&&added){adding=true;lbl.textContent='Added: '+(added.s||added.n);clearTimeout(addT);
+        addT=setTimeout(function(){adding=false;lbl.textContent=words(SL.get().length);},2500);
+        if(!reduce&&up()&&intro)replay(fab,'bump');}
+      else if(prev&&n<prev.length){clearTimeout(addT);adding=false;lbl.textContent=words(n);if(!reduce&&up())replay(fab,'settle');}
+      else if(!adding)lbl.textContent=words(n);
+      prev=names;vis();});
+    fab.addEventListener('click',function(){if(seen)return;seen=true;fab.classList.remove('idle');try{localStorage.setItem('tc-slfab-seen','1');}catch(e){}});
+    return {up:up};
+  })();
+
+  /* every heart on the page adds to / removes from the shortlist; a small toast only when the floating button is away */
   (function(){
     var toast=document.createElement('div');toast.className='sl-toast';toast.setAttribute('role','status');toast.innerHTML='<span class="t"></span><a href="#enquire">Send to my advisor →</a>';document.body.appendChild(toast);
     var tt=0;function show(msg){toast.querySelector('.t').textContent=msg;toast.classList.add('on');clearTimeout(tt);tt=setTimeout(function(){toast.classList.remove('on');},3200);}
@@ -462,7 +493,10 @@ window.__SVC=[{"html": "<div class=\"sp-top\"><span class=\"phase-tag\"><i>1<\/i
       h.setAttribute('aria-label',(on?'Remove ':'Add ')+h.dataset.n+(on?' from':' to')+' my shortlist');});}
     SL.on(paintHearts);
     document.addEventListener('click',function(e){var h=e.target.closest&&e.target.closest('.sl-heart');if(!h)return;e.preventDefault();e.stopPropagation();
-      var on=SL.toggle(h.dataset.n,h.dataset.s);paintHearts();h.classList.remove('pop');void h.offsetWidth;h.classList.add('pop');
+      var on=SL.toggle(h.dataset.n,h.dataset.s);
+      if(on===null){show('Your shortlist holds up to 12. Remove one to add another.');return;}
+      paintHearts();h.classList.remove('pop');void h.offsetWidth;h.classList.add('pop');
+      if(slFab&&slFab.up())return;
       var n=SL.get().length;show((on?'Added ':'Removed ')+(h.dataset.s||h.dataset.n)+(on?' · '+n+' in your shortlist':''));});
     window.__paintHearts=paintHearts;
   })();

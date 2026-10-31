@@ -181,21 +181,35 @@ var HEART='<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><p
     cl.innerHTML=l.map(function(x,i){var u=D.filter(function(d){return d.n===x.n;})[0];
       return '<li><span class="ci-n">'+(i+1)+'</span><div class="ci-t"><b>'+esc(x.n)+'</b><small>'+(u?esc(LABEL[u.t])+(u.sg?' · #'+u.sg+' in Singapore':'')+(u.qs?' · #'+esc(u.qs.replace('=',''))+' in the world':''):'')+'</small></div>'+
         '<span class="ci-m"><button type="button" data-mv="-1" data-i="'+i+'" aria-label="Move up"'+(i?'':' disabled')+'>↑</button><button type="button" data-mv="1" data-i="'+i+'" aria-label="Move down"'+(i<l.length-1?'':' disabled')+'>↓</button><button type="button" data-rm="'+i+'" aria-label="Remove '+esc(x.n)+'">×</button></span></li>';}).join('');}
-  SL.on(function(){paintHearts();paintCart();});
+  /* the floating button speaks for every change: an add bumps it and it reads "Added: NUS" for a moment, a removal
+     settles the count, and it glows now and then until it is first opened (sg-institutions.css: .cart-fab) */
+  var cw=document.getElementById('cartW'),reduce=matchMedia('(prefers-reduced-motion: reduce)').matches,prevN=null,addT=0,adding=false,seen=false,intro=false;
+  try{seen=localStorage.getItem('tc-slfab-seen')==='1';}catch(e){}
+  function words(n){return n+(n===1?' institution':' institutions')+' shortlisted';}
+  function replay(c){fab.classList.remove('intro','bump','settle');void fab.offsetWidth;fab.classList.add(c);}
+  function noteFab(){var l=SL.get(),n=l.length,names=l.map(function(x){return x.n;}),added=prevN?l.filter(function(x){return prevN.indexOf(x.n)<0;}).pop():null;
+    fab.classList.toggle('idle',!seen&&n>0);
+    if(prevN&&n>prevN.length&&added){adding=true;cw.textContent='Added: '+(added.s||added.n);clearTimeout(addT);
+      addT=setTimeout(function(){adding=false;cw.textContent=words(SL.get().length);},2500);if(!reduce)replay(intro?'bump':'intro');intro=true;}
+    else if(prevN&&n<prevN.length){clearTimeout(addT);adding=false;cw.textContent=words(n);if(!reduce&&n)replay('settle');}
+    else{if(!adding)cw.textContent=words(n);if(n&&!intro){intro=true;if(!reduce)replay('intro');}}
+    prevN=names;}
+  SL.on(function(){paintHearts();paintCart();noteFab();});
   var toast=document.createElement('div');toast.className='sl-toast';toast.setAttribute('role','status');document.body.appendChild(toast);var tt=0;
   document.addEventListener('click',function(e){var h=e.target.closest('.sl-heart,.sl-btn');if(!h)return;e.preventDefault();e.stopPropagation();
     var on=SL.toggle(h.dataset.n,h.dataset.s);if(on===null){toast.textContent='Your shortlist holds up to 12. Remove one to add another.';}
-    else{toast.textContent=(on?'Added ':'Removed ')+(h.dataset.s||h.dataset.n)+(on?' to':' from')+' your shortlist';h.classList.remove('pop');void h.offsetWidth;h.classList.add('pop');
-      if(on){fab.classList.remove('bump');void fab.offsetWidth;fab.classList.add('bump');}}
+    else{h.classList.remove('pop');void h.offsetWidth;h.classList.add('pop');
+      /* the floating button announces adds and removals; the toast only speaks once that button has gone (list emptied) */
+      if(!fab.hidden)return;toast.textContent=(on?'Added ':'Removed ')+(h.dataset.s||h.dataset.n)+(on?' to':' from')+' your shortlist';}
     toast.classList.add('on');clearTimeout(tt);tt=setTimeout(function(){toast.classList.remove('on');},2600);},true);
-  fab.addEventListener('click',function(){paintCart();if(cart.showModal)cart.showModal();else cart.setAttribute('open','');doc.classList.add('qf-lock');});
+  fab.addEventListener('click',function(){if(!seen){seen=true;fab.classList.remove('idle');try{localStorage.setItem('tc-slfab-seen','1');}catch(e){}}paintCart();if(cart.showModal)cart.showModal();else cart.setAttribute('open','');doc.classList.add('qf-lock');});
   cart.addEventListener('close',function(){doc.classList.remove('qf-lock');paintCart();});
   cart.addEventListener('click',function(e){if(e.target===cart){cart.close();return;}var l=SL.get(),b=e.target.closest('button');if(!b)return;
     if(b.dataset.mv){var i=+b.dataset.i,j=i+(+b.dataset.mv);if(j<0||j>=l.length)return;var t=l[i];l[i]=l[j];l[j]=t;SL.set(l);var nb=cl.querySelector('[data-i="'+j+'"][data-mv="'+b.dataset.mv+'"]')||cl.querySelector('[data-i="'+j+'"]');if(nb)nb.focus();}
     else if(b.dataset.rm){l.splice(+b.dataset.rm,1);SL.set(l);}});
   document.getElementById('cartX').addEventListener('click',function(){cart.close();});
   document.getElementById('cartClear').addEventListener('click',function(){SL.set([]);});
-  paintHearts();paintCart();
+  paintHearts();paintCart();noteFab();
   /* hero jump links */
   var jp=document.getElementById('jump');
   jp.innerHTML='<a class="hot" href="#ranked"><span>Ranked in Singapore</span><b>'+R.length+'</b></a>'+

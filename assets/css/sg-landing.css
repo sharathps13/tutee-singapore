@@ -72,3 +72,50 @@
 .pass-body .pf-duo .dd-btn{height:100%;min-height:var(--fh,53px);padding-top:6px;padding-bottom:6px}
 @media (max-width:640px){.pass-body .pf-duo{row-gap:4px}}
 @media (max-width:400px){.pass-body .pf-duo .dd-btn{font-size:14.5px;gap:6px}.pass-body .pf-duo .dd-v > span:last-child{overflow-wrap:anywhere}}
+/* shortlist hearts on the university cards: a clear red outline at rest so they read as buttons, and every 7s a slow
+   beat with a soft ring, one card at a time (off screen it holds still, see .offscreen above); a shortlisted heart rests */
+.uni-card .uc-heart[aria-pressed="false"]{border-color:#D92B3A;color:#B3202D;background:#FDF1F2;animation:slCue 7s ease-out var(--cue,2s) infinite}
+.uni-card .uc-heart[aria-pressed="false"]:hover{background:#FBE0E3;color:#D92B3A}
+html[data-mode="dark"] .uni-card .uc-heart[aria-pressed="false"]{border-color:#FF7A85;color:#FF9AA0;background:rgba(255,122,133,.12);animation-name:slCueD}
+html[data-mode="dark"] .uni-card .uc-heart[aria-pressed="false"]:hover{background:rgba(255,122,133,.22)}
+.uni-card .uc-heart[aria-pressed="false"] svg{animation:slBeat 7s ease-in-out var(--cue,2s) infinite}
+.uni-card:nth-child(2){--cue:3.75s}.uni-card:nth-child(3){--cue:5.5s}.uni-card:nth-child(4){--cue:7.25s}
+.uni-card .uc-heart.pop{animation:slPop .45s cubic-bezier(.34,1.56,.64,1)}
+@keyframes slCue{0%{box-shadow:0 0 0 0 rgba(217,43,58,.45)}12%,100%{box-shadow:0 0 0 8px rgba(217,43,58,0)}}
+@keyframes slCueD{0%{box-shadow:0 0 0 0 rgba(255,122,133,.45)}12%,100%{box-shadow:0 0 0 8px rgba(255,122,133,0)}}
+@keyframes slBeat{0%,14%,100%{scale:1}4%{scale:1.18}8%{scale:1}11%{scale:1.1}}
+/* floating shortlist button (sg-landing.js): the site's red with a strong shadow and the count on the heart; it tops
+   the WhatsApp / "Reserve a free call" dock on wide screens and sits above the bottom bar on phones */
+.sl-fab{position:relative;display:flex;align-items:center;gap:12px;min-height:56px;padding:8px 20px 8px 9px;border-radius:999px;background:#D92B3A;color:#fff;text-decoration:none;box-shadow:0 18px 36px -14px rgba(179,32,45,.8),0 4px 12px -4px rgba(8,28,36,.35);transition:transform .25s var(--ease-spring),box-shadow .25s}
+.sl-fab[hidden]{display:none!important}
+.sl-fab:hover{transform:translateY(-3px);box-shadow:0 22px 40px -14px rgba(179,32,45,.9),0 4px 12px -4px rgba(8,28,36,.35)}
+.sl-fab:focus-visible{outline:3px solid #F2B544;outline-offset:3px}
+.sl-fab-ic{position:relative;flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.18)}
+.sl-fab-ic svg{width:21px;height:21px}
+.sl-fab-ic b{position:absolute;top:-5px;right:-7px;min-width:22px;height:22px;padding:0 6px;border-radius:999px;display:grid;place-items:center;background:#fff;color:#B3202D;font-size:12.5px;line-height:1;font-variant-numeric:tabular-nums;box-shadow:0 2px 6px rgba(8,28,36,.25)}
+.sl-fab-t{display:grid;line-height:1.2;min-width:0}
+.sl-fab-t b{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:24ch}
+.sl-fab-t small{font-size:12.5px;font-weight:700;opacity:.92}
+/* first appearance, a bump for every add (pop, count flip, ripple ring), a settle when one is removed, and a soft glow
+   every 10s until the button is first used */
+.sl-fab::before,.sl-fab::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none}
+.sl-fab::before{box-shadow:0 0 0 6px rgba(217,43,58,.22),0 0 30px 8px rgba(217,43,58,.5);opacity:0}
+.sl-fab.idle::before{animation:slFabIdle 10s ease-in-out 4s infinite}
+.sl-fab.intro{animation:slFabIn .6s var(--ease-spring)}
+.sl-fab.bump{animation:slFabBump .45s var(--ease-spring)}
+.sl-fab.intro::after,.sl-fab.bump::after{animation:slFabRing .8s ease-out}
+.sl-fab.intro .sl-fab-ic b,.sl-fab.bump .sl-fab-ic b{animation:slFabN .5s var(--ease-spring)}
+.sl-fab.settle .sl-fab-ic b{animation:slFabSettle .35s ease-out}
+@keyframes slFabIn{from{scale:.6;opacity:0}to{scale:1;opacity:1}}
+@keyframes slFabBump{0%,100%{scale:1}40%{scale:1.12}}
+@keyframes slFabRing{from{box-shadow:0 0 0 0 rgba(217,43,58,.6)}to{box-shadow:0 0 0 16px rgba(217,43,58,0)}}
+@keyframes slFabN{0%{transform:rotateX(90deg) scale(.6)}60%{transform:rotateX(0) scale(1.25)}100%{transform:none}}
+@keyframes slFabSettle{from{scale:.8}to{scale:1}}
+@keyframes slFabIdle{0%,30%,100%{opacity:0}15%{opacity:1}}
+@media (max-width:640px){
+  .sl-fab{position:fixed;right:12px;bottom:calc(86px + env(safe-area-inset-bottom,0px));z-index:61;min-height:52px;padding:6px 16px 6px 7px;transform:translateY(24px);opacity:0;pointer-events:none;transition:transform .45s var(--ease-out),opacity .3s}
+  .sl-fab.show{transform:none;opacity:1;pointer-events:auto}
+  html.tai-open .sl-fab,html.pass-in .sl-fab{opacity:0;pointer-events:none}
+}
+.lite .uni-card .uc-heart[aria-pressed="false"],.lite .uni-card .uc-heart svg,.lite .sl-fab.idle::before{animation:none}
+@media (prefers-reduced-motion:reduce){.uni-card .uc-heart,.uni-card .uc-heart svg,.sl-fab,.sl-fab *,.sl-fab::before,.sl-fab::after{animation:none!important}.sl-fab{transition:opacity .2s!important}}
