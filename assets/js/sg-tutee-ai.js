@@ -170,6 +170,21 @@
   var KINDS=[['Autonomous University',/\b(autonomous|public|government|local) (universit|uni)|\bautonomous\b/],['Polytechnic',/\bpoly(t[a-z]*|s)?\b/],['Offshore Campus',/\b(offshore|foreign|overseas|branch) (campus|campuses|universit)/],
     ['Higher Education',/\bprivate (college|colleges|institution|institutions|school|schools|universit)/],['Arts Institution',/\barts? (institution|school|college|universit)/],['ITE',/\bite\b|technical education/]];
   var AREAS=['central','west','east','north-east','north'];
+  /* places people name, the neighbourhoods on the institution list that are closest to them, and how to describe them */
+  var LANDMARKS=[
+    ['Gardens by the Bay',/\b\w+ by the bay\b/,/Downtown Core|Singapore River|Museum|Rochor|Bras Basah|Outram/,'the city centre: Downtown Core, Singapore River, Museum, Rochor and Outram'],
+    ['Marina Bay',/\bmarina( bay)?( sands)?\b|\bmbs\b|\bmerlion\b|\besplanade\b/,/Downtown Core|Singapore River|Museum|Rochor|Bras Basah|Outram/,'the city centre: Downtown Core, Singapore River, Museum, Rochor and Outram'],
+    ['the city centre',/\b(city cent(re|er)|cbd|downtown|raffles place|clarke quay|boat quay|chinatown|tanjong pagar|bugis|bras basah|dhoby ghaut|little india|rochor)\b/,/Downtown Core|Singapore River|Museum|Rochor|Bras Basah|Outram/,'Downtown Core, Singapore River, Museum, Rochor and Outram'],
+    ['Orchard',/\b(orchard|somerset|newton|botanic gardens?|tanglin)\b/,/Orchard|Tanglin|Museum|Bukit Timah/,'Orchard, Tanglin, Museum and Bukit Timah'],
+    ['Sentosa and HarbourFront',/\b(sentosa|harbou?rfront|vivocity|telok blangah)\b/,/Bukit Merah|Outram|Queenstown/,'Bukit Merah, Outram and Queenstown'],
+    ['Kent Ridge and one-north',/\b(kent ridge|clementi|one[- ]north|buona vista|dover|queenstown)\b/,/Queenstown|Kent Ridge/,'Queenstown and Kent Ridge'],
+    ['Jurong',/\b(jurong( lake| east| west)?|boon lay|pioneer)\b/,/Jurong West|Jurong East/,'Jurong East and Jurong West'],
+    ['Changi and Tampines',/\b(changi|jewel|airport|tampines|pasir ris|bedok|east coast|simei)\b/,/Tampines|Bedok/,'Tampines and Bedok'],
+    ['Punggol and Sengkang',/\b(punggol|sengkang|hougang|serangoon|seletar)\b/,/Punggol|Hougang|Serangoon|Seletar/,'Punggol, Hougang, Serangoon and Seletar'],
+    ['Woodlands',/\b(woodlands|yishun|sembawang|admiralty)\b/,/Woodlands/,'Woodlands'],
+    ['Ang Mo Kio and Toa Payoh',/\b(ang mo kio|amk|bishan|toa payoh)\b/,/Ang Mo Kio|Toa Payoh/,'Ang Mo Kio and Toa Payoh'],
+    ['Kallang and Paya Lebar',/\b(kallang|geylang|paya lebar|sports hub|stadium)\b/,/Kallang|Geylang/,'Kallang and Geylang'],
+    ['Bukit Timah',/\b(bukit timah|beauty world)\b/,/Bukit Timah|Bukit Panjang/,'Bukit Timah and Bukit Panjang']];
   function ensureData(){
     if(dbP)return dbP;
     dbP=fetch('institutions.html',{credentials:'same-origin'}).then(function(r){return r.text();}).then(function(h){
@@ -242,6 +257,32 @@
     return M.docs.map(function(x){var s=0,hit=0;qt.forEach(function(t){var f=x.tf[t];if(f){hit++;s+=M.idf(t)*(f*(k1+1))/(f+k1*(1-b+b*x.t.length/M.avg));}});
       if(x.ask&&x.where==='#faq')s*=1.3;return {x:x,s:s,cover:hit/Math.max(1,qt.length)};}).filter(function(r){return r.s>0;}).sort(function(a,z){return z.s-a.s;});}
 
+  // Questions this site can't answer reliably (distances and travel times, whether your marks are enough, what can
+  // still start next month, the best area to live, a university's exact English score): say so, then hand over.
+  var NEEDS_COUNSELLOR = [
+    [/\b(how far|distance (from|to|between)|how long (does it|will it|would it|to) (take|get|reach|travel|commute)|commut\w*|by (train|bus|metro|tram|mrt|subway|tube|car)|travel time|minutes? (from|to|away)|km (from|to|away)|close to the city|far from)\b/, null,
+      'I can\'t give reliable distances or travel times: they depend on the exact campus and where you\'d live.'],
+    [/\b(next|this|coming) (month|week|few weeks)\b|\bstart\w* (soon|immediately|asap|right away)\b|\b(still|currently) (open|accepting)\b/, null,
+      'Which courses can still take you that soon depends on each university\'s current deadlines and places, which change all the time.'],
+    [/\b\d{2}(\.\d+)? ?(%|percent)|\b(percentage|marks|cgpa|gpa|backlogs?|gap year|study gap|year gap|education gap)\b/, /\b(admission|admit|get in|get into|eligib\w*|accept\w*|apply|qualify|enough|chances?|possible)\b/,
+      'Whether your marks are enough depends on the university, the course and the rest of your profile, so I won\'t guess.'],
+    [/\b(best|good|safe|safest|cheap\w*|nice) (area|areas|suburbs?|neighbou?rhoods?|localit(y|ies)|places?|part of (the )?(city|town)) (to (live|stay)|for students?)\b|\bwhere (should|can|do) (i|students) (live|stay)\b/, null,
+      'The best area to live depends on your campus, budget and lifestyle, and this site doesn\'t compare neighbourhoods.'],
+    [/\b(ielts|pte|toefl|duolingo)\b.*\b(scores?|bands?|minimum)\b|\b(scores?|bands?|minimum)\b.*\b(ielts|pte|toefl|duolingo)\b/, null,
+      'Each university sets its own minimum English test score, and it varies by course, so I won\'t quote one.'],
+    [/\b(distance learning|distance education|online (course|courses|degree|degrees|study|studies|classes|programmes?|programs?)|study online|studying online|remote study)\b/, null,
+      'A student visa is for full-time study on campus, and this site does not cover online or distance courses.']
+  ];
+  // "How do I apply?" (to a university, not for a visa, loan or scholarship): how applying works here, then hand over
+  var APPLY_Q = /\b(how (do|can|should|would|will) (i|we|one|students?) apply|how to apply|application process|admission process|applying (to|for) (a |an |the )?(universit\w*|unis?|college\w*|courses?|programm?e?s?|admissions?)|apply (to|for) (a |an |the )?(universit\w*|unis?|college\w*|courses?|programm?e?s?|admissions?))\b/;
+  function asksHowToApply(q) { return APPLY_Q.test(q) && !/\b(visa|pass|permit|stamp|loans?|scholarships?|bursar\w*|grants?|jobs?|work)\b/.test(q); }
+  function needsCounsellor(q) {
+    for (var i = 0; i < NEEDS_COUNSELLOR.length; i++) { var n = NEEDS_COUNSELLOR[i]; if (n[0].test(q) && (!n[1] || n[1].test(q))) return n[2]; }
+    return '';
+  }
+  // "universities near <a place we know>" is answered by its city instead
+  function namesLandmark(q) { return /b(near|nearby|nearest|close to|closest to|next to|around|walking distance)b/.test(q) && LANDMARKS.some(function (l) { return l.some(function (x) { return x instanceof RegExp && x.test(q); }); }); }
+
   /* ---------- answering ---------- */
   var ctx={inst:null,id:null};
   var FACETS=[['rank',/\b(rank|ranking|rankings|ranked|qs|position)\b/],['web',/\b(website|site|link|url|homepage)\b/],['where',/\b(where|location|located|address|area|campus)\b/],['work',/\b(work|part[- ]?time|job)\b/]];
@@ -252,6 +293,12 @@
     if(/^(hi|hello|hey|hii+|namaste|vanakkam|good (morning|afternoon|evening)|yo)\b[\s!.]*$/.test(q))return topicAnswer(T[0]);
     if(/^(thanks|thank you|thx|cheers|great|awesome|perfect|cool|ok|okay)\b/.test(q))return topicAnswer(T[1]);
     if(/^(bye|goodbye|see you|that'?s all)\b/.test(q))return {text:'Goodbye, and all the best with your plans! When you\'re ready, [reserve your free call](#enquire) or message us on '+WA+'.',id:'bye'};
+    var unsure=!namesLandmark(q)&&needsCounsellor(q);
+    if(unsure){ctx={inst:null,id:null};
+      return {text:unsure+' An advisor can check it for you on a free call: [reserve a call](#enquire) or message us on '+WA+'.',l:['#enquire','Reserve my free call'],s:['Request a callback','Which universities can I apply to?'],id:'none'};}
+    if(asksHowToApply(q)){ctx={inst:null,id:'apply'};
+      return {text:'You apply to each institution directly, online:\n- **Autonomous universities** (NUS, NTU, SMU, SUTD and the others) each run their own admissions portal. For August 2027, NUS takes international applications from **mid-December 2026 to mid-February 2027**\n- **Polytechnics and private institutions** have their own applications, and more than one intake a year\n- Once you accept an offer, your institution registers you in **SOLAR** and you apply for the **Student\'s Pass**\nDeadlines and documents differ by institution and course, so an advisor checks them for your shortlist: [reserve a free call](#enquire).',
+        l:['#enquire','Reserve my free call'],s:['What do I need to apply?','How does the Student\'s Pass work?'],id:'apply'};}
     var facet=(FACETS.filter(function(f){return f[1].test(q);})[0]||[])[0]||null;
     /* institutions by name; two of them is a comparison */
     var hits=instFind(raw);
@@ -262,6 +309,34 @@
     /* a follow-up about the institution just discussed: "and its ranking?", "where is it?" */
     if(ctx.inst&&facet&&qt.length<=3&&(/\b(it|its|there|they|their|and|what about|how about)\b/.test(q)||qt.length<=1)){var c=ctx.inst;
       return {text:instAnswer(c,facet),s:['Tell me about '+c.short,'Request a callback'],id:'inst'};}
+    /* a start month other than August ("programs in the January intake"): only some institutions have one, and the
+       courses change yearly, so this is an advisor's job rather than the August answer */
+    var mon=q.match(/\b(jan(uary)?|feb(ruary)?|mar(ch)?|apr(il)?|june?|july?|sept?(ember)?|oct(ober)?|nov(ember)?|dec(ember)?)\b/);
+    if(mon&&/\b(intakes?|intak\w*|start|starting|batch|session|programs?|programmes?|courses?|admissions?)\b/.test(q)&&!/^aug/.test(mon[1])){
+      var mname=fold(mon[1]);mname={jan:'January',feb:'February',mar:'March',apr:'April',jun:'June',jul:'July',sep:'September',sept:'September',oct:'October',nov:'November',dec:'December'}[mname]||(mname.charAt(0).toUpperCase()+mname.slice(1));
+      ctx={inst:null,id:'when'};
+      return {text:'The autonomous universities (NUS, NTU, SMU, SUTD and the others) take international undergraduates in **August** only. A **'+mname+'** start is offered mainly by private institutions and some polytechnic courses, and which courses run in '+mname+' changes every year, so I can\'t give you a reliable list here.\n\nAn advisor can check the current '+mname+' intakes for your subject, free: [reserve a call](#enquire) or message us on '+WA+'.',
+        l:['#enquire','Reserve my free call'],s:['Request a callback','When should I apply?','List private institutions'],id:'when'};}
+    /* "universities near Gardens by the Bay": match the place to the neighbourhoods on the institution list */
+    var nearQ=/\b(near|nearby|close to|closest to|nearest|next to|walking distance|close by|around|distance from)\b/.test(q);
+    /* without the institution list (the page opened straight from disk, where browsers block reading institutions.html,
+       or a failed load) a named place still gets its neighbourhood, never the general universities answer */
+    if(nearQ&&!(DB&&DB.length)){
+      var spot0=LANDMARKS.filter(function(x){return x[1].test(q);})[0];
+      if(spot0){ctx={inst:null,id:'list'};
+        return {text:'**'+spot0[0]+'** is closest to the institutions in '+spot0[3]+'. I couldn\'t load the institution list just now to name them, so open the [institutions page](institutions.html) and look for those areas, or ask an advisor on your free call.',
+          l:['institutions.html','Browse all 126 institutions'],s:['Request a callback','List the polytechnics'],id:'list'};}
+    }
+    if(nearQ&&DB&&DB.length){
+      var spot=LANDMARKS.filter(function(x){return x[1].test(q);})[0];
+      if(spot){var nl=instSort(DB.filter(function(u){return spot[2].test(u.l||'');}));
+        var nout=instList(nl,'Institutions nearest '+spot[0]);ctx={inst:null,id:'list'};
+        if(nout)return {text:nout+'\nThis goes by neighbourhood ('+spot[3]+'). For travel times from where you\'d live, an advisor can help on your free call.',s:nl.slice(0,2).map(function(u){return 'Tell me about '+u.short;}).concat(['Request a callback']),id:'list'};}
+      else if(!AREAS.some(function(a){return new RegExp('\\b(in|around|near) (the )?'+a+'\\b').test(q);})&&!/\b(rent|cost|costs|price|fees?|accommodation|housing|living)\b/.test(q)&&/\b(unis?|universit\w*|colleges?|institutions?|institutes?|schools?|polytechnics?|polys?|campus(es)?)\b/.test(q)){
+        ctx={inst:null,id:null};
+        return {text:'I can match institutions to a Singapore neighbourhood (for example Orchard, the city centre, Jurong, Tampines or Punggol), but I didn\'t recognise the place in your question. Try naming the area, or ask an advisor: [reserve a free call](#enquire) or message us on '+WA+'.',
+          s:['Universities near Orchard','Universities near Jurong','Request a callback'],id:'none'};}
+    }
     /* whole phrases, where single words would mislead ("how does it work" is not about part-time work) */
     for(var i=0;i<PHR.length;i++)if(PHR[i][0].test(q)){
       if(PHR[i][1]==='self')return {text:'I\'m **Tutee AI**, built from this page and its list of 126 institutions. I can answer questions about universities, applications, the Student\'s Pass, costs, funding and life after graduation. Your questions stay in this browser. For advice on your own profile, say **request a callback** and I\'ll pass your details to an advisor.',s:['Request a callback','Tell me about NUS'],id:'self'};
@@ -408,8 +483,9 @@
     busy=true;input.value='';add('me','<p>'+esc(q)+'</p>');setChips([]);
     history.push({role:'user',text:q});persist();
     var dots=add('bot typing','<span></span><span></span><span></span>'),t0=Date.now();
-    /* institution questions need the list; it is usually loaded by now, and never waits more than a moment */
-    var ready=DB?Promise.resolve():Promise.race([ensureData(),new Promise(function(r){setTimeout(r,1500);})]);
+    /* institution questions need the list; it is usually loaded by now. On a slow phone connection it is worth a few
+       seconds' wait: without it "universities near Gardens by the Bay" gets the general universities answer */
+    var ready=DB?Promise.resolve():Promise.race([ensureData(),new Promise(function(r){setTimeout(r,6000);})]);
     ready.then(function(){var r=leadStep(q);if(r===null)r=answer(q);return r;}).then(null,function(){return {text:'Sorry, I tripped over that one. You can always message us on '+WA+'.'};})
       .then(function(r){setTimeout(function(){dots.remove();
         var msg={role:'bot',text:r.text,l:r.l||null,s:r.s||[]};history.push(msg);persist();add('bot',botHtml(msg));setChips(msg.s);busy=false;},
